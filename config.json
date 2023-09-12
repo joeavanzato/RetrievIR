@@ -1,0 +1,317 @@
+{
+	"files": {
+		"JumpLists": {
+			"recursive": false,
+			"filter": ["*"],
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\Microsoft\\Windows\\Recent\\AutomaticDestinations\\*",
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\Microsoft\\Windows\\Recent\\CustomDestinations\\*"
+			]
+		},
+		"Prefetch": {
+			"filter": ["*.pf"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Windows\\Prefetch\\*"
+			]
+		},
+		"Amcache": {
+			"filter": ["Amcache.*"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Windows\\AppCompat\\Programs\\*"
+			]
+		},
+		"ScheduledTasks": {
+			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\Windows\\System32\\Tasks\\*"
+			]
+		},
+		"ConsoleHistory": {
+			"filter": ["*"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\Microsoft\\Windows\\PowerShell\\PSReadLine\\*"
+			]
+		},
+		"NTUSER_Hives": {
+			"filter": ["NTUSER.DAT"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\*"
+			]
+		},
+		"SRUDB": {
+			"filter": ["srudb.dat"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Windows\\System32\\sru\\*"
+			]
+		},
+		"UAL": {
+			"filter": ["srudb.mdb"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Windows\\System32\\LogFiles\\Sum\\*"
+			]
+		},
+		"LNK": {
+			"filter": ["*"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\Microsoft\\Windows\\Recent\\*",
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\Microsoft\\Office\\Recent\\*"
+			]
+		},
+		"EventLogs": {
+			"filter": [
+				"Security.evtx",
+				"Application.evtx",
+				"System.evtx",
+				"Microsoft-Windows-TaskScheduler%4Operational.evtx",
+				"Microsoft-Windows-PowerShell%4Operational.evtx",
+				"Microsoft-Windows-Shell-Core%4Operational.evtx",
+				"Microsoft-Windows-TerminalServices-*.evtx",
+				"Microsoft-Windows-RemoteDesktopServices-*.evtx"
+			],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Windows\\System32\\winevt\\logs\\*"
+			]
+		},
+		"ProgramCompatAssistant": {
+			"filter": ["PcaAppLaunchDic.txt"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Windows\\AppCompat\\pca\\*"
+			]
+		},
+		"BitmapCache": {
+			"filter": ["bcache*.bmc","cache*.bin"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Microsoft\\Terminal Server Client\\Cache\\*"
+			]
+		},
+		"WinTimeline": {
+			"filter": ["ActivitiesCache.db"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\ConnectedDevicesPlatform\\*\\*"
+			]
+		},
+		"WinSearchIndex": {
+			"filter": ["*"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\ProgramData\\Microsoft\\Search\\Data\\Applications\\Windows\\GatherLogs\\SystemIndex\\*"
+			]
+		},
+		"ThumbCache": {
+			"filter": ["Thumbcache_*"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Microsoft\\Windows\\Explorer\\*"
+			]
+		},
+		"USBSetupAPILog": {
+			"filter": ["setupapi.dev.log"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Windows\\inf\\*"
+			]
+		},
+		"BITSDB": {
+			"filter": ["*.edb,*.dat"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Packages\\Microsoft.Windows.Cortana_*\\AppData\\Indexed DB\\*",
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Packages\\Microsoft.Windows.Cortana_*\\LocalState\\ESEDatabase_CortanaCoreInstance\\*"
+			]
+		},
+		"CortanaDB": {
+			"filter": ["qmgr*"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\ProgramData\\Microsoft\\Network\\Downloader\\*"
+			]
+		},
+		"AntiVirus-Avast": {
+			"filter": ["*"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\ProgramData\\Avast Software\\Avast\\Log\\*",
+				"%HOMEDRIVE%\\ProgramData\\Avast Software\\Avast\\Chest\\*",
+				"%HOMEDRIVE%\\Users\\*\\Avast Software\\Avast\\Log\\*"
+			]
+		},
+		"AntiVirus-BitDefender": {
+			"filter": ["*"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\ProgramData\\BitDefender\\Endpoint Security\\Logs\\*",
+				"%HOMEDRIVE%\\ProgramData\\BitDefender\\Desktop\\Profiles\\Logs\\*"
+			]
+		},
+		"AntiVirus-McAfee": {
+			"filter": ["*"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\ProgramData\\McAfee\\DesktopProtection\\*",
+				"%HOMEDRIVE%\\ProgramData\\McAfee\\Endpoint Security\\Logs\\*",
+				"%HOMEDRIVE%\\ProgramData\\McAfee\\Endpoint Security\\Logs_Old\\*",
+				"%HOMEDRIVE%\\ProgramData\\McAfee\\VirusScan\\*"
+			]
+		},
+		"AntiVirus-Sophos": {
+			"filter": ["*"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\ProgramData\\Sophos\\Sophos*\\Logs\\*"
+			]
+		},
+		"AntiVirus-AVG": {
+			"filter": ["*"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\ProgramData\\AVG\\PersistentData\\Antivirus\\Logs\\*",
+				"%HOMEDRIVE%\\ProgramData\\AVG\\Antivirus\\Reports\\*"
+			]
+		},
+		"AntiVirus-ESET": {
+			"filter": ["*"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\ProgramData\\ESET\\ESET NNOD32 Antivirus\\Logs\\*"
+			]
+		},
+		"AntiVirus-TrendMicro": {
+			"filter": ["*"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\ProgramData\\Trend Micro\\*",
+				"%HOMEDRIVE%\\Program Files*\\Trend Micro\\Security Agent\\Report\\*",
+				"%HOMEDRIVE%\\Program Files*\\Trend Micro\\Security Agent\\ConnLog\\*"
+			]
+		},
+		"AntiVirus-Defender": {
+			"filter": ["MPCmdRun.log"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Windows\\temp\\*",
+				"%HOMEDRIVE%\\Windows.old\\temp\\*"
+			]
+		},
+		"RAT-AnyDesk": {
+			"filter": ["*"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\ProgramData\\AnyDesk\\ad.trace",
+				"%HOMEDRIVE%\\ProgramData\\AnyDesk\\connection_trace.txt",
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\AnyDesk\\ad.trace",
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\AnyDesk\\*.conf"
+			]
+		},
+		"RAT-RealVNC": {
+			"filter": ["*"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\ProgramData\\RealVNC-Service\\vncserver.log",
+				"%HOMEDRIVE%\\ProgramData\\RealVNC-Service\\vncserver.log.bak"
+			]
+		},
+		"RAT-TightVNC": {
+			"filter": ["*"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Windows\\System32\\config\\systemprofile\\AppData\\Roaming\\TightVNC\\tvnserver.log",
+				"%HOMEDRIVE%\\ProgramData\\TightVNC\\tvnserver.log"
+			]
+		},
+		"RAT-UltraVNC": {
+			"filter": ["*"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\ProgramData\\uvnc bvba\\WinVNC.log",
+				"%HOMEDRIVE%\\ProgramData\\uvnc bvba\\mslogon.log"
+			]
+		},
+		"RAT-TeamViewer": {
+			"filter": ["*"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\TeamViewer\\Connections.txt",
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Temp\\TeamViewer\\Connections_incoming.txt",
+				"%HOMEDRIVE%\\Program Files*\\TeamViewer\\Connections_incoming.txt",
+				"%HOMEDRIVE%\\Program Files*\\TeamViewer\\TeamViewer*_Logfile.log",
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\TeamViewer\\Logs\\TeamViewer*_Logfile.log",
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\TeamViewer\\TeamViewer*_Logfile.log"
+			]
+		}
+	},
+	"commands": {
+		"DNSCache": {
+			"command": "Get-NetTcpConnection -ErrorAction SilentlyContinue | Select * | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
+			"output": "DNSCache.csv"
+		},
+		"Services": {
+			"command": "Get-WmiObject win32_service -ErrorAction SilentlyContinue | Select-Object * | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
+			"output": "Services.csv"
+		},
+		"TCPConnections": {
+			"command": "Get-NetTcpConnection -ErrorAction SilentlyContinue | Select * | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
+			"output": "TCPConnections.csv"
+		},
+		"SMBShares": {
+			"command": "Get-SmbShare -ErrorAction SilentlyContinue | Select-Object * | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
+			"output": "SMBShares.csv"
+		},
+		"ScheduledTasksFormatted": {
+			"command": "Get-ScheduledTask -ErrorAction SilentlyContinue | Select-Object * | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
+			"output": "ScheduledTasks.csv"
+		},
+		"DefenderDetections": {
+			"command": "Get-MpThreatDetection -ErrorAction SilentlyContinue | Select-Object * | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
+			"output": "DefenderDetections.csv"
+		},
+		"Startups": {
+			"command": "Get-WMIObject Win32_StartupCommand -ErrorAction SilentlyContinue | Select-Object PSComputerName,Caption,Command,Description,Location,Name,User,UserSID | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
+			"output": "Startups.csv"
+		},
+		"FirewallRules": {
+			"command": "Get-NetFirewallRule -ErrorAction SilentlyContinue | Select * | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
+			"output": "FirewallRules.csv"
+		},
+		"ARPCache": {
+			"command": "Get-NetNeighbor -ErrorAction SilentlyContinue | Select * | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
+			"output": "ARPCache.csv"
+		},
+		"SuspiciousFiles": {
+			"command": "Get-ChildItem -Path %HOMEDRIVE%\\temp,%HOMEDRIVE%\\windows\\system32,%HOMEDRIVE%\\windows\\temp,%HOMEDRIVE%\\Users,%HOMEDRIVE%\\programdata -Include *.htm,*.vbs,*.hta,*.chm,*.exe,*.bat,*.ps1,*.zip,*.gz,*.7z,*.vba,*.ps,*.psm1,*.docm,*.xlsm,*.pptm,*.potm,*.ppam,*.ppsm,*.sldm,*.dotm,*.xltm,*.xlam,*.lnk,*.vb,*.pdf,*.jar,*.msi,*.msp,*.gadget,*.cmd,*.vbe,*.jsp,*.scr,*.rar,*.msh,*.wsh,*.wsf,*.scf -File -Recurse -ErrorAction SilentlyContinue | Where-Object { $_.CreationTime -lt (Get-Date).AddDays(-15) } | Select-Object PSPath, PSParentPath, PSChildName, PSDrive, PSProvider, PSIsContainer, Mode, LinkType, Name, Length, DirectoryName, Directory, IsReadOnly, Exists, FullName, Extension, CreationTime, CreationTimeUtc, LastAccessTime, LastAccessTimeUtc, LastWriteTime, LastWriteTimeUtc | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
+			"output": "SuspiciousFiles.csv"
+		},
+		"InstalledSoftware": {
+			"command": "Get-WmiObject -Class Win32_Product | Select Name,Version,InstallState,Caption,Description,InstallDate,InstallLocation,InstallSource,LocalPackage,PackageName,Vendor | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
+			"output": "InstalledSoftware.csv"
+		},
+		"ActiveScriptConsumers": {
+			"command": "Get-WmiObject ActiveScriptEventConsumer -Namespace root\\subscription  -ErrorAction SilentlyContinue | Select-Object * | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
+			"output": "ActiveScriptConsumers.csv"
+		},
+		"CommandLineConsumers": {
+			"command": "Get-WmiObject CommandLineEventConsumer -Namespace root\\subscription  -ErrorAction SilentlyContinue | Select-Object * | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
+			"output": "CommandLineEventConsumers.csv"
+		},
+		"RunningProcesses": {
+			"command": "Get-WmiObject Win32_Process -ErrorAction SilentlyContinue | Select-Object * | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
+			"output": "RunningProcesses.csv"
+		}
+	},
+	"registry": {
+		"path": "HKEY_USERS\\*\\SOFTWARE\\Microsoft\\Terminal Server Client\\Servers",
+		"recursive": true,
+		"keys": ["UsernameHint"]
+	}
+}

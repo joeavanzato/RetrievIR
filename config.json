@@ -1,14 +1,17 @@
 {
 	"files": {
 		"JumpLists": {
+			"category": "RecentFiles",
 			"recursive": false,
 			"filter": ["*"],
 			"paths": [
 				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\Microsoft\\Windows\\Recent\\AutomaticDestinations\\*",
 				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\Microsoft\\Windows\\Recent\\CustomDestinations\\*"
-			]
+			],
+			"dir_removals": 8
 		},
 		"Prefetch": {
+			"category": "RecentFiles",
 			"filter": ["*.pf"],
 			"recursive": false,
 			"paths": [
@@ -16,13 +19,74 @@
 			]
 		},
 		"Amcache": {
-			"filter": ["Amcache.*"],
+			"category": "RecentFiles",
+			"filter": ["Amcache.*","EncapsulationLogging.*"],
 			"recursive": false,
 			"paths": [
 				"%HOMEDRIVE%\\Windows\\AppCompat\\Programs\\*"
 			]
 		},
+		"ShimSDB": {
+			"category": "Windows",
+			"filter": ["*.sdb"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Windows\\apppatch\\Custom\\*",
+				"%HOMEDRIVE%\\Windows\\apppatch\\Custom\\Custom64\\*"
+			],
+			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/SDB.tkape"
+		},
+		"DeletedWindowsAppX": {
+			"category": "AppX",
+			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\Program Files\\WindowsApps\\Deleted*\\*"
+			]
+		},
+		"InstalledSystemAppX": {
+			"category": "AppX",
+			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\Windows\\SystemApps\\*"
+			]
+		},
+		"InstalledUserAppX": {
+			"category": "AppX",
+			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Packages\\*"
+			]
+		},
+		"AppXStateRepository": {
+			"category": "AppX",
+			"filter": ["StateRepository-*.srd"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\ProgramData\\Microsoft\\Windows\\AppRepository\\Packages\\*"
+			]
+		},
+		"AppXProgramData": {
+			"category": "AppX",
+			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\ProgramData\\Packages\\*"
+			]
+		},
+		"AssetAdvisorLog": {
+			"category": "RecentFiles",
+			"filter": ["EncapsulationLogging.hve"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\Windows\\CCM\\Logs\\*"
+			],
+			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/AssetAdvisorLog.tkape"
+		},
 		"ScheduledTasks": {
+			"category": "Windows",
 			"filter": ["*"],
 			"recursive": true,
 			"paths": [
@@ -30,13 +94,228 @@
 			]
 		},
 		"ConsoleHistory": {
+			"category": "PowerShell",
 			"filter": ["*"],
 			"recursive": false,
 			"paths": [
 				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\Microsoft\\Windows\\PowerShell\\PSReadLine\\*"
 			]
 		},
+		"WindowsDrivers": {
+			"category": "Windows",
+			"filter": ["*.sys"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Windows\\System32\\drivers\\*"
+			]
+		},
+		"RecycleBin": {
+			"category": "RecentFiles",
+			"filter": ["$I*", "$R*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\$Recycle.Bin\\*"
+			]
+		},
+		"RecentFileCache": {
+			"category": "RecentFiles",
+			"filter": ["RecentFileCache.bcf"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Windows\\AppCompat\\Programs\\*"
+			]
+		},
+		"RDPCacheFiles": {
+			"category": "RDP",
+			"filter": ["*"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Microsoft\\Terminal Server Client\\Cache\\*"
+			]
+		},
+		"NETCLRUsageLogs": {
+			"category": "Windows",
+			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Microsoft\\CLR_*\\UsageLogs\\*"
+			],
+			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/NETCLRUsageLogs.tkape"
+		},
+		"Minidumps": {
+			"category": "Windows",
+			"filter": ["*.dmp"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\Windows\\Minidump\\*"
+			],
+			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/MemoryFiles.tkape"
+		},
+		"SystemLogFiles": [
+			{
+			"category": "Windows",
+			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\Windows\\System32\\LogFiles\\*"
+			],
+			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/LogFiles.tkape"
+			},
+			{
+			"category": "Windows",
+			"filter": ["PFRO.log"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Windows\\*"
+			],
+			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/LogFiles.tkape"
+			}
+		],
+		"MOFs": {
+			"category": "WMI",
+			"filter": ["*.MOF"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\*"
+			],
+			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/MOF.tkape"
+		},
+		"LinuxOnWindows": {
+			"category": "Linux",
+			"filter": [".bash_history",".bash_logout",".bashrc",".profile"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Packages\\*\\LocalState\\rootfs\\home\\*\\*"
+			],
+			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/LinuxOnWindowsProfileFiles.tkape"
+		},
+		"EventTranscript": {
+			"category": "Windows",
+			"filter": ["EventTranscript.db"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\ProgramData\\Microsoft\\Diagnosis\\EventTranscript\\*"
+			],
+			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/EventTranscriptDB.tkape"
+		},
+		"EventTrace": [
+			{
+			"category": "WDI",
+			"filter": ["*.etl"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Windows\\System32\\WDI\\LogFiles\\*"
+			],
+			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/EventTraceLogs.tkape"
+			},
+			{
+			"category": "WDI",
+			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\Windows\\System32\\WDI\\LogFiles\\{*\\*"
+			],
+			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/EventTraceLogs.tkape"
+			},
+			{
+			"category": "WMI",
+			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\Windows\\System32\\LogFiles\\WMI\\*"
+			],
+			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/EventTraceLogs.tkape"
+			}
+		],
+		"OfficeBackstage": {
+			"category": "Office",
+			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Microsoft\\Office\\*\\BackstageinAppNavCache\\*"
+			],
+			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/MicrosoftOfficeBackstage.tkape"
+		},
+		"OfficeDocumentCache": {
+			"category": "Office",
+			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Microsoft\\Office\\*\\OfficeFileCache\\*"
+			]
+		},
+		"OfficeDiagnostics": [
+			{
+			"category": "Office",
+			"filter": ["PCW.debugreport.xml"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Diagnostics\\*",
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\ElevatedDiagnostics\\*"
+			]
+			},
+			{
+			"category": "Office",
+			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\temp\\Diagnostics\\*"
+			]
+			}
+		],
+		"OfficeAutosaves": {
+			"category": "Office",
+			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\Microsoft\\Word\\*",
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\Microsoft\\Excel\\*",
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\Microsoft\\Powerpoint\\*",
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\Microsoft\\Publisher\\*"
+			],
+			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/OfficeAutosave.tkape"
+		},
+		"WindowsPushNotificationService": {
+			"category": "Windows",
+			"filter": ["appdb.dat","wpndatabase.db"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Microsoft\\Windows\\Notifications\\*"
+			]
+		},
+		"PowerShell7Config": {
+			"category": "PowerShell",
+			"filter": ["powershell.config.json"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Program Files\\PowerShell\\7\\*"
+			]
+		},
+		"PowerShellTranscripts": {
+			"category": "PowerShell",
+			"filter": ["PowerShell_transcript.*.txt"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\Documents\\20*\\",
+				"%HOMEDRIVE%\\Windows\\SysWOW64\\*\\*",
+				"%HOMEDRIVE%\\Windows\\System32\\*\\*",
+				"%HOMEDRIVE%\\Program Files\\Amazon\\Ec2ConfigService\\Scripts\\*\\*"
+			],
+			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/PowerShellTranscripts.tkape"
+		},
+		"CertutilCache": {
+			"category": "Windows",
+			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\Windows\\System32\\config\\systemprofile\\AppData\\LocalLow\\Microsoft\\CryptnetUrlCache\\*",
+				"%HOMEDRIVE%\\Users\\*\\AppData\\LocalLow\\Microsoft\\CryptnetUrlCache\\*",
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Microsoft\\Windows\\INetCache\\IE\\*"
+			],
+			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/CertUtil.tkape"
+		},
 		"NTUSER_Hives": {
+			"category": "Users",
 			"filter": ["NTUSER.DAT"],
 			"recursive": false,
 			"paths": [
@@ -44,6 +323,7 @@
 			]
 		},
 		"SRUDB": {
+			"category": "RecentFiles",
 			"filter": ["srudb.dat"],
 			"recursive": false,
 			"paths": [
@@ -51,21 +331,101 @@
 			]
 		},
 		"UAL": {
-			"filter": ["srudb.mdb"],
+			"category": "RecentFiles",
+			"filter": ["*.mdb"],
 			"recursive": false,
 			"paths": [
 				"%HOMEDRIVE%\\Windows\\System32\\LogFiles\\Sum\\*"
 			]
 		},
+		"SignatureCatalog": {
+			"category": "Windows",
+			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\Windows\\System32\\CatRoot\\*"
+			],
+			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/SignatureCatalog.tkape"
+		},
+		"StartupFolders": {
+			"category": "Windows",
+			"filter": ["*"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\*",
+				"%HOMEDRIVE%\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\StartUp\\*"
+			],
+			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/StartupFolders.tkape"
+		},
+		"StartupXML": {
+			"category": "Windows",
+			"filter": ["*.xml"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Windows\\System32\\WDI\\LogFiles\\StartupInfo\\*"
+			],
+			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/StartupInfo.tkape"
+		},
+		"SnipCache": {
+			"category": "RecentFiles",
+			"filter": ["*.png"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Packages\\Microsoft.ScreenSketch_*\\TempState\\*"
+			],
+			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/SnipAndSketch.tkape"
+		},
 		"LNK": {
+			"category": "RecentFiles",
 			"filter": ["*"],
 			"recursive": false,
 			"paths": [
 				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\Microsoft\\Windows\\Recent\\*",
-				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\Microsoft\\Office\\Recent\\*"
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\Microsoft\\Office\\Recent\\*",
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\Microsoft\\Start Menu\\Programs\\*",
+				"%HOMEDRIVE%\\Users\\*\\Desktop\\*",
+				"%HOMEDRIVE%\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\*"
 			]
 		},
+		"IISConfigs": {
+			"category": "IIS",
+			"filter": ["applicationHost.config","administration.config","redirection.config","web.config"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Windows\\System32\\inetsrv\\config\\*",
+				"%HOMEDRIVE%\\inetpub\\wwwroot\\*"
+			],
+			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/IISConfiguration.tkape"
+		},
+		"GroupPolicyFiles": {
+			"category": "Windows",
+			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\Windows\\System32\\grouppolicy\\*"
+			],
+			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/GroupPolicy.tkape"
+		},
+		"ComputerGroupPolicyFiles": {
+			"category": "Windows",
+			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\ProgramData\\Microsoft\\Group Policy\\History\\*"
+			],
+			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/GroupPolicy.tkape"
+		},
+		"UserGroupPolicyFiles": {
+			"category": "Windows",
+			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Microsoft\\Group Policy\\History\\*"
+			],
+			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/GroupPolicy.tkape"
+		},
 		"EventLogs": {
+			"category": "Windows",
 			"filter": [
 				"Security.evtx",
 				"Application.evtx",
@@ -82,6 +442,7 @@
 			]
 		},
 		"ProgramCompatAssistant": {
+			"category": "RecentFiles",
 			"filter": ["PcaAppLaunchDic.txt"],
 			"recursive": false,
 			"paths": [
@@ -89,6 +450,7 @@
 			]
 		},
 		"BitmapCache": {
+			"category": "RecentFiles",
 			"filter": ["bcache*.bmc","cache*.bin"],
 			"recursive": false,
 			"paths": [
@@ -96,6 +458,7 @@
 			]
 		},
 		"WinTimeline": {
+			"category": "Windows",
 			"filter": ["ActivitiesCache.db"],
 			"recursive": false,
 			"paths": [
@@ -103,6 +466,7 @@
 			]
 		},
 		"WinSearchIndex": {
+			"category": "Windows",
 			"filter": ["*"],
 			"recursive": false,
 			"paths": [
@@ -110,6 +474,7 @@
 			]
 		},
 		"ThumbCache": {
+			"category": "RecentFiles",
 			"filter": ["Thumbcache_*"],
 			"recursive": false,
 			"paths": [
@@ -117,28 +482,91 @@
 			]
 		},
 		"USBSetupAPILog": {
-			"filter": ["setupapi.dev.log"],
+			"category": "Windows",
+			"filter": ["setupapi.*.log", "setupapi.log"],
 			"recursive": false,
 			"paths": [
-				"%HOMEDRIVE%\\Windows\\inf\\*"
+				"%HOMEDRIVE%\\Windows\\inf\\*",
+				"%HOMEDRIVE%\\Windows\\*"
+			],
+			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/USBDevicesLogs.tkape"
+		},
+		"WBEM": {
+			"category": "Windows",
+			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\Windows\\System32\\wbem\\Repository\\*"
+			],
+			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/WBEM.tkape"
+		},
+		"etc": {
+			"category": "Windows",
+			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\Windows\\System32\\drivers\\etc\\*"
 			]
 		},
-		"BITSDB": {
+		"Win10NotificationDB": {
+			"category": "Windows",
+			"filter": ["wpndatabase.db","appdb.dat"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Microsoft\\Windows\\Notifications\\*"
+			]
+		},
+		"WER": [
+			{
+			"category": "Windows",
+			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\ProgramData\\Microsoft\\Windows\\WER\\*",
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Microsoft\\Windows\\WER\\*"
+			],
+			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/WER.tkape"
+			},
+			{
+			"category": "Windows",
+			"filter": ["*.dmp"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\CrashDumps\\*",
+				"%HOMEDRIVE%\\Windows\\*"
+			],
+			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/WER.tkape"
+			}
+		],
+		"BITS": [
+			{
+			"category": "Windows",
 			"filter": ["*.edb,*.dat"],
 			"recursive": false,
 			"paths": [
 				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Packages\\Microsoft.Windows.Cortana_*\\AppData\\Indexed DB\\*",
 				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Packages\\Microsoft.Windows.Cortana_*\\LocalState\\ESEDatabase_CortanaCoreInstance\\*"
 			]
-		},
+			},
+			{
+			"category": "Windows",
+			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\ProgramData\\Microsoft\\Network\\Downloader\\*"
+			]
+			}
+		],
 		"CortanaDB": {
+			"category": "Windows",
 			"filter": ["qmgr*"],
 			"recursive": false,
 			"paths": [
 				"%HOMEDRIVE%\\ProgramData\\Microsoft\\Network\\Downloader\\*"
 			]
 		},
-		"AntiVirus-Avast": {
+		"Avast": {
+			"category": "AntiVirus",
 			"filter": ["*"],
 			"recursive": false,
 			"paths": [
@@ -147,7 +575,8 @@
 				"%HOMEDRIVE%\\Users\\*\\Avast Software\\Avast\\Log\\*"
 			]
 		},
-		"AntiVirus-BitDefender": {
+		"BitDefender": {
+			"category": "AntiVirus",
 			"filter": ["*"],
 			"recursive": false,
 			"paths": [
@@ -155,7 +584,9 @@
 				"%HOMEDRIVE%\\ProgramData\\BitDefender\\Desktop\\Profiles\\Logs\\*"
 			]
 		},
-		"AntiVirus-McAfee": {
+		"McAfee": [
+			{
+			"category": "AntiVirus",
 			"filter": ["*"],
 			"recursive": false,
 			"paths": [
@@ -164,30 +595,46 @@
 				"%HOMEDRIVE%\\ProgramData\\McAfee\\Endpoint Security\\Logs_Old\\*",
 				"%HOMEDRIVE%\\ProgramData\\McAfee\\VirusScan\\*"
 			]
-		},
-		"AntiVirus-Sophos": {
+			}
+		],
+		"Sophos": {
+			"category": "AntiVirus",
 			"filter": ["*"],
 			"recursive": false,
 			"paths": [
 				"%HOMEDRIVE%\\ProgramData\\Sophos\\Sophos*\\Logs\\*"
 			]
 		},
-		"AntiVirus-AVG": {
+		"AVG": [
+			{
+			"category": "AntiVirus",
 			"filter": ["*"],
-			"recursive": false,
+			"recursive": true,
 			"paths": [
 				"%HOMEDRIVE%\\ProgramData\\AVG\\PersistentData\\Antivirus\\Logs\\*",
+				"%HOMEDRIVE%\\ProgramData\\AVG\\Antivirus\\log\\*",
 				"%HOMEDRIVE%\\ProgramData\\AVG\\Antivirus\\Reports\\*"
 			]
-		},
-		"AntiVirus-ESET": {
+			},
+			{
+			"category": "AntiVirus",
+			"filter": ["FileInfo2.db","lsdb2.json"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\ProgramData\\AVG\\Antivirus\\*"
+			]
+			}
+		],
+		"ESET": {
+			"category": "AntiVirus",
 			"filter": ["*"],
 			"recursive": false,
 			"paths": [
 				"%HOMEDRIVE%\\ProgramData\\ESET\\ESET NNOD32 Antivirus\\Logs\\*"
 			]
 		},
-		"AntiVirus-TrendMicro": {
+		"TrendMicro": {
+			"category": "AntiVirus",
 			"filter": ["*"],
 			"recursive": false,
 			"paths": [
@@ -196,7 +643,8 @@
 				"%HOMEDRIVE%\\Program Files*\\Trend Micro\\Security Agent\\ConnLog\\*"
 			]
 		},
-		"AntiVirus-Defender": {
+		"Defender": {
+			"category": "AntiVirus",
 			"filter": ["MPCmdRun.log"],
 			"recursive": false,
 			"paths": [
@@ -204,7 +652,8 @@
 				"%HOMEDRIVE%\\Windows.old\\temp\\*"
 			]
 		},
-		"RAT-AnyDesk": {
+		"AnyDesk": {
+			"category": "RemoteAccessTools",
 			"filter": ["*"],
 			"recursive": false,
 			"paths": [
@@ -214,7 +663,8 @@
 				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\AnyDesk\\*.conf"
 			]
 		},
-		"RAT-RealVNC": {
+		"RealVNC": {
+			"category": "RemoteAccessTools",
 			"filter": ["*"],
 			"recursive": false,
 			"paths": [
@@ -222,7 +672,8 @@
 				"%HOMEDRIVE%\\ProgramData\\RealVNC-Service\\vncserver.log.bak"
 			]
 		},
-		"RAT-TightVNC": {
+		"TightVNC": {
+			"category": "RemoteAccessTools",
 			"filter": ["*"],
 			"recursive": false,
 			"paths": [
@@ -230,7 +681,8 @@
 				"%HOMEDRIVE%\\ProgramData\\TightVNC\\tvnserver.log"
 			]
 		},
-		"RAT-UltraVNC": {
+		"UltraVNC": {
+			"category": "RemoteAccessTools",
 			"filter": ["*"],
 			"recursive": false,
 			"paths": [
@@ -238,7 +690,8 @@
 				"%HOMEDRIVE%\\ProgramData\\uvnc bvba\\mslogon.log"
 			]
 		},
-		"RAT-TeamViewer": {
+		"TeamViewer": {
+			"category": "RemoteAccessTools",
 			"filter": ["*"],
 			"recursive": false,
 			"paths": [
@@ -253,65 +706,82 @@
 	},
 	"commands": {
 		"DNSCache": {
+			"category": "Network",
 			"command": "Get-NetTcpConnection -ErrorAction SilentlyContinue | Select * | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
 			"output": "DNSCache.csv"
 		},
 		"Services": {
+			"category": "Windows",
 			"command": "Get-WmiObject win32_service -ErrorAction SilentlyContinue | Select-Object * | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
 			"output": "Services.csv"
 		},
 		"TCPConnections": {
+			"category": "Network",
 			"command": "Get-NetTcpConnection -ErrorAction SilentlyContinue | Select * | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
 			"output": "TCPConnections.csv"
 		},
 		"SMBShares": {
+			"category": "Network",
 			"command": "Get-SmbShare -ErrorAction SilentlyContinue | Select-Object * | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
 			"output": "SMBShares.csv"
 		},
 		"ScheduledTasksFormatted": {
+			"category": "Windows",
 			"command": "Get-ScheduledTask -ErrorAction SilentlyContinue | Select-Object * | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
 			"output": "ScheduledTasks.csv"
 		},
-		"DefenderDetections": {
+		"Defender": {
+			"category": "AntiVirus",
 			"command": "Get-MpThreatDetection -ErrorAction SilentlyContinue | Select-Object * | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
 			"output": "DefenderDetections.csv"
 		},
 		"Startups": {
+			"category": "Windows",
 			"command": "Get-WMIObject Win32_StartupCommand -ErrorAction SilentlyContinue | Select-Object PSComputerName,Caption,Command,Description,Location,Name,User,UserSID | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
 			"output": "Startups.csv"
 		},
 		"FirewallRules": {
+			"category": "Network",
 			"command": "Get-NetFirewallRule -ErrorAction SilentlyContinue | Select * | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
 			"output": "FirewallRules.csv"
 		},
 		"ARPCache": {
+			"category": "Network",
 			"command": "Get-NetNeighbor -ErrorAction SilentlyContinue | Select * | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
 			"output": "ARPCache.csv"
 		},
 		"SuspiciousFiles": {
+			"category": "RecentFiles",
 			"command": "Get-ChildItem -Path %HOMEDRIVE%\\temp,%HOMEDRIVE%\\windows\\system32,%HOMEDRIVE%\\windows\\temp,%HOMEDRIVE%\\Users,%HOMEDRIVE%\\programdata -Include *.htm,*.vbs,*.hta,*.chm,*.exe,*.bat,*.ps1,*.zip,*.gz,*.7z,*.vba,*.ps,*.psm1,*.docm,*.xlsm,*.pptm,*.potm,*.ppam,*.ppsm,*.sldm,*.dotm,*.xltm,*.xlam,*.lnk,*.vb,*.pdf,*.jar,*.msi,*.msp,*.gadget,*.cmd,*.vbe,*.jsp,*.scr,*.rar,*.msh,*.wsh,*.wsf,*.scf -File -Recurse -ErrorAction SilentlyContinue | Where-Object { $_.CreationTime -lt (Get-Date).AddDays(-15) } | Select-Object PSPath, PSParentPath, PSChildName, PSDrive, PSProvider, PSIsContainer, Mode, LinkType, Name, Length, DirectoryName, Directory, IsReadOnly, Exists, FullName, Extension, CreationTime, CreationTimeUtc, LastAccessTime, LastAccessTimeUtc, LastWriteTime, LastWriteTimeUtc | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
 			"output": "SuspiciousFiles.csv"
 		},
 		"InstalledSoftware": {
+			"category": "Windows",
 			"command": "Get-WmiObject -Class Win32_Product | Select Name,Version,InstallState,Caption,Description,InstallDate,InstallLocation,InstallSource,LocalPackage,PackageName,Vendor | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
 			"output": "InstalledSoftware.csv"
 		},
 		"ActiveScriptConsumers": {
+			"category": "WMI",
 			"command": "Get-WmiObject ActiveScriptEventConsumer -Namespace root\\subscription  -ErrorAction SilentlyContinue | Select-Object * | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
 			"output": "ActiveScriptConsumers.csv"
 		},
 		"CommandLineConsumers": {
+			"category": "WMI",
 			"command": "Get-WmiObject CommandLineEventConsumer -Namespace root\\subscription  -ErrorAction SilentlyContinue | Select-Object * | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
 			"output": "CommandLineEventConsumers.csv"
 		},
 		"RunningProcesses": {
+			"category": "Windows",
 			"command": "Get-WmiObject Win32_Process -ErrorAction SilentlyContinue | Select-Object * | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
 			"output": "RunningProcesses.csv"
 		}
 	},
 	"registry": {
-		"path": "HKEY_USERS\\*\\SOFTWARE\\Microsoft\\Terminal Server Client\\Servers",
-		"recursive": true,
-		"keys": ["UsernameHint"]
+		"RDPCache": {
+			"category": "RDP",
+			"paths": ["HKEY_USERS\\*\\SOFTWARE\\Microsoft\\Terminal Server Client\\Servers"],
+			"recursive": true,
+			"keys": ["UsernameHint"]
+		}
 	}
 }

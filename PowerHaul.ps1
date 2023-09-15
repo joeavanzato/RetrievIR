@@ -228,7 +228,7 @@ function Start-Jobs ($computer_targets){
         Log-Message "[+] Targeting: $target"
         $current_evidence_dir = $evidence_dir + "\" + $target
         Create-Directory $current_evidence_dir
-        $status = Create-Shadow $target
+        #$status = Create-Shadow $target
         if ($status -eq 1){
             Log-Message "[!] [$target] Shadow Created Successfully!"
             Get-Files $target $current_evidence_dir $true
@@ -237,64 +237,121 @@ function Start-Jobs ($computer_targets){
             Get-Files $target $current_evidence_dir $false
         }
         Run-Commands $target $current_evidence_dir
-        Delete-Shadow $target
+        Get-Registry $target $current_evidence_dir
+        #Delete-Shadow $target
     }
+}
+
+function Remove-Front-Dirs ($path, $count, $tmp_dir){
+    # Receives a fully-qualified path to a file as well as a count of how many 'segments' should be removed from the front
+    # Helps with 'relative' copy-paste operations where we want to maintain a certain structure beyond a point.
+    # For example, passing "C:\Windows\App\Test\icon.png",3 will return "Test\icon.png"
+    # Passing "C:\Windows\App\Test\icon.png",2 would return "App\Test\icon.png"
+    $removes = 0
+    $max_index = $count - 1 + 4
+    $split_path = $path.Split("\")
+    For ($counter=0; $counter -lt $max_index; $counter++){
+        $first, $split_path = $split_path
+    }
+    $new_path = ""
+    $last_element = $split_path[-1]
+    ForEach($path_element in $split_path){
+        if ($path_element -eq $last_element){
+            $new_path += $path_element
+        } else {
+            $new_path += $path_element + "\"
+            $tmp_dir_evidence = $tmp_dir + "\" + $new_path.Trim("\")
+            Create-Directory $tmp_dir_evidence
+        }
+    }
+    #$new_path = $new_path.Trim("\")
+    return $new_path
+
 }
 
 function Get-Files ($target, $current_evidence_dir, $root_replace) {
     # TODO - Make user dir for any path which falls under C:\users\ and use as appropriate as base evidence directory
-    ForEach ($item in $global_configuration.config.files){
-        $obj_names = $item.psobject.Properties.Name
+    ForEach ($object in $global_configuration.config.files){
+        $obj_names = $object.psobject.Properties.Name
         ForEach ($category in $obj_names){
             Log-Message "[+] [$target] Collecting: $category"
-            $file_evidence_dir = $current_evidence_dir + "\" + $category
-            ForEach ($path in $item.$category.paths){
-                if ($root_replace){
-                    $tmp_path = $path -replace ("%HOMEDRIVE%", "\\$target\C$\$shadowcopy_name")
-                } else {
-                    $tmp_path = $path -replace ("%HOMEDRIVE%", "\\$target\C$")
-                }
-                if ($global_configuration.credential){
-                    Write-Host "CREDS"
-                    # TODO - possibly map drive but probably not required in most situations if access is already present.
-                }
-
-                try {
-                    $file_list = New-Object -TypeName "System.Collections.ArrayList"
-                    ForEach ($filter in $item.$category.filter){
-                        $files = $null
-                        if ($item.$category.recursive){
-                            $files = Get-ChildItem -Path "$tmp_path" -Recurse -Filter $filter -Force -ErrorVariable FailedItems -ErrorAction SilentlyContinue | Where {! $_.PSIsContainer }
+            ForEach ($item in $object.$category){
+                ForEach ($directive in $item){
+                    $file_evidence_dir = $current_evidence_dir + "\" + $directive.category + "\" + $category
+                    ForEach ($path in $directive.paths){
+                        if ($root_replace){
+                            $tmp_path = $path -replace ("%HOMEDRIVE%", "\\$target\C$\$shadowcopy_name")
                         } else {
-                            $files = Get-ChildItem -Path "$tmp_path" -Filter $filter -Force -ErrorVariable FailedItems -ErrorAction SilentlyContinue | Where {! $_.PSIsContainer }
+                            $tmp_path = $path -replace ("%HOMEDRIVE%", "\\$target\C$")
                         }
-                        foreach ($f in $files){
-                            $file_list.Add($f) | Out-Null
+                        $path_replace = $tmp_path -replace ("\*",".*")
+                        if ($global_configuration.credential){
+                            Write-Host "CREDS"
+                            # TODO - possibly map drive but probably not required in most situations if access is already present.
                         }
-                    }
-                } catch {
-                    Log-Message "Error Processing Path: $tmp_path" $true
-                }
-                if ($file_list.Count -ne 0){
-                    Create-Directory $file_evidence_dir
-                }
-                ForEach ($file in $file_list){
-                    # If the file we are attempting to copy exists under a specific user directory (Jumplists, etc) then we will store it under the relevant users name - $evidence_dir\jumplists\$USERNAME\$file
-                    try {
-                        if ($($file.FullName) -match ".*\\users\\(?<user>[^\\]*)\\.*"){
-                            $tmp_user_evidence_dir = $file_evidence_dir + "\" + $Matches.user
-                            Create-Directory $tmp_user_evidence_dir
-                            Copy-Item "$($file.FullName)" "$tmp_user_evidence_dir" -Force
-                        } else {
-                            Copy-Item "$($file.FullName)" "$file_evidence_dir" -Force
+                        try {
+                            $file_list_map = @{}
+                            $file_list = New-Object -TypeName "System.Collections.ArrayList"
+                            ForEach ($filter in $directive.filter){
+                                $files = $null
+                                if ($directive.recursive){
+                                    $files = Get-ChildItem -Path "$tmp_path" -Recurse -Filter $filter -Force -ErrorVariable FailedItems -ErrorAction SilentlyContinue #| Where {! $_.PSIsContainer }
+                                } else {
+                                    $files = Get-ChildItem -Path "$tmp_path" -Filter $filter -Force -ErrorVariable FailedItems -ErrorAction SilentlyContinue #| Where {! $_.PSIsContainer }
+                                }
+                                foreach ($f in $files){
+                                    $file_list.Add($f) | Out-Null
+                                }
+                            }
+                        } catch {
+                            Log-Message "Error Processing Path: $tmp_path" $true
                         }
-                    } catch{
-                        Log-Message "[!] Error copying file: $($file.FullName)" $true
+                        if ($file_list.Count -ne 0){
+                            Create-Directory $file_evidence_dir
+                        }
+                        ForEach ($file in $file_list){
+                            # If the file we are attempting to copy exists under a specific user directory (Jumplists, etc) then we will store it under the relevant users name - $evidence_dir\jumplists\$USERNAME\$file
+                            try {
+                                if ($($file.FullName) -match ".*\\users\\(?<user>[^\\]*)\\.*"){
+                                    $tmp_user_evidence_dir = $file_evidence_dir + "\" + $Matches.user
+                                    Create-Directory $tmp_user_evidence_dir
+                                    if ($directive.dir_removals){
+                                        $new_dest_path = Remove-Front-Dirs $file.FullName $directive.dir_removals $tmp_user_evidence_dir
+                                        $dest_path = $tmp_user_evidence_dir + "\" + $new_dest_path
+                                    } else {
+                                        $dest_path = $tmp_user_evidence_dir
+                                    }
+                                    Copy-Item "$($file.FullName)" "$dest_path" -Force
+                                } else {
+                                    if ($directive.dir_removals){
+                                        $dest_path = Remove-Front-Dirs $file.FullName $directive.dir_removals $file_evidence_dir
+                                    } else {
+                                        $dest_path = $file_evidence_dir
+                                    }
+                                    Copy-Item "$($file.FullName)" "$dest_path" -Force
+                                }
+                            } catch{
+                                Log-Message "[!] Error copying file: $($file.FullName)" $true
+                            }
+                        }
                     }
                 }
             }
         }
     }
+}
+
+function Build-Command-Script ($initial_command, $output){
+    $command = $initial_command -replace ("#FILEPATH#", $output)
+    $command_bytes = [System.Text.Encoding]::Unicode.GetBytes($command)
+    $commandb64 = [Convert]::ToBase64String($command_bytes)
+    $command_final = "powershell.exe -NoLogo -NonInteractive -ExecutionPolicy Unrestricted -WindowStyle Hidden -EncodedCommand " + $commandb64
+    return $command_final
+}
+
+function Execute-WMI-Command ($command, $target){
+    $command_start = Invoke-WmiMethod -ComputerName $target -Credential $global_configuration.credential -Class Win32_Process -Name Create -ArgumentList "$command_final"
+    return $command_start
 }
 
 function Run-Commands ($target, $current_evidence_dir) {
@@ -309,16 +366,14 @@ function Run-Commands ($target, $current_evidence_dir) {
         $obj_names = $item.psobject.Properties.Name
         ForEach ($category in $obj_names){
             Log-Message "[+] [$target] Collecting: $category"
-            $cmd_evidence_dir = $current_evidence_dir + "\" + $category
+            $cmd_evidence_dir = $current_evidence_dir + "\" + $item.$category.category + "\" + $category
             Create-Directory $cmd_evidence_dir
             $final_name = $($item.$category.output)
             $stamp = (Get-Date).toString("HH:mm:ss") -replace (":","_")
+            # Assuming C$ is accessible drive here
             $tmp_name = "\\$target\C$\Windows\temp\$stamp`_$($item.$category.output)"
-            $command = $item.$category.command -replace ("#FILEPATH#", $tmp_name)
-            $command_bytes = [System.Text.Encoding]::Unicode.GetBytes($command)
-            $commandb64 = [Convert]::ToBase64String($command_bytes)
-            $command_final = "powershell.exe -NoLogo -NonInteractive -ExecutionPolicy Unrestricted -WindowStyle Hidden -EncodedCommand " + $commandb64
-            $command_start = Invoke-WmiMethod -ComputerName $target -Credential $global_configuration.credential -Class Win32_Process -Name Create -ArgumentList "$command_final"
+            $command_final = Build-Command-Script $item.$category.command $tmp_name
+            $command_start = Execute-WMI-Command $command_final $target
             if ($command_start.ReturnValue -eq 0){
                 $target_files[$category] = $tmp_name
                 $copy_location[$category] = $cmd_evidence_dir + "\" + $final_name
@@ -355,6 +410,60 @@ function Run-Commands ($target, $current_evidence_dir) {
                 Log-Message "[+] $($i.Name)"
             }
             break
+        }
+    }
+}
+
+function Get-Registry ($target, $current_evidence_dir) {
+    # There are typically 3 classic ways to read the registry of a remote device:
+    # 1 - InvokeCommand with classic PowerShell - requires WinRM, basically a non-starter for most endpoints
+    # 2 - WMI Built-Ins - Doable as long as WMI is available (mostly it is), but limited.
+    # 3 - Remote Registry Service - This is typically disabled by default but we could check the state via WMI, enable then re-disable once we are done collecting data.
+    # 4 - We could take a similar approach as for running commands - package each registry check into a command, pass it via WMI and check for an output file - this will be the easiest and most flexible way.
+    # By default, we will take option 4 - it allows for the most flexibility when specifying paths to check (recursiveness, wildcards, etc via Get-ChildItem).
+
+    $HKEY_CLASSES_ROOT = 2147483648
+    $HKEY_CURRENT_USER = 2147483649
+    $HKEY_LOCAL_MACHINE = 2147483650
+    $HKEY_USERS = 2147483651
+    $HKEY_CURRENT_CONFIG = 2147483653
+    $HKEY_DYN_DATA = 2147483654
+    ForEach ($item in $global_configuration.config.registry)
+    {
+        $obj_names = $item.psobject.Properties.Name
+        ForEach ($category in $obj_names)
+        {
+            Log-Message "[+] [$target] Collecting: $category"
+            $temp_evidence_dir = $current_evidence_dir + "\" + $category
+            $reg_paths = $item.$category.paths
+            $recursive_flag = $item.$category.recursive
+            $key_filters = $item.$category.keys
+            ForEach ($path in $reg_paths){
+                if ($path.StartsWith("HKLM") -or $path.StartsWith("HKEY_LOCAL_MACHINE")){
+                    $hive = $HKEY_LOCAL_MACHINE
+                } elseif ($path.StartsWith("HKU") -or $path.StartsWith("HKEY_USERS")){
+                    $hive = $HKEY_USERS
+                } elseif ($path.StartsWith("HKCU") -or $path.StartsWith("HKEY_CURRENT_USER")){
+                    $hive = $HKEY_CURRENT_USER
+                } elseif ($path.StartsWith("HKCR") -or $path.StartsWith("HKEY_CLASSES_ROOT")){
+                    $hive = $HKEY_CLASSES_ROOT
+                } else {
+                    Log-Message "[!] Unable to find appropriate hive for key: $path"
+                }
+                #Write-Host $path
+
+                #$data = Invoke-WMIMethod -ComputerName $target -Namespace root\default -Class stdregprov -Name enumvalues @($hive, $path)
+                #ForEach ($object in $data){
+                    #Write-Host $object.sNames
+                #}
+                if ($recursive_flag){
+                    $command = "Get-ChildItem -Path `"Registry::$path`" -Recurse"
+                } else {
+                    $command = "Get-ChildItem -Path `"Registry::$path`" "
+                }
+                $command_final = Build-Command-Script $command $tmp_name
+
+            }
         }
     }
 }
@@ -420,6 +529,9 @@ function Main{
     $global_configuration.finished = 0
     Start-Jobs $computer_targets
     Log-Message "[!] Done! Evidence Directory: $evidence_dir"
+
+    #$fns = Get-ChildItem function: | Where-Object { $_.Name -like "Create-Shadow" }
+    #Write-Host $fns.ScriptBlock
 
 }
 

@@ -45,6 +45,7 @@ param
 
 $global_configuration = [hashtable]::Synchronized(@{})
 $global_configuration.hostname = hostname
+$log_path = $PSScriptRoot + "\PowerHaulAudit.log"
 
 $shadow_stamp = (Get-Date).toString("HH:mm:ss") -replace (":","_")
 $shadowcopy_name = "powerhaul_copy_$shadow_stamp"
@@ -138,6 +139,7 @@ function Log-Message ($msg, $error, $color, $quiet){
     } else{
         Write-Host $msg -ForegroundColor $color
     }
+    Add-Content -Path $log_path -Value "$timestamp - $msg"
 }
 
 function Get-Configuration {
@@ -228,7 +230,7 @@ function Start-Jobs ($computer_targets){
         Log-Message "[+] Targeting: $target"
         $current_evidence_dir = $evidence_dir + "\" + $target
         Create-Directory $current_evidence_dir
-        #$status = Create-Shadow $target
+        $status = Create-Shadow $target
         if ($status -eq 1){
             Log-Message "[!] [$target] Shadow Created Successfully!"
             Get-Files $target $current_evidence_dir $true
@@ -236,19 +238,23 @@ function Start-Jobs ($computer_targets){
             Log-Message "[!] [$target] Shadow Failure - System/Locked Files will be unavailable!"
             Get-Files $target $current_evidence_dir $false
         }
-        Run-Commands $target $current_evidence_dir
-        Get-Registry $target $current_evidence_dir
-        #Delete-Shadow $target
+        #Run-Commands $target $current_evidence_dir
+        #Get-Registry $target $current_evidence_dir
+        Delete-Shadow $target
     }
 }
 
-function Remove-Front-Dirs ($path, $count, $tmp_dir){
+function Remove-Front-Dirs ($path, $count, $tmp_dir, $shadow){
     # Receives a fully-qualified path to a file as well as a count of how many 'segments' should be removed from the front
     # Helps with 'relative' copy-paste operations where we want to maintain a certain structure beyond a point.
     # For example, passing "C:\Windows\App\Test\icon.png",3 will return "Test\icon.png"
     # Passing "C:\Windows\App\Test\icon.png",2 would return "App\Test\icon.png"
+    #Write-Host $path
     $removes = 0
     $max_index = $count - 1 + 4
+    if ($shadow){
+        $max_index += 1
+    }
     $split_path = $path.Split("\")
     For ($counter=0; $counter -lt $max_index; $counter++){
         $first, $split_path = $split_path
@@ -265,6 +271,7 @@ function Remove-Front-Dirs ($path, $count, $tmp_dir){
         }
     }
     #$new_path = $new_path.Trim("\")
+    #Write-Host $new_path
     return $new_path
 
 }
@@ -278,10 +285,17 @@ function Get-Files ($target, $current_evidence_dir, $root_replace) {
             ForEach ($item in $object.$category){
                 ForEach ($directive in $item){
                     $file_evidence_dir = $current_evidence_dir + "\" + $directive.category + "\" + $category
+                    if (-not ($root_replace) -and $directive.shadow){
+                        Log-Message "[+] [$target] Skipping: $category - Requires Volume Shadow which was unsuccessful!"
+                        continue
+                    }
                     ForEach ($path in $directive.paths){
-                        if ($root_replace){
+                        if ($root_replace -and $directive.shadow){
+                            $shadow_ok = $true
                             $tmp_path = $path -replace ("%HOMEDRIVE%", "\\$target\C$\$shadowcopy_name")
-                        } else {
+                        }
+                        else {
+                            $shadow_ok = $false
                             $tmp_path = $path -replace ("%HOMEDRIVE%", "\\$target\C$")
                         }
                         $path_replace = $tmp_path -replace ("\*",".*")
@@ -294,10 +308,22 @@ function Get-Files ($target, $current_evidence_dir, $root_replace) {
                             $file_list = New-Object -TypeName "System.Collections.ArrayList"
                             ForEach ($filter in $directive.filter){
                                 $files = $null
-                                if ($directive.recursive){
-                                    $files = Get-ChildItem -Path "$tmp_path" -Recurse -Filter $filter -Force -ErrorVariable FailedItems -ErrorAction SilentlyContinue #| Where {! $_.PSIsContainer }
-                                } else {
-                                    $files = Get-ChildItem -Path "$tmp_path" -Filter $filter -Force -ErrorVariable FailedItems -ErrorAction SilentlyContinue #| Where {! $_.PSIsContainer }
+                                $FailedItems = $null
+                                try {
+                                    if ($directive.recursive){
+                                        $files = Get-ChildItem -Path "$tmp_path" -Recurse -Filter $filter -Force -ErrorVariable FailedItems -ErrorAction SilentlyContinue #| Where {! $_.PSIsContainer }
+                                    } else {
+                                        $files = Get-ChildItem -Path "$tmp_path" -Filter $filter -Force -ErrorVariable FailedItems -ErrorAction SilentlyContinue #| Where {! $_.PSIsContainer }
+                                    }
+                                } catch {
+                                    Log-Message $_.Exception.GetType().FullName $true
+                                }
+                                ForEach ($failure in $FailedItems){
+                                    if ($failure.Exception -is [UnauthorizedAccessException]){
+                                        Log-Message "[!] [$target] Unauthorized Access Exception (Reading): $($failure.TargetObject)" $false "red"
+                                    } elseif ($failure.Exception -is [ArgumentException]){
+                                        Log-Message "[!] [$target] Invalid Argument Specified (Reading): $($failure.TargetObject)" $false "red"
+                                    }
                                 }
                                 foreach ($f in $files){
                                     $file_list.Add($f) | Out-Null
@@ -309,6 +335,7 @@ function Get-Files ($target, $current_evidence_dir, $root_replace) {
                         if ($file_list.Count -ne 0){
                             Create-Directory $file_evidence_dir
                         }
+                        #Write-Host "FILES TO COPY: $($file_list.Count)"
                         ForEach ($file in $file_list){
                             # If the file we are attempting to copy exists under a specific user directory (Jumplists, etc) then we will store it under the relevant users name - $evidence_dir\jumplists\$USERNAME\$file
                             try {
@@ -316,24 +343,49 @@ function Get-Files ($target, $current_evidence_dir, $root_replace) {
                                     $tmp_user_evidence_dir = $file_evidence_dir + "\" + $Matches.user
                                     Create-Directory $tmp_user_evidence_dir
                                     if ($directive.dir_removals){
-                                        $new_dest_path = Remove-Front-Dirs $file.FullName $directive.dir_removals $tmp_user_evidence_dir
+                                        $new_dest_path = Remove-Front-Dirs $file.FullName $directive.dir_removals $tmp_user_evidence_dir $shadow_ok
                                         $dest_path = $tmp_user_evidence_dir + "\" + $new_dest_path
                                     } else {
                                         $dest_path = $tmp_user_evidence_dir
                                     }
-                                    Copy-Item "$($file.FullName)" "$dest_path" -Force
                                 } else {
                                     if ($directive.dir_removals){
-                                        $dest_path = Remove-Front-Dirs $file.FullName $directive.dir_removals $file_evidence_dir
+                                        $new_dest_path = Remove-Front-Dirs $file.FullName $directive.dir_removals $file_evidence_dir $shadow_ok
+                                        $dest_path = $file_evidence_dir + "\" + $new_dest_path
                                     } else {
                                         $dest_path = $file_evidence_dir
                                     }
-                                    Copy-Item "$($file.FullName)" "$dest_path" -Force
                                 }
+
                             } catch{
-                                Log-Message "[!] Error copying file: $($file.FullName)" $true
+                                Log-Message "[!] [$target] Error processing file: $($file.FullName)" $false "red"
+                                continue
                             }
+                            #Write-Host "SOURCE: $($file.FullName)"
+                            #Write-Host "DEST: $dest_path"
+                            $FailedCopies = $null
+                            try {
+                                Copy-Item "$($file.FullName)" "$dest_path" -Force -ErrorVariable FailedCopies -ErrorAction SilentlyContinue
+                            } catch {}
+                            ForEach ($failure in $FailedCopies){
+                                if ($failure.Exception -is [UnauthorizedAccessException]){
+                                    Log-Message "[!] [$target] Unauthorized Access Exception (Copying): $($failure.TargetObject)" $false "red"
+                                } elseif ($failure.Exception -is [ArgumentException]){
+                                        Log-Message "[!] [$target] Invalid Argument Specified (Copying): $($failure.TargetObject)" $false "red"
+                                } elseif ($failure.Exception -is [System.IO.IOException]){
+                                        Log-Message "[!] [$target] Unable to access in-use file (Copying): $($failure.TargetObject)" $false "red"
+                                }
+                            }
+                            #try {
+                            #    Copy-Item "$($file.FullName)" "$dest_path" -Force
+                            #} catch {
+                            #    Write-Host "SOURCE: $($file.FullName)"
+                            #    Write-Host "DEST: $dest_path"
+                            #    Log-Message "[!] [$target] Error copying file: $($file.FullName)" $false "red"
+                            #}
                         }
+
+
                     }
                 }
             }

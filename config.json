@@ -24,7 +24,8 @@
 			"recursive": false,
 			"paths": [
 				"%HOMEDRIVE%\\Windows\\AppCompat\\Programs\\*"
-			]
+			],
+			"shadow": true
 		},
 		"ShimSDB": {
 			"category": "Windows",
@@ -42,7 +43,9 @@
 			"recursive": true,
 			"paths": [
 				"%HOMEDRIVE%\\Program Files\\WindowsApps\\Deleted*\\*"
-			]
+			],
+			"dir_removals": 4,
+			"shadow": true
 		},
 		"InstalledSystemAppX": {
 			"category": "AppX",
@@ -50,7 +53,9 @@
 			"recursive": true,
 			"paths": [
 				"%HOMEDRIVE%\\Windows\\SystemApps\\*"
-			]
+			],
+			"dir_removals": 3,
+			"shadow": true
 		},
 		"InstalledUserAppX": {
 			"category": "AppX",
@@ -58,7 +63,9 @@
 			"recursive": true,
 			"paths": [
 				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Packages\\*"
-			]
+			],
+			"dir_removals": 6,
+			"shadow": true
 		},
 		"AppXStateRepository": {
 			"category": "AppX",
@@ -66,7 +73,9 @@
 			"recursive": true,
 			"paths": [
 				"%HOMEDRIVE%\\ProgramData\\Microsoft\\Windows\\AppRepository\\Packages\\*"
-			]
+			],
+			"dir_removals": 6,
+			"shadow": true
 		},
 		"AppXProgramData": {
 			"category": "AppX",
@@ -74,7 +83,9 @@
 			"recursive": true,
 			"paths": [
 				"%HOMEDRIVE%\\ProgramData\\Packages\\*"
-			]
+			],
+			"dir_removals": 3,
+			"shadow": true
 		},
 		"AssetAdvisorLog": {
 			"category": "RecentFiles",
@@ -91,7 +102,8 @@
 			"recursive": true,
 			"paths": [
 				"%HOMEDRIVE%\\Windows\\System32\\Tasks\\*"
-			]
+			],
+			"dir_removals": 4
 		},
 		"ConsoleHistory": {
 			"category": "PowerShell",
@@ -115,7 +127,8 @@
 			"recursive": true,
 			"paths": [
 				"%HOMEDRIVE%\\$Recycle.Bin\\*"
-			]
+			],
+			"dir_removals": 2
 		},
 		"RecentFileCache": {
 			"category": "RecentFiles",
@@ -159,7 +172,8 @@
 			"paths": [
 				"%HOMEDRIVE%\\Windows\\System32\\LogFiles\\*"
 			],
-			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/LogFiles.tkape"
+			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/LogFiles.tkape",
+			"dir_removals": 4
 			},
 			{
 			"category": "Windows",
@@ -178,7 +192,8 @@
 			"paths": [
 				"%HOMEDRIVE%\\*"
 			],
-			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/MOF.tkape"
+			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/MOF.tkape",
+			"dir_removals": 1
 		},
 		"LinuxOnWindows": {
 			"category": "Linux",
@@ -252,7 +267,8 @@
 			"paths": [
 				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Diagnostics\\*",
 				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\ElevatedDiagnostics\\*"
-			]
+			],
+			"shadow": true
 			},
 			{
 			"category": "Office",
@@ -260,7 +276,8 @@
 			"recursive": true,
 			"paths": [
 				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\temp\\Diagnostics\\*"
-			]
+			],
+			"shadow": true
 			}
 		],
 		"OfficeAutosaves": {
@@ -312,7 +329,8 @@
 				"%HOMEDRIVE%\\Users\\*\\AppData\\LocalLow\\Microsoft\\CryptnetUrlCache\\*",
 				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Microsoft\\Windows\\INetCache\\IE\\*"
 			],
-			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/CertUtil.tkape"
+			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/CertUtil.tkape",
+			"dir_removals": 7
 		},
 		"NTUSER_Hives": {
 			"category": "Users",
@@ -320,7 +338,8 @@
 			"recursive": false,
 			"paths": [
 				"%HOMEDRIVE%\\Users\\*\\*"
-			]
+			],
+			"shadow": true
 		},
 		"SRUDB": {
 			"category": "RecentFiles",
@@ -355,7 +374,8 @@
 				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\*",
 				"%HOMEDRIVE%\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\StartUp\\*"
 			],
-			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/StartupFolders.tkape"
+			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/StartupFolders.tkape",
+			"dir_removals": 7
 		},
 		"StartupXML": {
 			"category": "Windows",
@@ -364,7 +384,8 @@
 			"paths": [
 				"%HOMEDRIVE%\\Windows\\System32\\WDI\\LogFiles\\StartupInfo\\*"
 			],
-			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/StartupInfo.tkape"
+			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/StartupInfo.tkape",
+			"dir_removals": 6
 		},
 		"SnipCache": {
 			"category": "RecentFiles",
@@ -431,10 +452,20 @@
 				"Application.evtx",
 				"System.evtx",
 				"Microsoft-Windows-TaskScheduler%4Operational.evtx",
-				"Microsoft-Windows-PowerShell%4Operational.evtx",
+				"Microsoft-Windows-PowerShell*.evtx",
 				"Microsoft-Windows-Shell-Core%4Operational.evtx",
 				"Microsoft-Windows-TerminalServices-*.evtx",
-				"Microsoft-Windows-RemoteDesktopServices-*.evtx"
+				"Microsoft-Windows-RemoteDesktopServices-*.evtx",
+				"Microsoft-Windows-Windows Defender*.evtx",
+				"Microsoft-Windows-RemoteAssistance*",
+				"DNS Server.evtx",
+				"Microsoft-Windows-remoteapp*",
+				"Microsoft-Windows-Security-netlogon*",
+				"Microsoft-Windows-SMB*",
+				"Microsoft-Windows-WinRM*",
+				"OpenSSH*",
+				"Microsoft-Windows-WMI*",
+				"*SYSMON*"
 			],
 			"recursive": false,
 			"paths": [
@@ -546,7 +577,8 @@
 			"paths": [
 				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Packages\\Microsoft.Windows.Cortana_*\\AppData\\Indexed DB\\*",
 				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Packages\\Microsoft.Windows.Cortana_*\\LocalState\\ESEDatabase_CortanaCoreInstance\\*"
-			]
+			],
+			"shadow": true
 			},
 			{
 			"category": "Windows",
@@ -554,7 +586,8 @@
 			"recursive": true,
 			"paths": [
 				"%HOMEDRIVE%\\ProgramData\\Microsoft\\Network\\Downloader\\*"
-			]
+			],
+			"shadow": true
 			}
 		],
 		"CortanaDB": {
@@ -563,7 +596,8 @@
 			"recursive": false,
 			"paths": [
 				"%HOMEDRIVE%\\ProgramData\\Microsoft\\Network\\Downloader\\*"
-			]
+			],
+			"shadow": true
 		},
 		"Avast": {
 			"category": "AntiVirus",
@@ -643,13 +677,63 @@
 				"%HOMEDRIVE%\\Program Files*\\Trend Micro\\Security Agent\\ConnLog\\*"
 			]
 		},
-		"Defender": {
+		"Defender": [
+			{
 			"category": "AntiVirus",
 			"filter": ["MPCmdRun.log"],
 			"recursive": false,
 			"paths": [
 				"%HOMEDRIVE%\\Windows\\temp\\*",
 				"%HOMEDRIVE%\\Windows.old\\temp\\*"
+			]
+			},
+			{
+			"category": "AntiVirus",
+			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\ProgramData\\Microsoft\\Windows Defender\\Scans\\History\\Service\\DetectionHistory\\*\\*"
+			],
+			"dir_removals": 7
+			},
+			{
+			"category": "AntiVirus",
+			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\ProgramData\\Microsoft\\Windows Defender\\Quarantine\\*"
+			],
+			"dir_removals": 4
+			}
+		],
+		"SentinelOne": {
+			"category": "AntiVirus",
+			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\programdata\\sentinel\\logs\\*"
+			]
+		},
+		"MalwareBytes": {
+			"category": "AntiVirus",
+			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\ProgramData\\Malwarebytes\\Malwarebytes Anti-Malware\\Logs\\*",
+				"%HOMEDRIVE%\\ProgramData\\Malwarebytes\\MBAMService\\logs\\*",
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\Malwarebytes\\Malwarebytes Anti-Malware\\Logs\\*",
+				"%HOMEDRIVE%\\ProgramData\\Malwarebytes\\MBAMService\\ScanResults\\*"
+			]
+		},
+		"Cylance": {
+			"category": "AntiVirus",
+			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\ProgramData\\Malwarebytes\\Malwarebytes Anti-Malware\\Logs\\*",
+				"%HOMEDRIVE%\\ProgramData\\Malwarebytes\\MBAMService\\logs\\*",
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\Malwarebytes\\Malwarebytes Anti-Malware\\Logs\\*",
+				"%HOMEDRIVE%\\ProgramData\\Malwarebytes\\MBAMService\\ScanResults\\*"
 			]
 		},
 		"AnyDesk": {
@@ -781,7 +865,69 @@
 			"category": "RDP",
 			"paths": ["HKEY_USERS\\*\\SOFTWARE\\Microsoft\\Terminal Server Client\\Servers"],
 			"recursive": true,
-			"keys": ["UsernameHint"]
-		}
+			"keys": ["UsernameHint"],
+			"store_empty": true
+		},
+		"ShellFolders": {
+			"category": "Autorun",
+			"paths": [
+				"HKCU\\*\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\*Shell Folders",
+				"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\*Shell Folders"],
+			"recursive": true,
+			"keys": ["*"],
+			"store_empty": true
+		},
+		"ImageFileExecutionOptions": {
+			"category": "Autorun",
+			"paths": ["HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options"],
+			"recursive": true,
+			"keys": ["*"],
+			"store_empty": false
+		},
+		"ShimDB": {
+			"category": "Application",
+			"paths": [
+				"HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\InstalledSDB",
+				"HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Custom"],
+			"recursive": true,
+			"keys": ["*"],
+			"store_empty": true
+		},
+		"ExtensionData": {
+			"category": "Application",
+			"paths": [
+				"HKU\\*\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts"],
+			"recursive": true,
+			"keys": ["*"],
+			"store_empty": true
+		},
+		"ServiceInformation": {
+			"category": "Windows",
+			"paths": [
+				"HKLM\\SYSTEM\\CurrentControlSet\\Services"],
+			"recursive": true,
+			"keys": ["*"],
+			"store_empty": true
+		},
+		"DefenderExclusions": {
+			"category": "Antivirus",
+			"paths": [
+				"HKLM\\SOFTWARE\\Microsoft\\Windows Defender\\Exclusions"],
+			"recursive": true,
+			"keys": ["*"],
+			"store_empty": true
+		},
+		"RunOnce": [{
+			"category": "Autorun",
+			"paths": [
+				"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run*",
+				"HKU\\*\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run*",
+				"HKLM\\SOFTWARE\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Run*",
+				"HKU\\*\\SOFTWARE\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Run*"
+			],
+			"recursive": true,
+			"keys": ["*"],
+			"store_empty": true
+		}]
 	}
 }

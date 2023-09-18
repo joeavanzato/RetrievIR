@@ -186,6 +186,107 @@ function Get-Configuration {
         Log-Message "[+] Command Collection Directives: 0"
     }
 
+    $tmp_timestamp = (Get-Date).toString("HH:mm:ss") -replace (":","_")
+    $script:registry_output = "C:\Windows\temp\powerhaul_registry_output_$tmp_timestamp.json"
+    $Serialized = [System.Management.Automation.PSSerializer]::Serialize($data.registry)
+    $Bytes = [System.Text.Encoding]::Unicode.GetBytes($Serialized)
+    $EncodedArguments = [Convert]::ToBase64String($Bytes)
+    $script:read_registry_script = "
+    `$Serialized = [System.Text.Encoding]::Unicode.GetString([System.Convert]::FromBase64String('$EncodedArguments'))
+    `$directives  = [System.Management.Automation.PSSerializer]::Deserialize(`$Serialized)
+    `$output_path = '$registry_output'
+    `$type_mapping = @{
+        3 = 'BINARY'
+        4 = 'DWORD'
+        2 = 'EXPAND_SZ'
+        7 = 'MULTI_SZ'
+        -1 = 'NONE'
+        11 = 'QWORD'
+        1 = 'SZ'
+        0 = 'UNKNOWN'
+    }
+    `$primary_object = New-Object -TypeName 'System.Collections.ArrayList'
+    ForEach (`$object in `$directives) {
+        `$obj_names = `$object.psobject.Properties.Name
+        ForEach (`$module in `$obj_names){
+            ForEach (`$objective in `$object.`$module){
+                ForEach (`$inner_objective in `$objective){
+                    `$primary_module_object = [PSCustomObject]@{
+                        name = `$module
+                        category = `$inner_objective.category
+                        items = New-Object -TypeName 'System.Collections.ArrayList'
+                    }
+                    `$recurse = `$inner_objective.recursive
+                    `$category = `$inner_objective.category
+                    `$paths = `$inner_objective.paths
+                    `$key_filter = `$inner_objective.keys
+                    `$data_list = New-Object -TypeName 'System.Collections.ArrayList'
+                    ForEach (`$path in `$paths){
+                        `$data = `$null
+                        if (`$recurse){
+                            `$data = Get-ChildItem -Path `"Registry::`$path`" -Recurse -ErrorAction SilentlyContinue
+                        } else {
+                            `$data = Get-ChildItem -Path `"Registry::`$path`" -ErrorAction SilentlyContinue
+                        }
+                        `$current = `$null
+                        `$current = Get-Item -Path `"Registry::`$path`" -ErrorAction SilentlyContinue
+                        if (`$data){
+                            ForEach (`$1 in `$data){
+                                `$data_list.Add(`$1) | Out-Null
+                            }
+                        }
+                        if (`$current){
+                            ForEach (`$1 in `$current){
+                                `$data_list.Add(`$1) | Out-Null
+                            }
+                        }
+                        ForEach (`$item in `$data_list){
+                            `$key_object = [PSCustomObject]@{
+                                path = `$item.Name
+                                values = New-Object -TypeName 'System.Collections.ArrayList'
+                            }
+                            try{
+                                `$values = `$item.GetValueNames()
+                            } catch {
+                                `$values = @()
+                                `$new_value = @{
+                                    name = 'ERROR RETRIEVING VALUES'
+                                    value = 'ERROR RETRIEVING VALUES'
+                                }
+                                `$key_object.values.Add(`$new_value) | Out-Null
+                            }
+                            if (`$values.Count -eq 0 -and -not `$directive.store_empty){
+                                continue
+                            }
+                            ForEach (`$value in `$values){
+                                if (-not (`$key_filter -contains `$value) -and `$key_filter[0] -ne '*'){
+                                    continue
+                                }
+                                try{
+                                    `$new_value = @{
+                                        name = `$value
+                                        value = `$item.GetValue(`$value)
+                                        type = `$type_mapping[[int]`$item.GetValueKind(`$value)]
+                                    }
+                                } catch {
+                                    `$new_value = @{
+                                        name = `$value
+                                        value = 'ERROR RETRIEVING VALUE'
+                                        type = 'ERROR RETRIEVING TYPE'
+                                    }
+                                }
+                                `$key_object.values.Add(`$new_value) | Out-Null
+                            }
+                            `$primary_module_object.items.Add(`$key_object) | Out-Null
+                        }
+                    }
+                    `$primary_object.Add(`$primary_module_object) | Out-Null
+                }
+            }
+        }
+    }
+    `$primary_object | ConvertTo-Json -Depth 6 | Add-Content -Path `$output_path
+    "
     return $data
 }
 
@@ -213,7 +314,6 @@ function Get-Targets {
     }
 }
 
-
 function Start-Jobs ($computer_targets){
     Log-Message "[+] Starting Collections..."
 
@@ -230,17 +330,17 @@ function Start-Jobs ($computer_targets){
         Log-Message "[+] Targeting: $target"
         $current_evidence_dir = $evidence_dir + "\" + $target
         Create-Directory $current_evidence_dir
-        $status = Create-Shadow $target
+        #$status = Create-Shadow $target
         if ($status -eq 1){
             Log-Message "[!] [$target] Shadow Created Successfully!"
-            Get-Files $target $current_evidence_dir $true
+            #Get-Files $target $current_evidence_dir $true
         } else {
             Log-Message "[!] [$target] Shadow Failure - System/Locked Files will be unavailable!"
-            Get-Files $target $current_evidence_dir $false
+            #Get-Files $target $current_evidence_dir $false
         }
         #Run-Commands $target $current_evidence_dir
-        #Get-Registry $target $current_evidence_dir
-        Delete-Shadow $target
+        Get-Registry $target $current_evidence_dir
+        #Delete-Shadow $target
     }
 }
 
@@ -273,7 +373,6 @@ function Remove-Front-Dirs ($path, $count, $tmp_dir, $shadow){
     #$new_path = $new_path.Trim("\")
     #Write-Host $new_path
     return $new_path
-
 }
 
 function Get-Files ($target, $current_evidence_dir, $root_replace) {
@@ -402,7 +501,12 @@ function Build-Command-Script ($initial_command, $output){
 }
 
 function Execute-WMI-Command ($command, $target){
-    $command_start = Invoke-WmiMethod -ComputerName $target -Credential $global_configuration.credential -Class Win32_Process -Name Create -ArgumentList "$command_final"
+    if ($global_configuration.credential){
+        $command_start = Invoke-WmiMethod -ComputerName $target -Credential $global_configuration.credential -Class Win32_Process -Name Create -ArgumentList "$command"
+    } else {
+        $command
+        $command_start = Invoke-WmiMethod -ComputerName $target -Class Win32_Process -Name Create -ArgumentList "$command"
+    }
     return $command_start
 }
 
@@ -466,6 +570,7 @@ function Run-Commands ($target, $current_evidence_dir) {
     }
 }
 
+
 function Get-Registry ($target, $current_evidence_dir) {
     # There are typically 3 classic ways to read the registry of a remote device:
     # 1 - InvokeCommand with classic PowerShell - requires WinRM, basically a non-starter for most endpoints
@@ -473,8 +578,65 @@ function Get-Registry ($target, $current_evidence_dir) {
     # 3 - Remote Registry Service - This is typically disabled by default but we could check the state via WMI, enable then re-disable once we are done collecting data.
     # 4 - We could take a similar approach as for running commands - package each registry check into a command, pass it via WMI and check for an output file - this will be the easiest and most flexible way.
     # By default, we will take option 4 - it allows for the most flexibility when specifying paths to check (recursiveness, wildcards, etc via Get-ChildItem).
+    # Since this will be too big to run in a single command-line - we will instead copy the actual script to execute over to the target host then in the WMI we will have it dynamically load the script and execute the specified content.
 
-    $HKEY_CLASSES_ROOT = 2147483648
+    #$command_start = Execute-WMI-Command $full_command $target
+    Log-Message "[*] [$target] Starting Registry Collection"
+    try {
+        Log-Message "[*] [$target] Copying Script to Target"
+        Set-Content -Path "\\$target\C$\Windows\temp\powerhaul_registry_collection.ps1" -Value $read_registry_script
+    } catch {
+        Log-Message "[!] [$target] Fatal Error copying script!" $false "Red"
+        Log-Message "[!] [$target] Registry Information will not be available!"
+        return
+    }
+    Log-Message "[*] [$target] Invoking Registry Collection Script"
+    $invoke_registry_script = "powershell.exe -NoLogo -NonInteractive -ExecutionPolicy Unrestricted -WindowStyle Hidden C:\Windows\Temp\powerhaul_registry_collection.ps1"
+    $command_start = Execute-WMI-Command $invoke_registry_script $target
+    if ($command_start.ReturnValue -eq 0){
+        $target_file = $registry_output
+        $copy_location = $current_evidence_dir + "\registry.json"
+        [string]$process_id = $command_start.ProcessId
+    } else {
+        Log-Message "[!] [$target] Fatal Error invoking script!" $false "Red"
+        return
+    }
+    $loops = 0
+    while ($true){
+        try{
+            if ($global_configuration.credential){
+                $process = Get-WmiObject -Query "SELECT CommandLine FROM Win32_Process WHERE ProcessID = $process_id" -Computer $target -Credential $global_configuration.credential
+            } else {
+                $process = Get-WmiObject -Query "SELECT CommandLine FROM Win32_Process WHERE ProcessID = $process_id" -Computer $target
+            }
+            if ($process){
+                Log-Message "[*] [$target] Waiting for Output..."
+                Start-Sleep 3
+                $loops += 1
+            } else {
+                $output_file = $registry_output -replace (":", "$")
+                Log-Message "[*] [$target] Retrieving Output File: \\$target\$output_file"
+                try {
+                    Copy-Item  "\\$target\$output_file" "$copy_location"
+                    Log-Message "[*] [$target] Retrieved Successfully"
+                } catch {
+                    Log-Message "[!] [$target] Fatal Error Copying Evidence File: \\$target\$output_file" $false "Red"
+                }
+                break
+            }
+            if ($loops -ge 10){
+                Log-Message "[!] [$target] Breaking to avoid infinite loop - target process still appears to be running (PID: $process_id)"
+                Log-Message "[*] [$target] Check For Output File: \\$target\$output_file"
+            }
+        } catch {
+            Log-Message "[!] [$target] Fatal Error Processing Registry Retrieval!" $false "Red"
+        }
+
+    }
+
+
+
+<#    $HKEY_CLASSES_ROOT = 2147483648
     $HKEY_CURRENT_USER = 2147483649
     $HKEY_LOCAL_MACHINE = 2147483650
     $HKEY_USERS = 2147483651
@@ -517,7 +679,7 @@ function Get-Registry ($target, $current_evidence_dir) {
 
             }
         }
-    }
+    }#>
 }
 
 

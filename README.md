@@ -5,7 +5,6 @@
 Forensic Artifact Retrieval
 </h2>
 
-
 ### What is it?
 
 RetrievIR ['Retriever'] is a script to help Incident Responders gather forensically-useful artifacts from both local and remote hosts.  
@@ -116,6 +115,17 @@ Commandline parameters are documented below.
 * Installed Software
 * ActiveScript/CommandLine WMI Consumers
 * Running Processes
+
+### Images
+
+<p align="center">
+<img src="assets/usage_1.png">
+</p>
+
+<p align="center">
+<img src="assets/usage_2.png">
+</p>
+
 
 ### Building Custom Configurations
 

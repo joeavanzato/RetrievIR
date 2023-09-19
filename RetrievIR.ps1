@@ -315,7 +315,7 @@ function Get-Targets {
 }
 
 function Start-Jobs ($computer_targets){
-    Log-Message "[+] Starting Collections..."
+    Log-Message "[+] Starting Collection..."
 
     $evidence_dir_replace = $evidence_dir -Replace (":", "$")
     $share_map_script = "
@@ -330,17 +330,17 @@ function Start-Jobs ($computer_targets){
         Log-Message "[+] Targeting: $target"
         $current_evidence_dir = $evidence_dir + "\" + $target
         Create-Directory $current_evidence_dir
-        #$status = Create-Shadow $target
+        $status = Create-Shadow $target
         if ($status -eq 1){
             Log-Message "[!] [$target] Shadow Created Successfully!"
-            #Get-Files $target $current_evidence_dir $true
+            Get-Files $target $current_evidence_dir $true
         } else {
             Log-Message "[!] [$target] Shadow Failure - System/Locked Files will be unavailable!"
-            #Get-Files $target $current_evidence_dir $false
+            Get-Files $target $current_evidence_dir $false
         }
-        #Run-Commands $target $current_evidence_dir
+        Run-Commands $target $current_evidence_dir
         Get-Registry $target $current_evidence_dir
-        #Delete-Shadow $target
+        Delete-Shadow $target
     }
 }
 

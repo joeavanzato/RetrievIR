@@ -88,20 +88,53 @@ Commandline parameters are documented below.
 * WER Files
 * BITS DB/Related Files
 * Cortana DB/Related Files
-* Antivirus Logs
+* Antivirus Logs/Artifacts
   * Avast
-  * BitDefender
-  * McAfee
-  * Sophos
   * AVG
-  * ESET
-  * TrendMicro
+  * BitDefender
+  * Cybereason
+  * Cylance
   * Defender
+  * ESET
+  * F-Secure
+  * MalwareBytes
+  * McAfee
+  * SentinelOne
+  * Sophos
+  * SUPER
+  * Symantec
+  * TrendMicro
+* Cloud/FileTransfer Logs/Artifacts
+  * Box
+  * Dropbox
+  * FileZilla
+  * Google Drive
+  * OneDrive
+  * SugarSync
+  * TeraCopy
 * RAT Logs/Artifacts
+  * Ammyy Admin
   * AnyDesk
+  * Atera
+  * Aspera
+  * DWAgent
+  * Kaseya
+  * mRemoteNG
+  * OpenSSH
+  * OpenVPN
+  * ProtonVPN
+  * Radmin
   * RealVNC
-  * UltraVNC
+  * Remote Utilities
+  * RustDesk
+  * ScreenConnect
+  * SplashTop (Atera)
+  * Supremo
+  * TightVNC
   * TeamViewer
+  * UltraVNC
+  * UltraViewer
+  * ZoHo Assist / GoToMeeting
 * DNS Cache
 * Windows Services
 * TCP Connections

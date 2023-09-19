@@ -8,7 +8,7 @@ Forensic Artifact Retrieval
 
 ### What is it?
 
-PowerHaul is a script to help Incident Responders gather forensically-useful artifacts from both local and remote hosts.  
+RetrievIR ['Retriever'] is a script to help Incident Responders gather forensically-useful artifacts from both local and remote hosts.  
 
 The tool is designed to gather as many 'raw' artifacts as possible for easier use in downstream data analysis pipelines.
 
@@ -22,12 +22,12 @@ The tool is also designed to allow for flexible evidence specification via the i
 Commandline parameters are documented below.
 
 ```
-.\PowerHaul.ps1 : Default Usage - collects all artifacts specified in config.json from the localhost into the current directory.
-.\PowerHaul.ps1 -targets HOSTNAME1,HOSTNAME2 : Run PowerHaul against the provided hostnames.
-.\PowerHaul.ps1 -target_file C:\targets.txt : Run PowerHaul against the line-delimited targets present in the specified text file.
-.\PowerHaul.ps1 -creds : Tell PowerHaul to prompt the user for credentials to use.
-.\PowerHaul.ps1 -evidence_dir C:\evidence : Tell PowerHaul where to store collected evidence.
-.\PowerHaul.ps1 -config C:\config.json : Specify the path to a custom configuration file to use - by default, PowerHaul will look for 'config.json' in the current script directory.
+.\RetrievIR.ps1 : Default Usage - collects all artifacts specified in config.json from the localhost into the current directory.
+.\RetrievIR.ps1 -targets HOSTNAME1,HOSTNAME2 : Run RetrievIR against the provided hostnames.
+.\RetrievIR.ps1 -target_file C:\targets.txt : Run RetrievIR against the line-delimited targets present in the specified text file.
+.\RetrievIR.ps1 -creds : Tell RetrievIR to prompt the user for credentials to use.
+.\RetrievIR.ps1 -evidence_dir C:\evidence : Tell RetrievIR where to store collected evidence.
+.\RetrievIR.ps1 -config C:\config.json : Specify the path to a custom configuration file to use - by default, RetrievIR will look for 'config.json' in the current script directory.
 ```
 ### What is collected in the default config.json?
 * Jumplists
@@ -193,7 +193,7 @@ Reviewing config.json will help users to understand the possibilities available 
 
 #### Commands
 
-Command directives are intended to specify commands which should run on the target host and output results to a file which will be transferred back to the machine running PowerHaul.  Command directives contain 3 primary components:
+Command directives are intended to specify commands which should run on the target host and output results to a file which will be transferred back to the machine running RetrievIR.  Command directives contain 3 primary components:
 
 * category [string] - The category of the command, similar to files - this will group evidence at the parent-level directory.
 * command [string] - The command to execute - each command must output to a file designated as '#FILEPATH#' - this is replaced dynamically in-line.
@@ -270,9 +270,9 @@ Registry directives are bundled into a single large script that is executed on t
 
 ### Requirements
 
-* WMI - Used for launching processes / retrieving data from remote hosts.
+* WMI - Used for launching processes / querying data on remote hosts.
 * Local Admin Privileges - Required for using WMI remotely, mapping drives, etc.
-* SMB - Used for transferring data from remote hosts (Access via Drive Mapping such as \\TARGET\\C$\).
+* SMB - Used for transferring data from remote hosts (Access via Drive Mapping such as \\\TARGET\C$\).
 * VSS/ShadowCopies for targeting locked system files - otherwise these will be inaccessible.
 
 ### References

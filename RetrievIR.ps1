@@ -45,11 +45,11 @@ param
 
 $global_configuration = [hashtable]::Synchronized(@{})
 $global_configuration.hostname = hostname
-$log_path = $PSScriptRoot + "\PowerHaulAudit.log"
+$log_path = $PSScriptRoot + "\RetrievIRAudit.log"
 
 $shadow_stamp = (Get-Date).toString("HH:mm:ss") -replace (":","_")
-$shadowcopy_name = "powerhaul_copy_$shadow_stamp"
-$shadowcopy_output_status_file = "powerhaul_vss_status_$shadow_stamp"
+$shadowcopy_name = "rretrievir_copy_$shadow_stamp"
+$shadowcopy_output_status_file = "retrievir_vss_status_$shadow_stamp"
 if ($vss) {
     $root = $env:systemdrive+"\"+$shadowcopy_name
 } else {
@@ -187,7 +187,7 @@ function Get-Configuration {
     }
 
     $tmp_timestamp = (Get-Date).toString("HH:mm:ss") -replace (":","_")
-    $script:registry_output = "C:\Windows\temp\powerhaul_registry_output_$tmp_timestamp.json"
+    $script:registry_output = "C:\Windows\temp\retrievir_registry_output_$tmp_timestamp.json"
     $Serialized = [System.Management.Automation.PSSerializer]::Serialize($data.registry)
     $Bytes = [System.Text.Encoding]::Unicode.GetBytes($Serialized)
     $EncodedArguments = [Convert]::ToBase64String($Bytes)
@@ -584,14 +584,14 @@ function Get-Registry ($target, $current_evidence_dir) {
     Log-Message "[*] [$target] Starting Registry Collection"
     try {
         Log-Message "[*] [$target] Copying Script to Target"
-        Set-Content -Path "\\$target\C$\Windows\temp\powerhaul_registry_collection.ps1" -Value $read_registry_script
+        Set-Content -Path "\\$target\C$\Windows\temp\retrievir_registry_collection.ps1" -Value $read_registry_script
     } catch {
         Log-Message "[!] [$target] Fatal Error copying script!" $false "Red"
         Log-Message "[!] [$target] Registry Information will not be available!"
         return
     }
     Log-Message "[*] [$target] Invoking Registry Collection Script"
-    $invoke_registry_script = "powershell.exe -NoLogo -NonInteractive -ExecutionPolicy Unrestricted -WindowStyle Hidden C:\Windows\Temp\powerhaul_registry_collection.ps1"
+    $invoke_registry_script = "powershell.exe -NoLogo -NonInteractive -ExecutionPolicy Unrestricted -WindowStyle Hidden C:\Windows\Temp\retrievir_registry_collection.ps1"
     $command_start = Execute-WMI-Command $invoke_registry_script $target
     if ($command_start.ReturnValue -eq 0){
         $target_file = $registry_output
@@ -684,7 +684,7 @@ function Get-Registry ($target, $current_evidence_dir) {
 
 
 function Get-Credentials {
-    $Credential = $host.ui.PromptForCredential("PowerHaul Credential Entry", "Please enter username and password.", "", "NetBiosUserName")
+    $Credential = $host.ui.PromptForCredential("RetrievIR Credential Entry", "Please enter username and password.", "", "NetBiosUserName")
     #Write-Host $Credential.UserName
     #Write-Host $Credential.GetNetworkCredential().Password
     return $Credential
@@ -723,13 +723,13 @@ function Delete-Shadow ($target){
 
 function Main{
     Log-Message "
-        ____                          __  __            __
-       / __ \____ _      _____  _____/ / / /___ ___  __/ /
-      / /_/ / __ \ | /| / / _ \/ ___/ /_/ / __  `/ / / / /
-     / ____/ /_/ / |/ |/ /  __/ /  / __  / /_/ / /_/ / /
-    /_/    \____/|__/|__/\___/_/  /_/ /_/\__,_/\__,_/_/
-    " -color "Green"
-    Log-Message "    PowerHaul - https://github.com/joeavanzato/powerhaul" -color "Green"
+        ____       __       _           ________
+       / __ \___  / /______(_)__ _   __/  _/ __ \
+      / /_/ / _ \/ __/ ___/ / _ \ | / // // /_/ /
+     / _, _/  __/ /_/ /  / /  __/ |/ // // _, _/
+    /_/ |_|\___/\__/_/  /_/\___/|___/___/_/ |_|
+" -color "Green"
+    Log-Message "    RetrievIR - https://github.com/joeavanzato/RetrievIR" -color "Green"
     Log-Message "    Happy Hunting!" -color "Green"
     Write-Host ""
     Create-Directory $evidence_dir | Out-Null

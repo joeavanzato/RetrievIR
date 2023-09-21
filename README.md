@@ -7,7 +7,7 @@ Forensic Artifact Retrieval
 
 ### What is it?
 
-RetrievIR ['Retriever'] is a script to help Incident Responders gather forensically-useful artifacts from both local and remote hosts.  
+RetrievIR ['Retriever'] is a light-weight PowerShell script built to help Incident Responders gather forensically-useful artifacts from both local and remote hosts.  
 
 The tool is designed to gather as many 'raw' artifacts as possible for easier use in downstream data analysis pipelines.
 
@@ -21,12 +21,12 @@ The tool is also designed to allow for flexible evidence specification via the i
 Commandline parameters are documented below.
 
 ```
-.\RetrievIR.ps1 : Default Usage - collects all artifacts specified in config.json from the localhost into the current directory.
+.\RetrievIR.ps1 : Default Usage - collects all artifacts specified in JSON within 'configs' directory from the localhost into the current directory.
 .\RetrievIR.ps1 -targets HOSTNAME1,HOSTNAME2 : Run RetrievIR against the provided hostnames.
 .\RetrievIR.ps1 -target_file C:\targets.txt : Run RetrievIR against the line-delimited targets present in the specified text file.
 .\RetrievIR.ps1 -creds : Tell RetrievIR to prompt the user for credentials to use.
 .\RetrievIR.ps1 -evidence_dir C:\evidence : Tell RetrievIR where to store collected evidence.
-.\RetrievIR.ps1 -config C:\config.json : Specify the path to a custom configuration file to use - by default, RetrievIR will look for 'config.json' in the current script directory.
+.\RetrievIR.ps1 -config C:\config.json : Specify the path to a custom configuration file (or directory contaning files) to use - by default, RetrievIR will look for all JSON files within the 'configs' directory in PSScriptRoot (current executing directory).
 ```
 ### What is collected in the default config.json?
 * Jumplists
@@ -182,7 +182,7 @@ There are a few optional parameters designed to help augment the parsing of evid
 
 Any evidence path containing the pattern '\Users\*\' will be automatically added into a per-user folder undernear the primary evidence path. 
 
-For example - evidence collected from C:\Users\Joe\Test\Test2\* will be stored at $EVIDENCE_DIRECTORY$\$CATEGORY\$DIRECTIVE_NAME\Joe\$EVIDENCE.
+For example - evidence collected from C:\Users\Joe\Test\Test2\* will be stored at %EVIDENCE_DIRECTORY\%CATEGORY\%DIRECTIVE_NAME\Joe\%EVIDENCE.
 
 An example complete configuration file containing a single file-based directive is shown below:
 

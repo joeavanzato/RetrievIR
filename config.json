@@ -1081,6 +1081,41 @@
 				"%HOMEDRIVE%\\Program Files*\\ZohoMeeting\\Unattended\\Zohomeeting\\*.conf",
 				"%HOMEDRIVE%\\Program Files*\\ZohoMeeting\\Unattended\\Zohomeeting\\*.txt"
 			]
+		},
+		"WindowsProtect": {
+			"category": "Windows",
+			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\Microsoft\\Protect\\*\\*"
+			]
+		},
+		"ChromeUserData": {
+			"category": "Browsers",
+			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Google\\Chrome\\User Data\\*\\*"
+			],
+			"dir_removals": 7
+		},
+		"Edge": {
+			"category": "Browsers",
+			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Packages\\Microsoft.MicrosoftEdge_8wekyb3d8bbwe\\*"
+			],
+			"dir_removals": 7
+		},
+		"EdgeUserData": {
+			"category": "Browsers",
+			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Microsoft\\Edge\\User Data\\*\\*"
+			],
+			"dir_removals": 7
 		}
 	},
 	"commands": {
@@ -1153,6 +1188,16 @@
 			"category": "Windows",
 			"command": "Get-WmiObject Win32_Process -ErrorAction SilentlyContinue | Select-Object * | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
 			"output": "RunningProcesses.csv"
+		},
+		"LocalAdmins": {
+			"category": "Windows",
+			"command": "Get-LocalGroupMember -Group 'Administrators' | Select Name, SID, PrincipalSource, Description | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
+			"output": "LocalAdmins.csv"
+		},
+		"LocalGroups": {
+			"category": "Windows",
+			"command": "Get-LocalGroup | Select Name, SID, Description | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
+			"output": "LocalGroups.csv"
 		}
 	},
 	"registry": {

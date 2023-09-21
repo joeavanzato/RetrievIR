@@ -1,0 +1,252 @@
+{
+	"files": {
+		"AnyDesk": {
+			"category": "RemoteAccessTools",
+			"filter": ["*"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\ProgramData\\AnyDesk\\*.trace",
+				"%HOMEDRIVE%\\ProgramData\\AnyDesk\\*.conf",
+				"%HOMEDRIVE%\\ProgramData\\AnyDesk\\connection_trace.txt",
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\AnyDesk\\ad.trace",
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\AnyDesk\\*.conf",
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\AnyDesk\\connection_trace.txt",
+				"%HOMEDRIVE%\\Windows\\SysWOW64\\config\\systemprofile\\AppData\\Roaming\\AnyDesk\\*"
+			]
+		},
+		"Ammyy": {
+			"category": "RemoteAccessTools",
+			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\ProgramData\\Ammyy\\*"
+			]
+		},
+		"Atera": {
+			"category": "RemoteAccessTools",
+			"filter": ["*.ini", "*.txt", "*.db", "*.config", "*.cfg"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\Program Files\\ATERA Networks\\AteraAgent\\*"
+			]
+		},
+		"Aspera": {
+			"category": "RemoteAccessTools",
+			"filter": ["*.log"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Aspera\\Aspera Connect\\var\\log\\*",
+				"%HOMEDRIVE%\\Users\\*\\.aspera\\connect\\var\\log\\*"
+			]
+		},
+		"DWAgent": {
+			"category": "RemoteAccessTools",
+			"filter": ["*.log"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\ProgramData\\DWAgent*\\*"
+			]
+		},
+		"Kaseya": {
+			"category": "RemoteAccessTools",
+			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Kaseya\\Log\\KaseyaLiveConnect\\*",
+				"%HOMEDRIVE%\\ProgramData\\Kaseya\\Log\\Endpoint\\*",
+				"%HOMEDRIVE%\\Program Files*\\Kaseya\\*\\*.log",
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Temp\\*.log",
+				"%HOMEDRIVE%\\Windows\\Temp\\KASetup.log",
+				"%HOMEDRIVE%\\ProgramData\\Kaseya\\Log\\KaseyaEdgeServices\\*"
+			]
+		},
+		"LogMeIn": {
+			"category": "RemoteAccessTools",
+			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\ProgramData\\LogMeIn\\Logs\\*",
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\temp\\LogMeInLogs\\*"
+			]
+		},
+		"mRemoteNG": {
+			"category": "RemoteAccessTools",
+			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\mRemoteNG\\*.log",
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\mRemoteNG\\*.xml*",
+				"%HOMEDRIVE%\\Users\\*\\AppData\\*\\mRemoteNG\\user.config"
+			]
+		},
+		"OpenSSH": [
+			{
+			"category": "RemoteAccessTools",
+			"filter": ["config","known_hosts","*.pub","id_rsa","id_ecdsa","id_ed25519*","id_dsa"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\.ssh\\*"
+			]
+			},
+			{
+			"category": "RemoteAccessTools",
+			"filter": ["*"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\ProgramData\\ssh\\sshd_config",
+				"%HOMEDRIVE%\\ProgramData\\ssh\\ssh_host*",
+				"%HOMEDRIVE%\\ProgramData\\ssh\\administrators_authorized_keys",
+				"%HOMEDRIVE%\\ProgramData\\ssh\\logs\\*",
+				"%HOMEDRIVE%\\Users\\*\\.ssh\\authorized_keys*"
+			]
+			}
+		],
+		"OpenVPN": {
+			"category": "RemoteAccessTools",
+			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\OpenVPN\\config\\*",
+				"%HOMEDRIVE%\\Program Files*\\OpenVPN\\config\\*",
+				"%HOMEDRIVE%\\Users\\*\\OpenVPN\\log\\*.log"
+			]
+		},
+		"ProtonVPN": {
+			"category": "RemoteAccessTools",
+			"filter": ["*"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\ProtonVPN\\Logs\\*"
+			]
+		},
+		"Radmin": {
+			"category": "RemoteAccessTools",
+			"filter": ["*"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Windows\\SysWOW64\\rserver30\\Radm_log.htm",
+				"%HOMEDRIVE%\\Windows\\System32\\rserver30\\Radm_log.htm",
+				"%HOMEDRIVE%\\Windows\\*\\rserver30\\CHATLOGS\\*.htm",
+				"%HOMEDRIVE%\\Users\\*\\Documents\\ChatLogs\\*\\*.htm"
+			]
+		},
+		"RealVNC": {
+			"category": "RemoteAccessTools",
+			"filter": ["*"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\ProgramData\\RealVNC-Service\\vncserver.log",
+				"%HOMEDRIVE%\\ProgramData\\RealVNC-Service\\vncserver.log.bak",
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\RealVNC\\*.log"
+			]
+		},
+		"RemoteUtilities": {
+			"category": "RemoteAccessTools",
+			"filter": ["*"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Program Files*\\Remote Utilities*\\Logs\\rut_log_*.html",
+				"%HOMEDRIVE%\\ProgramData\\Remote Utilities\\install.log"
+			]
+		},
+		"RustDesk": {
+			"category": "RemoteAccessTools",
+			"filter": ["*"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\RustDesk\\*",
+				"%HOMEDRIVE%\\Windows\\ServiceProfiles\\LocalService\\AppData\\Roaming\\RustDesk\\log\\server\\*"
+			]
+		},
+		"ScreenConnect": {
+			"category": "RemoteAccessTools",
+			"filter": ["*"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Program Files*\\ScreenConnect\\App_Data\\Session.db",
+				"%HOMEDRIVE%\\Program Files*\\ScreenConnect\\App_Data\\User.xml",
+				"%HOMEDRIVE%\\ProgramData\\ScreenConnect Client*\\user.config"
+			]
+		},
+		"Splashtop": {
+			"category": "RemoteAccessTools",
+			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\Program Files*\\Splashtop\\Splashtop Remote\\Server\\log\\*",
+				"%HOMEDRIVE%\\ProgramData\\Splashtop\\Temp\\log\\*"
+			]
+		},
+		"SupremoRemoteDesktop": {
+			"category": "RemoteAccessTools",
+			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\ProgramData\\SupremoRemoteDesktop\\Log\\*.log",
+				"%HOMEDRIVE%\\ProgramData\\SupremoRemoteDesktop\\Inbox\\*"
+			]
+		},
+		"TightVNC": {
+			"category": "RemoteAccessTools",
+			"filter": ["*"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Windows\\System32\\config\\systemprofile\\AppData\\Roaming\\TightVNC\\tvnserver.log",
+				"%HOMEDRIVE%\\ProgramData\\TightVNC\\tvnserver.log",
+				"%HOMEDRIVE%\\ProgramData\\TightVNC\\Server\\Logs\\*"
+			]
+		},
+		"TeamViewer": {
+			"category": "RemoteAccessTools",
+			"filter": ["*"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\TeamViewer\\Connections.txt",
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Temp\\TeamViewer\\Connections_incoming.txt",
+				"%HOMEDRIVE%\\Program Files*\\TeamViewer\\Connections_incoming.txt",
+				"%HOMEDRIVE%\\Program Files*\\TeamViewer\\TeamViewer*_Logfile.log",
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\TeamViewer\\Logs\\TeamViewer*_Logfile.log",
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\TeamViewer\\TeamViewer*_Logfile.log",
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\TeamViewer\\MRU\\RemoteSupport\\*"
+			]
+		},
+		"UltraVNC": {
+			"category": "RemoteAccessTools",
+			"filter": ["*"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\ProgramData\\uvnc bvba\\WinVNC.log",
+				"%HOMEDRIVE%\\ProgramData\\uvnc bvba\\mslogon.log"
+			]
+		},
+		"UltraViewer": {
+			"category": "RemoteAccessTools",
+			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\UltraViewer\\*",
+				"%HOMEDRIVE%\\Program Files*\\UltraViewer\\*.txt",
+				"%HOMEDRIVE%\\Program Files*\\UltraViewer\\*.log",
+				"%HOMEDRIVE%\\Windows\\SysWow64\\config\\systemprofile\\AppData\\Roaming\\UltraViewer\\*"
+			]
+		},
+		"ZoHoAssist": {
+			"category": "RemoteAccessTools",
+			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\ZoHoMeeting\\Log\\*",
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\ZoHoMeeting\\*.conf",
+				"%HOMEDRIVE%\\ProgramData\\ZohoMeeting\\log\\*",
+				"%HOMEDRIVE%\\ProgramData\\ZohoMeeting\\*.conf",
+				"%HOMEDRIVE%\\Program Files*\\ZohoMeeting\\Unattended\\Zohomeeting\\logs\\*",
+				"%HOMEDRIVE%\\Program Files*\\ZohoMeeting\\Unattended\\Zohomeeting\\*.conf",
+				"%HOMEDRIVE%\\Program Files*\\ZohoMeeting\\Unattended\\Zohomeeting\\*.txt"
+			]
+		}
+	},
+	"commands": {
+	},
+	"registry": {
+	}
+}

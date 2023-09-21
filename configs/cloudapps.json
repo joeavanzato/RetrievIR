@@ -1,0 +1,71 @@
+{
+	"files": {
+		"Box": {
+			"category": "CloudApps",
+			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Box\\Box\\*",
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Box Sync\\*"
+			]
+		},
+		"Dropbox": {
+			"category": "CloudApps",
+			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Dropbox\\info.json",
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Dropbox\\host.db",
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Dropbox\\instace*\\*"
+			]
+		},
+		"FileZilla": {
+			"category": "CloudApps",
+			"filter": ["*.xml", "*.sqlite3*", "*.log"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\FileZilla*\\*",
+				"%HOMEDRIVE%\\Program Files*\\FileZilla Server\\Logs\\*"
+			]
+		},
+		"GoogleDrive": {
+			"category": "CloudApps",
+			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Google\\Drive*\\*"
+			]
+		},
+		"OneDrive": {
+			"category": "CloudApps",
+			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Microsoft\\OneDrive\\logs\\*",
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Microsoft\\OneDrive\\settings\\*"
+			]
+		},
+		"SugarSync": {
+			"category": "CloudApps",
+			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\SugarSync\\sc1.log",
+				"%HOMEDRIVE%\\Users\\*\\Documents\\SugarSync Shared Folders\\*",
+				"%HOMEDRIVE%\\Users\\*\\Documents\\My SugarSync\\*"
+			]
+		},
+		"TeraCopy": {
+			"category": "CloudApps",
+			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\TeraCopy\\*"
+			]
+		}
+	},
+	"commands": {
+	},
+	"registry": {
+	}
+}

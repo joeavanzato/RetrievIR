@@ -1,0 +1,35 @@
+{
+	"files": {
+		"ChromeUserData": {
+			"category": "Browsers",
+			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Google\\Chrome\\User Data\\*\\*"
+			],
+			"dir_removals": 7
+		},
+		"Edge": {
+			"category": "Browsers",
+			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Packages\\Microsoft.MicrosoftEdge_8wekyb3d8bbwe\\*"
+			],
+			"dir_removals": 7
+		},
+		"EdgeUserData": {
+			"category": "Browsers",
+			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Microsoft\\Edge\\User Data\\*\\*"
+			],
+			"dir_removals": 7
+		}
+	},
+	"commands": {
+	},
+	"registry": {
+	}
+}

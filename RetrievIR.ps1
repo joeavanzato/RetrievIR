@@ -21,7 +21,7 @@ param
 	[string]$evidence_dir = "$PSScriptRoot\evidence",
 
 	[Parameter(Mandatory = $false, HelpMessage = 'The fully-qualified file-path for the configuration file, defaults to $PSScriptRoot\config.json')]
-	[string]$config = "$PSScriptRoot\config.json",
+	[string]$config = "$PSScriptRoot\configs",
 
 	[Parameter(Mandatory = $false, HelpMessage = 'Comma-delimited list of target computers - leaving blank will only target "127.0.0.1" (localhost).')]
 	[array]$targets,
@@ -35,12 +35,24 @@ param
 	[Parameter(Mandatory = $false, HelpMessage = 'If specified, will setup a Shadow Copy to access locked system files.')]
 	[switch]$vss,
 
-	[Parameter(Mandatory = $false, HelpMessage = 'Method to use for file-collection - either SMB or WinRM')]
+	[Parameter(Mandatory = $false, HelpMessage = 'Select specific directives to run using comma-delimited arguments.')]
     [ValidateSet(
-		"SMB",
-        "WinRM"
+		"AntiVirus",
+        "AppX",
+        "Browsers",
+        "CloudApps",
+        "Network",
+        "Office",
+        "PowerShell",
+        "RDP",
+        "RecentFiles",
+        "RemoteAccessTools",
+        "Users",
+        "WDI",
+        "Windows",
+        "WMI"
 	)]
-	[string]$method
+	[string]$categories
 )
 
 $global_configuration = [hashtable]::Synchronized(@{})
@@ -110,15 +122,14 @@ $remove_shadow_b64 = [Convert]::ToBase64String($remove_shadow_bytes)
 $remove_shadow_command = "powershell.exe -NoLogo -NonInteractive -ExecutionPolicy Unrestricted -WindowStyle Hidden -EncodedCommand " + $remove_shadow_b64
 
 function Create-Directory ($dir) {
-    Log-Message "[+] Creating Evidence Directory: $dir" -quiet $true
+    #Log-Message "[+] Creating Evidence Directory: $dir" -quiet $true
     if (Test-Path $dir){
-        Log-Message "[!] Directory already exists: $dir" -quiet $true
+        #Log-Message "[!] Directory already exists: $dir" -quiet $true
         return
     }
-    try
-    {
+    try {
         New-Item -Path $dir -ItemType Directory | Out-Null
-        Log-Message "[!] Evidence Directory Created!" -quiet $true
+        Log-Message "[!] Evidence Directory Created: $dir" -quiet $true
     }catch{
         Log-Message "[!] Could not create directory: $dir" $true
     }
@@ -142,21 +153,7 @@ function Log-Message ($msg, $error, $color, $quiet){
     Add-Content -Path $log_path -Value "$timestamp - $msg"
 }
 
-function Get-Configuration {
-    if (-not (Test-Path $config)){
-        Log-Message "Could not find specified configuration file: $config" $true
-        Log-Message "[*] Please double check the specified file exists!"
-        Log-Message "[!] Exiting..."
-        exit
-    }
-    try {
-        $data = Get-Content $config -Raw | ConvertFrom-Json
-    } catch {
-        Log-Message "[!] Error reading/parsing specified configuration file!" $true
-        Log-Message "[!] Exiting..."
-        exit
-    }
-
+function Summarize-Configuration ($data){
     Log-Message "[!] Configuration Summary:"
     if ($data.files){
         ForEach ($i in $data.files){
@@ -185,6 +182,76 @@ function Get-Configuration {
     } else {
         Log-Message "[+] Command Collection Directives: 0"
     }
+}
+
+function Merge ($target, $source, $index) {
+    $source.psobject.Properties | % {
+        if ($_.TypeNameOfValue -eq 'System.Management.Automation.PSCustomObject' -and $target."$($_.Name)" ) {
+            if ($($_.Name) -in "files","registry","commands"){
+                Merge $target."$($_.Name)" $_.Value
+            } else {
+                "[!] Duplicate Module Name Detected between configurations: $($_.Name)"
+                "[!] Source File: $($file_list[$counter])"
+                "[!] First detected module will be used: $($module_first_seen[$_.Name])"
+            }
+        }
+        else {
+            $target | Add-Member -MemberType $_.MemberType -Name $_.Name -Value $_.Value -Force
+        }
+    }
+}
+
+function Get-Configuration {
+    if (-not (Test-Path $config)){
+        Log-Message "Could not find specified configuration file: $config" $true
+        Log-Message "[*] Please double check the specified file exists!"
+        Log-Message "[!] Exiting..."
+        exit
+    }
+
+<#    try {
+        $data = Get-Content $config -Raw | ConvertFrom-Json
+    } catch {
+        Log-Message "[!] Error reading/parsing specified configuration file!" $true
+        Log-Message "[!] Exiting..."
+        exit
+    }#>
+
+    try {
+    $file_list = Get-ChildItem -Path $config | Where-Object {! $_.PSIsContainer } | Select-Object -ExpandProperty FullName
+    } catch {
+        Log-Message "[!] Error reading specified configuration path" $true
+        Log-Message "[!] Exiting..."
+        #exit
+    }
+    $module_first_seen = @{}
+    if ($file_list.GetType().Name -eq "String"){
+        # In case there is only a single configuration file.
+        $file_list = @($file_list)
+    }
+    $data = New-Object PSObject
+    For ($counter=0; $counter -lt $file_list.Count; $counter++){
+        $tmp_data = Get-Content -Raw -Path $file_list[$counter] | ConvertFrom-Json
+        ForEach ($module in $tmp_data){
+            ForEach ($type in "files","registry","commands"){
+                if ($module.$type){
+                    $module.$type
+                    ForEach ($item in $module.$type){
+                        $name = $item.psobject.Properties.Name
+                        ForEach ($n in $name){
+                            if (-not ($module_first_seen.ContainsKey($n))){
+                                $module_first_seen[$n] = $file_list[$counter]
+                                #Write-Host " $($n) : $($file_list[$counter])"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        Merge $data $tmp_data $counter
+    }
+
+    Summarize-Configuration $data
 
     $tmp_timestamp = (Get-Date).toString("HH:mm:ss") -replace (":","_")
     $script:registry_output = "C:\Windows\temp\retrievir_registry_output_$tmp_timestamp.json"
@@ -410,9 +477,9 @@ function Get-Files ($target, $current_evidence_dir, $root_replace) {
                                 $FailedItems = $null
                                 try {
                                     if ($directive.recursive){
-                                        $files = Get-ChildItem -Path "$tmp_path" -Recurse -Filter $filter -Force -ErrorVariable FailedItems -ErrorAction SilentlyContinue #| Where {! $_.PSIsContainer }
+                                        $files = Get-ChildItem -Path "$tmp_path" -Recurse -Filter $filter -Force -ErrorVariable FailedItems -ErrorAction SilentlyContinue | Where {! $_.PSIsContainer }
                                     } else {
-                                        $files = Get-ChildItem -Path "$tmp_path" -Filter $filter -Force -ErrorVariable FailedItems -ErrorAction SilentlyContinue #| Where {! $_.PSIsContainer }
+                                        $files = Get-ChildItem -Path "$tmp_path" -Filter $filter -Force -ErrorVariable FailedItems -ErrorAction SilentlyContinue | Where {! $_.PSIsContainer }
                                     }
                                 } catch {
                                     Log-Message $_.Exception.GetType().FullName $true

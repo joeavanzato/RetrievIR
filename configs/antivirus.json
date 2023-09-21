@@ -1,0 +1,192 @@
+{
+	"files": {
+		"Avast": {
+			"category": "AntiVirus",
+			"filter": ["*"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\ProgramData\\Avast Software\\Avast\\Log\\*",
+				"%HOMEDRIVE%\\ProgramData\\Avast Software\\Avast\\Chest\\*",
+				"%HOMEDRIVE%\\Users\\*\\Avast Software\\Avast\\Log\\*"
+			]
+		},
+		"AVG": [
+			{
+			"category": "AntiVirus",
+			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\ProgramData\\AVG\\PersistentData\\Antivirus\\Logs\\*",
+				"%HOMEDRIVE%\\ProgramData\\AVG\\Antivirus\\log\\*",
+				"%HOMEDRIVE%\\ProgramData\\AVG\\Antivirus\\Reports\\*"
+			]
+			},
+			{
+			"category": "AntiVirus",
+			"filter": ["FileInfo2.db","lsdb2.json"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\ProgramData\\AVG\\Antivirus\\*"
+			]
+			}
+		],
+		"BitDefender": {
+			"category": "AntiVirus",
+			"filter": ["*"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\ProgramData\\BitDefender\\Endpoint Security\\Logs\\*",
+				"%HOMEDRIVE%\\ProgramData\\BitDefender\\Desktop\\Profiles\\Logs\\*"
+			]
+		},
+		"Cybereason": {
+			"category": "AntiVirus",
+			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\ProgramData\\crs1\\Logs\\*",
+				"%HOMEDRIVE%\\ProgramData\\apv2\\Logs\\*",
+				"%HOMEDRIVE%\\ProgramData\\crb1\\Logs\\*"
+			],
+			"dir_removals": 2
+		},
+		"Cylance": {
+			"category": "AntiVirus",
+			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\ProgramData\\Cylance\\Desktop\\*",
+				"%HOMEDRIVE%\\ProgramData\\Cylance\\Optics\\Log\\*"
+			],
+			"dir_removals": 3
+		},
+		"Defender": [
+			{
+			"category": "AntiVirus",
+			"filter": ["MPCmdRun.log"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Windows\\temp\\*",
+				"%HOMEDRIVE%\\Windows.old\\temp\\*"
+			]
+			},
+			{
+			"category": "AntiVirus",
+			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\ProgramData\\Microsoft\\Windows Defender\\Scans\\History\\Service\\DetectionHistory\\*\\*"
+			],
+			"dir_removals": 7
+			},
+			{
+			"category": "AntiVirus",
+			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\ProgramData\\Microsoft\\Windows Defender\\Quarantine\\*"
+			],
+			"dir_removals": 4
+			}
+		],
+		"ESET": {
+			"category": "AntiVirus",
+			"filter": ["*"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\ProgramData\\ESET\\ESET NNOD32 Antivirus\\Logs\\*"
+			]
+		},
+		"F-Secure": {
+			"category": "AntiVirus",
+			"filter": ["*"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\ProgramData\\F-Secure\\Log\\*",
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\F-Secure\\Log\\*",
+				"%HOMEDRIVE%\\ProgramData\\F-Secure\\Antivirus\\ScheduledScanReports\\*"
+			]
+		},
+		"MalwareBytes": {
+			"category": "AntiVirus",
+			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\ProgramData\\Malwarebytes\\Malwarebytes Anti-Malware\\Logs\\*",
+				"%HOMEDRIVE%\\ProgramData\\Malwarebytes\\MBAMService\\logs\\*",
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\Malwarebytes\\Malwarebytes Anti-Malware\\Logs\\*",
+				"%HOMEDRIVE%\\ProgramData\\Malwarebytes\\MBAMService\\ScanResults\\*"
+			]
+		},
+		"McAfee": [
+			{
+			"category": "AntiVirus",
+			"filter": ["*"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\ProgramData\\McAfee\\DesktopProtection\\*",
+				"%HOMEDRIVE%\\ProgramData\\McAfee\\Endpoint Security\\Logs\\*",
+				"%HOMEDRIVE%\\ProgramData\\McAfee\\Endpoint Security\\Logs_Old\\*",
+				"%HOMEDRIVE%\\ProgramData\\McAfee\\VirusScan\\*"
+			]
+			}
+		],
+		"SentinelOne": {
+			"category": "AntiVirus",
+			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\programdata\\sentinel\\logs\\*"
+			]
+		},
+		"Sophos": {
+			"category": "AntiVirus",
+			"filter": ["*"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\ProgramData\\Sophos\\Sophos*\\Logs\\*"
+			]
+		},
+		"SUPER": {
+			"category": "AntiVirus",
+			"filter": ["*"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\SUPERAntiSpyware\\Logs\\*"
+			]
+		},
+		"Symantec": {
+			"category": "AntiVirus",
+			"filter": ["*"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\ProgramData\\Symantec\\Symantec Endpoint Protection\\*\\Data\\Logs\\*",
+				"%HOMEDRIVE%\\ProgramData\\Symantec\\Symantec Endpoint Protection\\*\\Data\\Quarantine\\*",
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Symantec\\Symantec Endpoint Protection\\Logs\\*"
+			],
+			"dir_removals": 6
+		},
+		"TrendMicro": {
+			"category": "AntiVirus",
+			"filter": ["*"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\ProgramData\\Trend Micro\\*",
+				"%HOMEDRIVE%\\Program Files*\\Trend Micro\\Security Agent\\Report\\*",
+				"%HOMEDRIVE%\\Program Files*\\Trend Micro\\Security Agent\\ConnLog\\*"
+			]
+		}
+	},
+	"commands": {
+	},
+	"registry": {
+		"DefenderExclusions": {
+			"category": "Antivirus",
+			"paths": [
+				"HKLM\\SOFTWARE\\Microsoft\\Windows Defender\\Exclusions"],
+			"recursive": true,
+			"keys": ["*"],
+			"store_empty": true
+		}
+	}
+}

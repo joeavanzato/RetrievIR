@@ -1,0 +1,141 @@
+{
+	"files": {
+		"JumpLists": {
+			"category": "RecentFiles",
+			"recursive": false,
+			"filter": ["*"],
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\Microsoft\\Windows\\Recent\\AutomaticDestinations\\*",
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\Microsoft\\Windows\\Recent\\CustomDestinations\\*"
+			],
+			"dir_removals": 8,
+			"tags": ["sans_triage"]
+		},
+		"Prefetch": {
+			"category": "RecentFiles",
+			"filter": ["*.pf"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Windows\\Prefetch\\*"
+			],
+			"tags": ["sans_triage"]
+		},
+		"Amcache": {
+			"category": "RecentFiles",
+			"filter": ["Amcache.*","EncapsulationLogging.*"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Windows\\AppCompat\\Programs\\*"
+			],
+			"shadow": true,
+			"tags": ["sans_triage"]
+		},
+		"Syscache": {
+			"category": "RecentFiles",
+			"filter": ["syscache.*"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\System Volume Information\\*"
+			],
+			"shadow": true,
+			"tags": ["sans_triage"]
+		},
+		"AssetAdvisorLog": {
+			"category": "RecentFiles",
+			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\Windows\\CCM\\Logs\\AssetAdvisor.log"
+			],
+			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/AssetAdvisorLog.tkape",
+			"tags": ["sans_triage"]
+		},
+		"RecycleBin": {
+			"category": "RecentFiles",
+			"filter": ["$I*", "$R*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\$Recycle.Bin\\*"
+			],
+			"dir_removals": 2,
+			"tags": ["sans_triage"]
+		},
+		"RecentFileCache": {
+			"category": "RecentFiles",
+			"filter": ["RecentFileCache.bcf"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Windows\\AppCompat\\Programs\\*"
+			],
+			"tags": ["sans_triage"]
+		},
+		"SRUDB": {
+			"category": "RecentFiles",
+			"filter": ["srudb.dat"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Windows\\System32\\sru\\*"
+			],
+			"tags": ["sans_triage"]
+		},
+		"UAL": {
+			"category": "RecentFiles",
+			"filter": ["*.mdb"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Windows\\System32\\LogFiles\\Sum\\*"
+			],
+			"tags": ["sans_triage"]
+		},
+		"SnipCache": {
+			"category": "RecentFiles",
+			"filter": ["*.png"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Packages\\Microsoft.ScreenSketch_*\\TempState\\*"
+			],
+			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/SnipAndSketch.tkape"
+		},
+		"LNK": {
+			"category": "RecentFiles",
+			"filter": ["*"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\Microsoft\\Windows\\Recent\\*",
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\Microsoft\\Office\\Recent\\*",
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\Microsoft\\Start Menu\\Programs\\*",
+				"%HOMEDRIVE%\\Users\\*\\Desktop\\*",
+				"%HOMEDRIVE%\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\*"
+			],
+			"tags": ["sans_triage"]
+		},
+		"ProgramCompatAssistant": {
+			"category": "RecentFiles",
+			"filter": ["PcaAppLaunchDic.txt"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Windows\\AppCompat\\pca\\*"
+			]
+		},
+		"BitmapCache": {
+			"category": "RecentFiles",
+			"filter": ["bcache*.bmc","cache*.bin"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Microsoft\\Terminal Server Client\\Cache\\*"
+			]
+		},
+		"ThumbCache": {
+			"category": "RecentFiles",
+			"filter": ["Thumbcache_*"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Microsoft\\Windows\\Explorer\\*"
+			]
+		}
+	},
+	"commands": {
+	},
+	"registry": {
+	}
+}

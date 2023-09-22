@@ -517,82 +517,98 @@
 		"DNSCache": {
 			"category": "Network",
 			"command": "Get-NetTcpConnection -ErrorAction SilentlyContinue | Select * | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
-			"output": "DNSCache.csv"
+			"output": "DNSCache.csv",
+			"tags": ["sans_triage"]
 		},
 		"Services": {
 			"category": "Windows",
 			"command": "Get-WmiObject win32_service -ErrorAction SilentlyContinue | Select-Object * | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
-			"output": "Services.csv"
+			"output": "Services.csv",
+			"tags": ["sans_triage"]
 		},
 		"TCPConnections": {
 			"category": "Network",
 			"command": "Get-NetTcpConnection -ErrorAction SilentlyContinue | Select * | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
-			"output": "TCPConnections.csv"
+			"output": "TCPConnections.csv",
+			"tags": ["sans_triage"]
 		},
 		"SMBShares": {
 			"category": "Network",
 			"command": "Get-SmbShare -ErrorAction SilentlyContinue | Select-Object * | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
-			"output": "SMBShares.csv"
+			"output": "SMBShares.csv",
+			"tags": ["sans_triage"]
 		},
 		"ScheduledTasksFormatted": {
 			"category": "Windows",
 			"command": "Get-ScheduledTask -ErrorAction SilentlyContinue | Select-Object * | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
-			"output": "ScheduledTasks.csv"
+			"output": "ScheduledTasks.csv",
+			"tags": ["sans_triage"]
 		},
 		"Defender": {
 			"category": "AntiVirus",
 			"command": "Get-MpThreatDetection -ErrorAction SilentlyContinue | Select-Object * | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
-			"output": "DefenderDetections.csv"
+			"output": "DefenderDetections.csv",
+			"tags": ["sans_triage"]
 		},
 		"Startups": {
 			"category": "Windows",
 			"command": "Get-WMIObject Win32_StartupCommand -ErrorAction SilentlyContinue | Select-Object PSComputerName,Caption,Command,Description,Location,Name,User,UserSID | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
-			"output": "Startups.csv"
+			"output": "Startups.csv",
+			"tags": ["sans_triage"]
 		},
 		"FirewallRules": {
 			"category": "Network",
 			"command": "Get-NetFirewallRule -ErrorAction SilentlyContinue | Select * | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
-			"output": "FirewallRules.csv"
+			"output": "FirewallRules.csv",
+			"tags": ["sans_triage"]
 		},
 		"ARPCache": {
 			"category": "Network",
 			"command": "Get-NetNeighbor -ErrorAction SilentlyContinue | Select * | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
-			"output": "ARPCache.csv"
+			"output": "ARPCache.csv",
+			"tags": ["sans_triage"]
 		},
 		"SuspiciousFiles": {
 			"category": "RecentFiles",
 			"command": "Get-ChildItem -Path %HOMEDRIVE%\\temp,%HOMEDRIVE%\\windows\\system32,%HOMEDRIVE%\\windows\\temp,%HOMEDRIVE%\\Users,%HOMEDRIVE%\\programdata -Include *.htm,*.vbs,*.hta,*.chm,*.exe,*.bat,*.ps1,*.zip,*.gz,*.7z,*.vba,*.ps,*.psm1,*.docm,*.xlsm,*.pptm,*.potm,*.ppam,*.ppsm,*.sldm,*.dotm,*.xltm,*.xlam,*.lnk,*.vb,*.pdf,*.jar,*.msi,*.msp,*.gadget,*.cmd,*.vbe,*.jsp,*.scr,*.rar,*.msh,*.wsh,*.wsf,*.scf -File -Recurse -ErrorAction SilentlyContinue | Where-Object { $_.CreationTime -lt (Get-Date).AddDays(-15) } | Select-Object PSPath, PSParentPath, PSChildName, PSDrive, PSProvider, PSIsContainer, Mode, LinkType, Name, Length, DirectoryName, Directory, IsReadOnly, Exists, FullName, Extension, CreationTime, CreationTimeUtc, LastAccessTime, LastAccessTimeUtc, LastWriteTime, LastWriteTimeUtc | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
-			"output": "SuspiciousFiles.csv"
+			"output": "SuspiciousFiles.csv",
+			"tags": ["sans_triage"]
 		},
 		"InstalledSoftware": {
 			"category": "Windows",
 			"command": "Get-WmiObject -Class Win32_Product | Select Name,Version,InstallState,Caption,Description,InstallDate,InstallLocation,InstallSource,LocalPackage,PackageName,Vendor | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
-			"output": "InstalledSoftware.csv"
+			"output": "InstalledSoftware.csv",
+			"tags": ["sans_triage"]
 		},
 		"ActiveScriptConsumers": {
 			"category": "WMI",
 			"command": "Get-WmiObject ActiveScriptEventConsumer -Namespace root\\subscription  -ErrorAction SilentlyContinue | Select-Object * | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
-			"output": "ActiveScriptConsumers.csv"
+			"output": "ActiveScriptConsumers.csv",
+			"tags": ["sans_triage"]
 		},
 		"CommandLineConsumers": {
 			"category": "WMI",
 			"command": "Get-WmiObject CommandLineEventConsumer -Namespace root\\subscription  -ErrorAction SilentlyContinue | Select-Object * | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
-			"output": "CommandLineEventConsumers.csv"
+			"output": "CommandLineEventConsumers.csv",
+			"tags": ["sans_triage"]
 		},
 		"RunningProcesses": {
 			"category": "Windows",
 			"command": "Get-WmiObject Win32_Process -ErrorAction SilentlyContinue | Select-Object * | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
-			"output": "RunningProcesses.csv"
+			"output": "RunningProcesses.csv",
+			"tags": ["sans_triage"]
 		},
 		"LocalAdmins": {
 			"category": "Windows",
 			"command": "Get-LocalGroupMember -Group 'Administrators' | Select Name, SID, PrincipalSource, Description | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
-			"output": "LocalAdmins.csv"
+			"output": "LocalAdmins.csv",
+			"tags": ["sans_triage"]
 		},
 		"LocalGroups": {
 			"category": "Windows",
 			"command": "Get-LocalGroup | Select Name, SID, Description | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
-			"output": "LocalGroups.csv"
+			"output": "LocalGroups.csv",
+			"tags": ["sans_triage"]
 		}
 	},
 	"registry": {
@@ -601,7 +617,8 @@
 			"paths": ["HKEY_USERS\\*\\SOFTWARE\\Microsoft\\Terminal Server Client\\Servers"],
 			"recursive": true,
 			"keys": ["UsernameHint"],
-			"store_empty": true
+			"store_empty": true,
+			"tags": ["sans_triage"]
 		},
 		"ShellFolders": {
 			"category": "Autorun",
@@ -620,7 +637,7 @@
 			"store_empty": false
 		},
 		"ShimDB": {
-			"category": "Windows",
+			"category": "Application",
 			"paths": [
 				"HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\InstalledSDB",
 				"HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Custom"],
@@ -629,7 +646,7 @@
 			"store_empty": true
 		},
 		"ExtensionData": {
-			"category": "Windows",
+			"category": "Application",
 			"paths": [
 				"HKU\\*\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts"],
 			"recursive": true,
@@ -642,7 +659,8 @@
 				"HKLM\\SYSTEM\\CurrentControlSet\\Services"],
 			"recursive": true,
 			"keys": ["*"],
-			"store_empty": true
+			"store_empty": true,
+			"tags": ["sans_triage"]
 		},
 		"RunOnce": [{
 			"category": "Autorun",
@@ -654,7 +672,8 @@
 			],
 			"recursive": true,
 			"keys": ["*"],
-			"store_empty": true
+			"store_empty": true,
+			"tags": ["sans_triage"]
 		}]
 	}
 }

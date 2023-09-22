@@ -8,7 +8,8 @@
 				"%HOMEDRIVE%\\ProgramData\\Avast Software\\Avast\\Log\\*",
 				"%HOMEDRIVE%\\ProgramData\\Avast Software\\Avast\\Chest\\*",
 				"%HOMEDRIVE%\\Users\\*\\Avast Software\\Avast\\Log\\*"
-			]
+			],
+			"tags": ["sans_triage"]
 		},
 		"AVG": [
 			{
@@ -19,7 +20,8 @@
 				"%HOMEDRIVE%\\ProgramData\\AVG\\PersistentData\\Antivirus\\Logs\\*",
 				"%HOMEDRIVE%\\ProgramData\\AVG\\Antivirus\\log\\*",
 				"%HOMEDRIVE%\\ProgramData\\AVG\\Antivirus\\Reports\\*"
-			]
+			],
+			"tags": ["sans_triage"]
 			},
 			{
 			"category": "AntiVirus",
@@ -27,7 +29,8 @@
 			"recursive": true,
 			"paths": [
 				"%HOMEDRIVE%\\ProgramData\\AVG\\Antivirus\\*"
-			]
+			],
+			"tags": ["sans_triage"]
 			}
 		],
 		"BitDefender": {
@@ -37,7 +40,8 @@
 			"paths": [
 				"%HOMEDRIVE%\\ProgramData\\BitDefender\\Endpoint Security\\Logs\\*",
 				"%HOMEDRIVE%\\ProgramData\\BitDefender\\Desktop\\Profiles\\Logs\\*"
-			]
+			],
+			"tags": ["sans_triage"]
 		},
 		"Cybereason": {
 			"category": "AntiVirus",
@@ -48,7 +52,8 @@
 				"%HOMEDRIVE%\\ProgramData\\apv2\\Logs\\*",
 				"%HOMEDRIVE%\\ProgramData\\crb1\\Logs\\*"
 			],
-			"dir_removals": 2
+			"dir_removals": 2,
+			"tags": ["sans_triage"]
 		},
 		"Cylance": {
 			"category": "AntiVirus",
@@ -58,7 +63,8 @@
 				"%HOMEDRIVE%\\ProgramData\\Cylance\\Desktop\\*",
 				"%HOMEDRIVE%\\ProgramData\\Cylance\\Optics\\Log\\*"
 			],
-			"dir_removals": 3
+			"dir_removals": 3,
+			"tags": ["sans_triage"]
 		},
 		"Defender": [
 			{
@@ -68,7 +74,8 @@
 			"paths": [
 				"%HOMEDRIVE%\\Windows\\temp\\*",
 				"%HOMEDRIVE%\\Windows.old\\temp\\*"
-			]
+			],
+			"tags": ["sans_triage"]
 			},
 			{
 			"category": "AntiVirus",
@@ -77,7 +84,8 @@
 			"paths": [
 				"%HOMEDRIVE%\\ProgramData\\Microsoft\\Windows Defender\\Scans\\History\\Service\\DetectionHistory\\*\\*"
 			],
-			"dir_removals": 7
+			"dir_removals": 7,
+			"tags": ["sans_triage"]
 			},
 			{
 			"category": "AntiVirus",
@@ -86,7 +94,8 @@
 			"paths": [
 				"%HOMEDRIVE%\\ProgramData\\Microsoft\\Windows Defender\\Quarantine\\*"
 			],
-			"dir_removals": 4
+			"dir_removals": 4,
+			"tags": ["sans_triage"]
 			}
 		],
 		"ESET": {
@@ -95,7 +104,8 @@
 			"recursive": false,
 			"paths": [
 				"%HOMEDRIVE%\\ProgramData\\ESET\\ESET NNOD32 Antivirus\\Logs\\*"
-			]
+			],
+			"tags": ["sans_triage"]
 		},
 		"F-Secure": {
 			"category": "AntiVirus",
@@ -105,7 +115,8 @@
 				"%HOMEDRIVE%\\ProgramData\\F-Secure\\Log\\*",
 				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\F-Secure\\Log\\*",
 				"%HOMEDRIVE%\\ProgramData\\F-Secure\\Antivirus\\ScheduledScanReports\\*"
-			]
+			],
+			"tags": ["sans_triage"]
 		},
 		"MalwareBytes": {
 			"category": "AntiVirus",
@@ -116,7 +127,8 @@
 				"%HOMEDRIVE%\\ProgramData\\Malwarebytes\\MBAMService\\logs\\*",
 				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\Malwarebytes\\Malwarebytes Anti-Malware\\Logs\\*",
 				"%HOMEDRIVE%\\ProgramData\\Malwarebytes\\MBAMService\\ScanResults\\*"
-			]
+			],
+			"tags": ["sans_triage"]
 		},
 		"McAfee": [
 			{
@@ -128,7 +140,8 @@
 				"%HOMEDRIVE%\\ProgramData\\McAfee\\Endpoint Security\\Logs\\*",
 				"%HOMEDRIVE%\\ProgramData\\McAfee\\Endpoint Security\\Logs_Old\\*",
 				"%HOMEDRIVE%\\ProgramData\\McAfee\\VirusScan\\*"
-			]
+			],
+			"tags": ["sans_triage"]
 			}
 		],
 		"SentinelOne": {
@@ -137,7 +150,8 @@
 			"recursive": true,
 			"paths": [
 				"%HOMEDRIVE%\\programdata\\sentinel\\logs\\*"
-			]
+			],
+			"tags": ["sans_triage"]
 		},
 		"Sophos": {
 			"category": "AntiVirus",
@@ -145,7 +159,8 @@
 			"recursive": false,
 			"paths": [
 				"%HOMEDRIVE%\\ProgramData\\Sophos\\Sophos*\\Logs\\*"
-			]
+			],
+			"tags": ["sans_triage"]
 		},
 		"SUPER": {
 			"category": "AntiVirus",
@@ -153,7 +168,8 @@
 			"recursive": false,
 			"paths": [
 				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\SUPERAntiSpyware\\Logs\\*"
-			]
+			],
+			"tags": ["sans_triage"]
 		},
 		"Symantec": {
 			"category": "AntiVirus",
@@ -164,7 +180,8 @@
 				"%HOMEDRIVE%\\ProgramData\\Symantec\\Symantec Endpoint Protection\\*\\Data\\Quarantine\\*",
 				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Symantec\\Symantec Endpoint Protection\\Logs\\*"
 			],
-			"dir_removals": 6
+			"dir_removals": 6,
+			"tags": ["sans_triage"]
 		},
 		"TrendMicro": {
 			"category": "AntiVirus",
@@ -174,7 +191,8 @@
 				"%HOMEDRIVE%\\ProgramData\\Trend Micro\\*",
 				"%HOMEDRIVE%\\Program Files*\\Trend Micro\\Security Agent\\Report\\*",
 				"%HOMEDRIVE%\\Program Files*\\Trend Micro\\Security Agent\\ConnLog\\*"
-			]
+			],
+			"tags": ["sans_triage"]
 		}
 	},
 	"commands": {
@@ -186,7 +204,8 @@
 				"HKLM\\SOFTWARE\\Microsoft\\Windows Defender\\Exclusions"],
 			"recursive": true,
 			"keys": ["*"],
-			"store_empty": true
+			"store_empty": true,
+			"tags" : ["sans_triage"]
 		}
 	}
 }

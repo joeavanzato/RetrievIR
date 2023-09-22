@@ -275,8 +275,13 @@ function Merge ($target, $source, $index) {
 }
 
 function Get-Configuration {
+    # This function will first validate that the specified configuration path/file is a valid path
+    # Then it will acquire a list of all files in that directory
+    # Then it will read / import each JSON and merge them into a growing PowerShell object
+    # The Merge function will handle duplicately-named keys - these will be alerted to and only the first key will be used for each collection directive
+
     if (-not (Test-Path $config)){
-        Log-Message "Could not find specified configuration file: $config" $true
+        Log-Message "Could not find specified configuration path: $config" $true
         Log-Message "[*] Please double check the specified file exists!"
         Log-Message "[!] Exiting..."
         exit
@@ -330,19 +335,25 @@ function Get-Configuration {
 }
 
 function Build-Registry-Script ($data) {
-
+    # This function is responsible for building a stand-alone script block that will be copied to remote hosts and executed via WMI
+    # This script block will process all registry directives based on category/tag filters and output the results to a single JSON file, described at $registry_output
+    # The script relies on a serialized version of the registry directives, category filter and tag filter to function correctly.
 
     $tmp_timestamp = (Get-Date).toString("HH:mm:ss") -replace (":","_")
     $script:registry_output = "C:\Windows\temp\retrievir_registry_output_$tmp_timestamp.json"
+
     $Serialized_reg_data = [System.Management.Automation.PSSerializer]::Serialize($data.registry)
     $Bytes_reg_data = [System.Text.Encoding]::Unicode.GetBytes($Serialized_reg_data)
     $EncodedRegData = [Convert]::ToBase64String($Bytes_reg_data)
+
     $Serialized_category = [System.Management.Automation.PSSerializer]::Serialize($categories)
     $bytes_categories = [System.Text.Encoding]::Unicode.GetBytes($Serialized_category)
     $encoded_category = [Convert]::ToBase64String($bytes_categories)
+
     $Serialized_tags = [System.Management.Automation.PSSerializer]::Serialize($tags)
     $bytes_tags = [System.Text.Encoding]::Unicode.GetBytes($Serialized_tags)
     $encoded_tags = [Convert]::ToBase64String($bytes_tags)
+
     $script:read_registry_script = "
     `$Serialized = [System.Text.Encoding]::Unicode.GetString([System.Convert]::FromBase64String('$EncodedRegData'))
     `$directives  = [System.Management.Automation.PSSerializer]::Deserialize(`$Serialized)

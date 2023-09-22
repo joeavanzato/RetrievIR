@@ -18,17 +18,26 @@ The tool is also designed to allow for flexible evidence specification via the i
 
 ### Usage
 
-Commandline parameters are documented below.
+To use, just download the RetrievIR.ps1 and either config.json or individual configs present in \configs - by default, RetrievIR will check for a configs directory in the script's root directory - if it is unable to find this, it will then check for a file named 'config.json' in the same directory.  If it is unable to find either of these and a parameter has not been provided, RetrievIR will not execute.
+
+Common commandline parameters are documented below.
 
 ```
 .\RetrievIR.ps1 : Default Usage - collects all artifacts specified in JSON within 'configs' directory from the localhost into the current directory.
 .\RetrievIR.ps1 -targets HOSTNAME1,HOSTNAME2 : Run RetrievIR against the provided hostnames.
 .\RetrievIR.ps1 -target_file C:\targets.txt : Run RetrievIR against the line-delimited targets present in the specified text file.
-.\RetrievIR.ps1 -creds : Tell RetrievIR to prompt the user for credentials to use.
-.\RetrievIR.ps1 -evidence_dir C:\evidence : Tell RetrievIR where to store collected evidence.
-.\RetrievIR.ps1 -config C:\config.json : Specify the path to a custom configuration file (or directory contaning files) to use - by default, RetrievIR will look for all JSON files within the 'configs' directory in PSScriptRoot (current executing directory).
+.\RetrievIR.ps1 -creds : Tell RetrievIR to prompt the user for credentials to use - by default, RetrievIR runs with the current user context.
+.\RetrievIR.ps1 -evidence_dir C:\evidence : Tell RetrievIR where to store collected evidence - by default, evidence will be stored in PSScriptRoot\evidence
+.\RetrievIR.ps1 -config C:\my_config.json : Specify the path to a custom configuration file to use - by default, RetrievIR will look for all JSON files within the 'configs' directory in PSScriptRoot (current executing directory).
+.\RetrievIR.ps1 -config C:\RetrievIRConfigs : Specify the path to a directory containing 1 or more customer configuration JSON to use - by default, RetrievIR will look for all JSON files within the 'configs' directory in PSScriptRoot (current executing directory).
+.\RetrievIR.ps1 -categories antivirus,recentfiles : Specify to only collect evidence when the category is within the provided values.
+.\RetrievIR.ps1 -categoryscan : Skip all evidence collection and just list all categories in provided configuration file(s).
+.\RetrievIR.ps1 -simulate : Tells RetrievIR to skip evidence collection and only determine how many files and total size of data that would be collected with specified categories/tags.
 ```
-### What is collected in the default config.json?
+### What is collected in the default configuration files?
+
+The default configuration files are meant to be more 'complete' repositories of information - these should be trimmed and tailored to meet your teams Incident Response needs - additionally, a 'SANS Triage' configuration is included in this repository as 'sans_triage.json' - this attempts to mimic the standard KAPE SANS Triage artifact collection.
+
 * Jumplists
 * Prefetch Files
 * Amcache HVE and LOGs

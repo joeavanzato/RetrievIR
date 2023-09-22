@@ -41,6 +41,12 @@ param
 	[Parameter(Mandatory = $false, HelpMessage = 'Return information on categories available for use with -categories argument from specified configuration file(s).')]
 	[switch]$categoryscan,
 
+	[Parameter(Mandatory = $false, HelpMessage = 'Return information on tags available for use with -tags argument from specified configuration file(s).')]
+	[switch]$tagscan,
+
+	[Parameter(Mandatory = $false, HelpMessage = 'Only use directives which have one or more of the specified tags.')]
+	[array]$tags = @("*"),
+
 	[Parameter(Mandatory = $false, HelpMessage = 'Select specific directive-categories to run using comma-delimited arguments - only directives which are contained within the list will be executed.')]
 	[array]$categories = @("*")
 )
@@ -140,6 +146,7 @@ function Log-Message ($msg, $error, $color, $quiet){
 function Summarize-Configuration ($data){
     Log-Message "[!] Configuration Summary:"
     $category_list = New-Object -TypeName 'System.Collections.ArrayList'
+    $tag_list = New-Object -TypeName 'System.Collections.ArrayList'
     if ($data.files){
         $directives = 0
         ForEach ($object in $data.files){
@@ -150,9 +157,21 @@ function Summarize-Configuration ($data){
                         if (-not ($directive.category -in $category_list)){
                             $category_list.Add($directive.category) | Out-Null
                         }
-                        if ($categories[0] -eq '*') { $directives += 1 } elseif ($directive.category -in $categories) { $directives += 1 } else {
+                        if ($directive.tags){
+                            ForEach ($t in $directive.tags){
+                                if (-not ($t -in $tag_list)){
+                                    $tag_list.Add($t) | Out-Null
+                                }
+                            }
+                        }
+                        if (-not ($tags[0] -eq '*') -and -not ($directive.tags -in $tags)) {
                             continue
                         }
+                        if (-not ($categories[0] -eq '*') -and -not ($directive.category -in $categories)) {
+                            continue
+                        }
+                        $directives += 1
+
                     }
                 }
             }
@@ -173,9 +192,20 @@ function Summarize-Configuration ($data){
                         if (-not ($directive.category -in $category_list)){
                             $category_list.Add($directive.category) | Out-Null
                         }
-                        if ($categories[0] -eq '*') { $directives += 1 } elseif ($directive.category -in $categories) { $directives += 1 } else {
+                        if ($directive.tags){
+                            ForEach ($t in $directive.tags){
+                                if (-not ($t -in $tag_list)){
+                                    $tag_list.Add($t) | Out-Null
+                                }
+                            }
+                        }
+                        if (-not ($tags[0] -eq '*') -and -not ($directive.tags -in $tags)) {
                             continue
                         }
+                        if (-not ($categories[0] -eq '*') -and -not ($directive.category -in $categories)) {
+                            continue
+                        }
+                        $directives += 1
                     }
                 }
             }
@@ -195,9 +225,20 @@ function Summarize-Configuration ($data){
                         if (-not ($directive.category -in $category_list)){
                             $category_list.Add($directive.category) | Out-Null
                         }
-                        if ($categories[0] -eq '*') { $directives += 1 } elseif ($directive.category -in $categories) { $directives += 1 } else {
+                        if ($directive.tags){
+                            ForEach ($t in $directive.tags){
+                                if (-not ($t -in $tag_list)){
+                                    $tag_list.Add($t) | Out-Null
+                                }
+                            }
+                        }
+                        if (-not ($tags[0] -eq '*') -and -not ($directive.tags -in $tags)) {
                             continue
                         }
+                        if (-not ($categories[0] -eq '*') -and -not ($directive.category -in $categories)) {
+                            continue
+                        }
+                        $directives += 1
                     }
                 }
             }
@@ -208,6 +249,10 @@ function Summarize-Configuration ($data){
     }
     if ($categoryscan){
         Log-Message "[!] Available Categories in Scanned Configs: $($category_list -join ', ')"
+        exit
+    }
+    if ($tagscan){
+        Log-Message "[!] Available Tags in Scanned Configs: $($tag_list -join ', ')"
         exit
     }
 }
@@ -279,6 +324,7 @@ function Get-Configuration {
     }
     Summarize-Configuration $data
     Log-Message "[!] Targeted Directive Categories: $categories"
+    Log-Message "[!] Targeted Directive Tags: $tags"
     Build-Registry-Script $data
     return $data
 }
@@ -510,6 +556,22 @@ function Get-Files ($target, $current_evidence_dir, $root_replace) {
                         #Log-Message "[+] [$target] Skipping: $category - Not in specified arguments!"
                         continue
                     }
+                    if ($tags[0] -eq "*"){
+                    } elseif ($tags){
+                        if ($directive.tags){
+                            $pass = $true
+                            ForEach ($t in $directive.tags){
+                                if ($t -in $tags){
+                                    $pass = $false
+                                }
+                            }
+                        } else {
+                            continue
+                        }
+                        if ($pass){
+                            continue
+                        }
+                    }
                     Log-Message "[+] [$target] Collecting: $category"
                     ForEach ($path in $directive.paths){
                         if ($root_replace -and $directive.shadow){
@@ -650,6 +712,22 @@ function Run-Commands ($target, $current_evidence_dir) {
             if ($categories[0] -eq '*') { } elseif ($item.$category.category -in $categories) { } else {
                 #Log-Message "[+] [$target] Skipping: $($item.$category.category) - Not in specified arguments!"
                 continue }
+            if ($tags[0] -eq "*"){
+            } elseif ($tags){
+                if ($item.$category.tags){
+                    $pass = $true
+                    ForEach ($t in $item.$category.tags){
+                        if ($t -in $tags){
+                            $pass = $false
+                        }
+                    }
+                } else {
+                    continue
+                }
+                if ($pass){
+                    continue
+                }
+            }
             Log-Message "[+] [$target] Collecting: $category"
             $cmd_evidence_dir = $current_evidence_dir + "\" + $item.$category.category + "\" + $category
             Create-Directory $cmd_evidence_dir

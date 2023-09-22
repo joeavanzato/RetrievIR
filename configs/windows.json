@@ -60,16 +60,30 @@
 			"dir_removals": 3,
 			"shadow": true
 		},
-		"ScheduledTasks": {
+		"ScheduledTasks": [
+			{
 			"category": "Windows",
 			"filter": ["*"],
 			"recursive": true,
 			"paths": [
-				"%HOMEDRIVE%\\Windows\\System32\\Tasks\\*"
+				"%HOMEDRIVE%\\Windows\\System32\\Tasks\\*",
+				"%HOMEDRIVE%\\Windows\\SysWOW64\\Tasks\\*"
 			],
-			"dir_removals": 4,
+			"dir_removals": 2,
 			"tags": ["sans_triage"]
-		},
+			},
+			{
+			"category": "Windows",
+			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\Windows\\Tasks\\*.job",
+				"%HOMEDRIVE%\\Windows\\SchedLgU.txt"
+			],
+			"dir_removals": 2,
+			"tags": ["sans_triage"]
+			}
+		],
 		"ConsoleHistory": {
 			"category": "PowerShell",
 			"filter": ["*"],
@@ -284,12 +298,24 @@
 			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/CertUtil.tkape",
 			"dir_removals": 7
 		},
-		"NTUSER_Hives": {
+		"USER_Hives": {
 			"category": "Users",
-			"filter": ["NTUSER.DAT*"],
+			"filter": ["NTUSER.DAT*", "UsrClass.*"],
 			"recursive": false,
 			"paths": [
 				"%HOMEDRIVE%\\Users\\*\\*",
+				"%HOMEDRIVE%\\Users\\AppData\\Local\\Microsoft\\Windows\\*"
+			],
+			"shadow": true,
+			"tags": ["sans_triage"]
+		},
+		"SYSTEM_Hives": {
+			"category": "Users",
+			"filter": ["SAM*", "SECURITY*", "SOFTWARE*", "SYSTEM*", "NTUSER*", "DEFAULT*"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Windows\\System32\\config\\*",
+				"%HOMEDRIVE%\\Windows\\System32\\config\\RegBack\\*",
 				"%HOMEDRIVE%\\Windows\\ServiceProfiles\\*\\*"
 			],
 			"shadow": true,
@@ -399,7 +425,8 @@
 			"recursive": false,
 			"paths": [
 				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\ConnectedDevicesPlatform\\*\\*"
-			]
+			],
+			"tags": ["sans_triage"]
 		},
 		"WinSearchIndex": {
 			"category": "Windows",
@@ -407,7 +434,8 @@
 			"recursive": false,
 			"paths": [
 				"%HOMEDRIVE%\\ProgramData\\Microsoft\\Search\\Data\\Applications\\Windows\\GatherLogs\\SystemIndex\\*"
-			]
+			],
+			"tags": ["sans_triage"]
 		},
 		"USBSetupAPILog": {
 			"category": "Windows",
@@ -426,7 +454,8 @@
 			"paths": [
 				"%HOMEDRIVE%\\Windows\\System32\\wbem\\Repository\\*"
 			],
-			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/WBEM.tkape"
+			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/WBEM.tkape",
+			"tags": ["sans_triage"]
 		},
 		"etc": {
 			"category": "Windows",
@@ -453,7 +482,8 @@
 				"%HOMEDRIVE%\\ProgramData\\Microsoft\\Windows\\WER\\*",
 				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Microsoft\\Windows\\WER\\*"
 			],
-			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/WER.tkape"
+			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/WER.tkape",
+			"tags": ["sans_triage"]
 			},
 			{
 			"category": "Windows",
@@ -463,7 +493,8 @@
 				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\CrashDumps\\*",
 				"%HOMEDRIVE%\\Windows\\*"
 			],
-			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/WER.tkape"
+			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/WER.tkape",
+			"tags": ["sans_triage"]
 			}
 		],
 		"BITS": [
@@ -475,7 +506,8 @@
 				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Packages\\Microsoft.Windows.Cortana_*\\AppData\\Indexed DB\\*",
 				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Packages\\Microsoft.Windows.Cortana_*\\LocalState\\ESEDatabase_CortanaCoreInstance\\*"
 			],
-			"shadow": true
+			"shadow": true,
+			"tags": ["sans_triage"]
 			},
 			{
 			"category": "Windows",
@@ -484,7 +516,8 @@
 			"paths": [
 				"%HOMEDRIVE%\\ProgramData\\Microsoft\\Network\\Downloader\\*"
 			],
-			"shadow": true
+			"shadow": true,
+			"tags": ["sans_triage"]
 			}
 		],
 		"CortanaDB": {

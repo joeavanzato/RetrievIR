@@ -1,9 +1,9 @@
 <p align="center">
 <img src="assets/logo.png">
 </p>
-<h2 align="center">
+<h1 align="center">
 Forensic Artifact Retrieval
-</h2>
+</h1>
 
 ### What is it?
 
@@ -31,7 +31,9 @@ Common commandline parameters are documented below.
 .\RetrievIR.ps1 -config C:\my_config.json : Specify the path to a custom configuration file to use - by default, RetrievIR will look for all JSON files within the 'configs' directory in PSScriptRoot (current executing directory).
 .\RetrievIR.ps1 -config C:\RetrievIRConfigs : Specify the path to a directory containing 1 or more customer configuration JSON to use - by default, RetrievIR will look for all JSON files within the 'configs' directory in PSScriptRoot (current executing directory).
 .\RetrievIR.ps1 -categories antivirus,recentfiles : Specify to only collect evidence when the category is within the provided values.
-.\RetrievIR.ps1 -categoryscan : Skip all evidence collection and just list all categories in provided configuration file(s).
+.\RetrievIR.ps1 -categoryscan : List all categories in provided configuration file(s).
+.\RetrievIR.ps1 -tags sans_triage : Specify to only collect evidence when the directive contains a provided tag.
+.\RetrievIR.ps1 -tagscan : List all tags in provided configuration file(s).
 .\RetrievIR.ps1 -simulate : Tells RetrievIR to skip evidence collection and only determine how many files and total size of data that would be collected with specified categories/tags.
 ```
 ### What is collected in the default configuration files?
@@ -176,6 +178,8 @@ Configuration files describe forensic evidence to capture from a target endpoint
 2. commands
 3. registry
 
+A configuration file consists of 'directives' which may consist of 1 or more 'objectives' - an objective describes the individual collection task while a directive is the higher level collection of objectives.
+
 #### Files
 
 File Collection Directives are described by 4 primary key attributes in addition to the name of the directive (which is used as the last folder name for evidence storage)
@@ -185,6 +189,7 @@ File Collection Directives are described by 4 primary key attributes in addition
 * paths [array of strings] - The paths to hunt for relevant evidence.
 
 There are a few optional parameters designed to help augment the parsing of evidence as well as collecting 'locked' evidence such as NTUSER.DAT hives, AmCache, etc.
+* tags [array of strings] - Specifies tags applied to the objective.
 * shadow [boolean] - Specifies whether the evidence must be collected from a newly-created Shadow Copy
 * dir_removals [int] - Specifies how many path segments to remove from the front of the path
   * Example: Specifying dir_removal = 5 for a target evidence path such as C:\Users\*\AppData\Local\Apps\* will remove C:, Users, the username, AppData and Local, copying the remaining directory structure of Apps\* into the directive evidence location.
@@ -213,35 +218,35 @@ This directive will check the specified path for any file with any extension, no
 
 ```
 {
-	"files": {
-        "Example": [
-        {
-            "category": "Windows"
-			"filter": ["*.log"],
-			"recursive": false,
-			"paths": [
-				"%HOMEDRIVE%\\ProgramData\\Microsoft\\Test\\*"
-				
-			],
-			"dir_removals": 4
-		},
-        {
-            "category": "Windows"
-			"filter": ["*.txt", "*.db"],
-			"recursive": true,
-			"paths": [
-				"%HOMEDRIVE%\\ProgramData\\Example\\*",
-				"%HOMEDRIVE%\\ProgramData\\AnotherExample\\*"
-			],
-			"shadow": true
-		}
-		]
-	}
+  "files": {
+    "Example": [
+    {
+        "category": "Windows"
+        "filter": ["*.log"],
+        "recursive": false,
+        "paths": [
+            "%HOMEDRIVE%\\ProgramData\\Microsoft\\Test\\*"
+            
+        ],
+        "dir_removals": 4
+    },
+    {
+        "category": "Windows"
+        "filter": ["*.txt", "*.db"],
+        "recursive": true,
+        "paths": [
+            "%HOMEDRIVE%\\ProgramData\\Example\\*",
+            "%HOMEDRIVE%\\ProgramData\\AnotherExample\\*"
+        ],
+        "shadow": true
+    }
+    ]
+  }
 }
 ```
-The example above contains two distinct collection directives under the same module - all detected evidence will be stored in the same parent directory, 'Example', but each directive can have varying specifications.
+The example above contains two distinct collection objectives under the same directive - all detected evidence will be stored in the same parent directory, 'Example', but each directive can have varying specifications.
 
-Reviewing config.json will help users to understand the possibilities available in file-based directives.
+Reviewing the configuration files found inside .\configs will help users to understand the possibilities available in file-based directives.
 
 #### Commands
 
@@ -250,18 +255,19 @@ Command directives are intended to specify commands which should run on the targ
 * category [string] - The category of the command, similar to files - this will group evidence at the parent-level directory.
 * command [string] - The command to execute - each command must output to a file designated as '#FILEPATH#' - this is replaced dynamically in-line.
 * output [string] - The final file name that the resulting evidence will be stored as.
+* tags [array of strings] - Specifies tags applied to the objective.
 
 An example directive is shown below:
 
 ```
 {
   "commmands": {
-        "DNSCache": {
-                    "category": "Network",
-                    "command": "Get-NetTcpConnection -ErrorAction SilentlyContinue | Select * | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
-                    "output": "DNSCache.csv"
-                },
-        }
+    "DNSCache": {
+            "category": "Network",
+            "command": "Get-NetTcpConnection -ErrorAction SilentlyContinue | Select * | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
+            "output": "DNSCache.csv"
+        },
+    }
 }
 ```
 
@@ -278,20 +284,21 @@ Registry directives collect key/value information from specified paths into a si
 * recursive [boolean] - Whether the registry search should be recursive.
 * keys [array of strings] - Specifies specific key-names to store instead of storing all key/value pairs in identified registry paths.
 * store_empty [boolean] - Specifies whether keys that do not have values should be stored.
+* tags [array of strings] - Specifies tags applied to the objective.
 
 An example registry directive is shown below:
 
 ```
 {
-	"registry": {
-		"RDPCache": {
-			"category": "RDP",
-			"paths": ["HKEY_USERS\\*\\SOFTWARE\\Microsoft\\Terminal Server Client\\Servers"],
-			"recursive": true,
-			"keys": ["UsernameHint"],
-			"store_empty": true
-		}
-	}
+  "registry": {
+    "RDPCache": {
+      "category": "RDP",
+      "paths": ["HKEY_USERS\\*\\SOFTWARE\\Microsoft\\Terminal Server Client\\Servers"],
+      "recursive": true,
+      "keys": ["UsernameHint"],
+      "store_empty": true
+    }
+  }
 }
 ```
 
@@ -301,22 +308,22 @@ Registry directives are bundled into a single large script that is executed on t
 
 ```
 [
-    {
-        "name":  "RDPCache",
-        "category":  "RDP",
-        "items":  [
-                      {
-                          "path":  "HKEY_USERS\\S-1-5-21-63485881-451500365-4075260605-1001\\SOFTWARE\\Microsoft\\Terminal Server Client\\Servers\\34.227.81.6",
-                          "values":  [
-                                         {
-                                             "type":  "SZ",
-                                             "name":  "UsernameHint",
-                                             "value":  "MicrosoftAccount\\Administrator"
-                                         }
-                                     ]
-                      }
-                  ]
-    }
+  {
+    "name":  "RDPCache",
+    "category":  "RDP",
+    "items":  [
+                {
+                  "path":  "HKEY_USERS\\S-1-5-21-63485881-451500365-4075260605-1001\\SOFTWARE\\Microsoft\\Terminal Server Client\\Servers\\34.227.81.6",
+                  "values":  [
+                               {
+                                   "type":  "SZ",
+                                   "name":  "UsernameHint",
+                                   "value":  "MicrosoftAccount\\Administrator"
+                               }
+                             ]
+                }
+              ]
+  }
 ]
 ```
 

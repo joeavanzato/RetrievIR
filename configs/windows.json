@@ -1,32 +1,5 @@
 {
 	"files": {
-		"JumpLists": {
-			"category": "RecentFiles",
-			"recursive": false,
-			"filter": ["*"],
-			"paths": [
-				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\Microsoft\\Windows\\Recent\\AutomaticDestinations\\*",
-				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\Microsoft\\Windows\\Recent\\CustomDestinations\\*"
-			],
-			"dir_removals": 8
-		},
-		"Prefetch": {
-			"category": "RecentFiles",
-			"filter": ["*.pf"],
-			"recursive": false,
-			"paths": [
-				"%HOMEDRIVE%\\Windows\\Prefetch\\*"
-			]
-		},
-		"Amcache": {
-			"category": "RecentFiles",
-			"filter": ["Amcache.*","EncapsulationLogging.*"],
-			"recursive": false,
-			"paths": [
-				"%HOMEDRIVE%\\Windows\\AppCompat\\Programs\\*"
-			],
-			"shadow": true
-		},
 		"ShimSDB": {
 			"category": "Windows",
 			"filter": ["*.sdb"],
@@ -87,15 +60,6 @@
 			"dir_removals": 3,
 			"shadow": true
 		},
-		"AssetAdvisorLog": {
-			"category": "RecentFiles",
-			"filter": ["EncapsulationLogging.hve"],
-			"recursive": true,
-			"paths": [
-				"%HOMEDRIVE%\\Windows\\CCM\\Logs\\*"
-			],
-			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/AssetAdvisorLog.tkape"
-		},
 		"ScheduledTasks": {
 			"category": "Windows",
 			"filter": ["*"],
@@ -103,7 +67,8 @@
 			"paths": [
 				"%HOMEDRIVE%\\Windows\\System32\\Tasks\\*"
 			],
-			"dir_removals": 4
+			"dir_removals": 4,
+			"tags": ["sans_triage"]
 		},
 		"ConsoleHistory": {
 			"category": "PowerShell",
@@ -111,7 +76,8 @@
 			"recursive": false,
 			"paths": [
 				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\Microsoft\\Windows\\PowerShell\\PSReadLine\\*"
-			]
+			],
+			"tags": ["sans_triage"]
 		},
 		"WindowsDrivers": {
 			"category": "Windows",
@@ -119,23 +85,6 @@
 			"recursive": false,
 			"paths": [
 				"%HOMEDRIVE%\\Windows\\System32\\drivers\\*"
-			]
-		},
-		"RecycleBin": {
-			"category": "RecentFiles",
-			"filter": ["$I*", "$R*"],
-			"recursive": true,
-			"paths": [
-				"%HOMEDRIVE%\\$Recycle.Bin\\*"
-			],
-			"dir_removals": 2
-		},
-		"RecentFileCache": {
-			"category": "RecentFiles",
-			"filter": ["RecentFileCache.bcf"],
-			"recursive": false,
-			"paths": [
-				"%HOMEDRIVE%\\Windows\\AppCompat\\Programs\\*"
 			]
 		},
 		"RDPCacheFiles": {
@@ -162,7 +111,8 @@
 			"paths": [
 				"%HOMEDRIVE%\\Windows\\Minidump\\*"
 			],
-			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/MemoryFiles.tkape"
+			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/MemoryFiles.tkape",
+			"tags": ["sans_triage"]
 		},
 		"SystemLogFiles": [
 			{
@@ -173,7 +123,8 @@
 				"%HOMEDRIVE%\\Windows\\System32\\LogFiles\\*"
 			],
 			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/LogFiles.tkape",
-			"dir_removals": 4
+			"dir_removals": 4,
+			"tags": ["sans_triage"]
 			},
 			{
 			"category": "Windows",
@@ -182,7 +133,8 @@
 			"paths": [
 				"%HOMEDRIVE%\\Windows\\*"
 			],
-			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/LogFiles.tkape"
+			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/LogFiles.tkape",
+			"tags": ["sans_triage"]
 			}
 		],
 		"MOFs": {
@@ -334,28 +286,14 @@
 		},
 		"NTUSER_Hives": {
 			"category": "Users",
-			"filter": ["NTUSER.DAT"],
+			"filter": ["NTUSER.DAT*"],
 			"recursive": false,
 			"paths": [
-				"%HOMEDRIVE%\\Users\\*\\*"
+				"%HOMEDRIVE%\\Users\\*\\*",
+				"%HOMEDRIVE%\\Windows\\ServiceProfiles\\*\\*"
 			],
-			"shadow": true
-		},
-		"SRUDB": {
-			"category": "RecentFiles",
-			"filter": ["srudb.dat"],
-			"recursive": false,
-			"paths": [
-				"%HOMEDRIVE%\\Windows\\System32\\sru\\*"
-			]
-		},
-		"UAL": {
-			"category": "RecentFiles",
-			"filter": ["*.mdb"],
-			"recursive": false,
-			"paths": [
-				"%HOMEDRIVE%\\Windows\\System32\\LogFiles\\Sum\\*"
-			]
+			"shadow": true,
+			"tags": ["sans_triage"]
 		},
 		"SignatureCatalog": {
 			"category": "Windows",
@@ -387,27 +325,6 @@
 			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/StartupInfo.tkape",
 			"dir_removals": 6
 		},
-		"SnipCache": {
-			"category": "RecentFiles",
-			"filter": ["*.png"],
-			"recursive": false,
-			"paths": [
-				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Packages\\Microsoft.ScreenSketch_*\\TempState\\*"
-			],
-			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/SnipAndSketch.tkape"
-		},
-		"LNK": {
-			"category": "RecentFiles",
-			"filter": ["*"],
-			"recursive": false,
-			"paths": [
-				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\Microsoft\\Windows\\Recent\\*",
-				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\Microsoft\\Office\\Recent\\*",
-				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\Microsoft\\Start Menu\\Programs\\*",
-				"%HOMEDRIVE%\\Users\\*\\Desktop\\*",
-				"%HOMEDRIVE%\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\*"
-			]
-		},
 		"IISConfigs": {
 			"category": "IIS",
 			"filter": ["applicationHost.config","administration.config","redirection.config","web.config"],
@@ -425,7 +342,8 @@
 			"paths": [
 				"%HOMEDRIVE%\\Windows\\System32\\grouppolicy\\*"
 			],
-			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/GroupPolicy.tkape"
+			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/GroupPolicy.tkape",
+			"tags": ["sans_triage"]
 		},
 		"ComputerGroupPolicyFiles": {
 			"category": "Windows",
@@ -434,7 +352,8 @@
 			"paths": [
 				"%HOMEDRIVE%\\ProgramData\\Microsoft\\Group Policy\\History\\*"
 			],
-			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/GroupPolicy.tkape"
+			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/GroupPolicy.tkape",
+			"tags": ["sans_triage"]
 		},
 		"UserGroupPolicyFiles": {
 			"category": "Windows",
@@ -443,7 +362,8 @@
 			"paths": [
 				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Microsoft\\Group Policy\\History\\*"
 			],
-			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/GroupPolicy.tkape"
+			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/GroupPolicy.tkape",
+			"tags": ["sans_triage"]
 		},
 		"EventLogs": {
 			"category": "Windows",
@@ -470,23 +390,8 @@
 			"recursive": false,
 			"paths": [
 				"%HOMEDRIVE%\\Windows\\System32\\winevt\\logs\\*"
-			]
-		},
-		"ProgramCompatAssistant": {
-			"category": "RecentFiles",
-			"filter": ["PcaAppLaunchDic.txt"],
-			"recursive": false,
-			"paths": [
-				"%HOMEDRIVE%\\Windows\\AppCompat\\pca\\*"
-			]
-		},
-		"BitmapCache": {
-			"category": "RecentFiles",
-			"filter": ["bcache*.bmc","cache*.bin"],
-			"recursive": false,
-			"paths": [
-				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Microsoft\\Terminal Server Client\\Cache\\*"
-			]
+			],
+			"tags": ["sans_triage"]
 		},
 		"WinTimeline": {
 			"category": "Windows",
@@ -502,14 +407,6 @@
 			"recursive": false,
 			"paths": [
 				"%HOMEDRIVE%\\ProgramData\\Microsoft\\Search\\Data\\Applications\\Windows\\GatherLogs\\SystemIndex\\*"
-			]
-		},
-		"ThumbCache": {
-			"category": "RecentFiles",
-			"filter": ["Thumbcache_*"],
-			"recursive": false,
-			"paths": [
-				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Microsoft\\Windows\\Explorer\\*"
 			]
 		},
 		"USBSetupAPILog": {
@@ -605,6 +502,14 @@
 			"recursive": true,
 			"paths": [
 				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\Microsoft\\Protect\\*\\*"
+			]
+		},
+		"WindowsFirewall": {
+			"category": "Windows",
+			"filter": ["*"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Windows\\System32\\LogFiles\\Firewall\\pfirewall.*"
 			]
 		}
 	},

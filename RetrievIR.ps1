@@ -331,6 +331,7 @@ function Get-Configuration {
 
 function Build-Registry-Script ($data) {
 
+
     $tmp_timestamp = (Get-Date).toString("HH:mm:ss") -replace (":","_")
     $script:registry_output = "C:\Windows\temp\retrievir_registry_output_$tmp_timestamp.json"
     $Serialized_reg_data = [System.Management.Automation.PSSerializer]::Serialize($data.registry)
@@ -339,11 +340,16 @@ function Build-Registry-Script ($data) {
     $Serialized_category = [System.Management.Automation.PSSerializer]::Serialize($categories)
     $bytes_categories = [System.Text.Encoding]::Unicode.GetBytes($Serialized_category)
     $encoded_category = [Convert]::ToBase64String($bytes_categories)
+    $Serialized_tags = [System.Management.Automation.PSSerializer]::Serialize($tags)
+    $bytes_tags = [System.Text.Encoding]::Unicode.GetBytes($Serialized_tags)
+    $encoded_tags = [Convert]::ToBase64String($bytes_tags)
     $script:read_registry_script = "
     `$Serialized = [System.Text.Encoding]::Unicode.GetString([System.Convert]::FromBase64String('$EncodedRegData'))
     `$directives  = [System.Management.Automation.PSSerializer]::Deserialize(`$Serialized)
     `$Serialized_category = [System.Text.Encoding]::Unicode.GetString([System.Convert]::FromBase64String('$encoded_category'))
     `$categories  = [System.Management.Automation.PSSerializer]::Deserialize(`$Serialized_category)
+    `$Serialized_tags = [System.Text.Encoding]::Unicode.GetString([System.Convert]::FromBase64String('$encoded_tags'))
+    `$tags  = [System.Management.Automation.PSSerializer]::Deserialize(`$Serialized_tags)
     `$output_path = '$registry_output'
     `$type_mapping = @{
         3 = 'BINARY'
@@ -367,6 +373,22 @@ function Build-Registry-Script ($data) {
                         items = New-Object -TypeName 'System.Collections.ArrayList'
                     }
                     if (`$categories[0] -eq '*') { } elseif (`$inner_objective.category -in `$categories) { } else {continue }
+                    if (`$tags[0] -eq '*'){
+                    } elseif (`$tags){
+                        if (`$inner_objective.tags){
+                            `$pass = `$true
+                            ForEach (`$t in `$inner_objective.tags){
+                                if (`$t -in `$tags){
+                                    `$pass = `$false
+                                }
+                            }
+                        } else {
+                            continue
+                        }
+                        if (`$pass){
+                            continue
+                        }
+                    }
                     `$recurse = `$inner_objective.recursive
                     `$category = `$inner_objective.category
                     `$paths = `$inner_objective.paths

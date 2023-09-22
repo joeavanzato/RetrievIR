@@ -29,30 +29,20 @@ param
 	[Parameter(Mandatory = $false, HelpMessage = 'Line-delimited list of target computers - if specified, -targets parameter will be ignored.')]
 	[string]$target_file,
 
-	[Parameter(Mandatory = $false, HelpMessage = 'If specified, will prompt for credentials to use for remote operations (if not using current user).')]
+	[Parameter(Mandatory = $false, HelpMessage = 'If specified, will prompt for credentials to use for remote operations (if not using current user). [TODO]')]
 	[switch]$creds,
 
-	[Parameter(Mandatory = $false, HelpMessage = 'If specified, will setup a Shadow Copy to access locked system files.')]
-	[switch]$vss,
+	[Parameter(Mandatory = $false, HelpMessage = 'If specified, will not create Shadow Copy to access locked system files. [TODO]')]
+	[switch]$noshadow,
 
-	[Parameter(Mandatory = $false, HelpMessage = 'Select specific directives to run using comma-delimited arguments.')]
-    [ValidateSet(
-		"AntiVirus",
-        "AppX",
-        "Browsers",
-        "CloudApps",
-        "Network",
-        "Office",
-        "PowerShell",
-        "RDP",
-        "RecentFiles",
-        "RemoteAccessTools",
-        "Users",
-        "WDI",
-        "Windows",
-        "WMI"
-	)]
-	[string]$categories
+	[Parameter(Mandatory = $false, HelpMessage = 'Return information on how many files and total size of data that would be collected with specified configuration.')]
+	[switch]$simulate,
+
+	[Parameter(Mandatory = $false, HelpMessage = 'Return information on categories available for use with -categories argument from specified configuration file(s).')]
+	[switch]$categoryscan,
+
+	[Parameter(Mandatory = $false, HelpMessage = 'Select specific directive-categories to run using comma-delimited arguments - only directives which are contained within the list will be executed.')]
+	[array]$categories = @("*")
 )
 
 $global_configuration = [hashtable]::Synchronized(@{})
@@ -62,12 +52,6 @@ $log_path = $PSScriptRoot + "\RetrievIRAudit.log"
 $shadow_stamp = (Get-Date).toString("HH:mm:ss") -replace (":","_")
 $shadowcopy_name = "rretrievir_copy_$shadow_stamp"
 $shadowcopy_output_status_file = "retrievir_vss_status_$shadow_stamp"
-if ($vss) {
-    $root = $env:systemdrive+"\"+$shadowcopy_name
-} else {
-    $root = $env:systemdrive
-}
-
 
 # We will send the functions to a remote computer and output the result to a file at C:\Windows\temp\powerhaul_vss_check.txt
 # If shadow creation is successful, file contents will contain below:
@@ -155,32 +139,76 @@ function Log-Message ($msg, $error, $color, $quiet){
 
 function Summarize-Configuration ($data){
     Log-Message "[!] Configuration Summary:"
+    $category_list = New-Object -TypeName 'System.Collections.ArrayList'
     if ($data.files){
-        ForEach ($i in $data.files){
-            $name = $i.psobject.Properties.Name
-            $file_dir_count = $name | Measure-Object
+        $directives = 0
+        ForEach ($object in $data.files){
+            $name = $object.psobject.Properties.Name
+            ForEach ($j in $name){
+                ForEach ($k in $object.$j){
+                    ForEach ($directive in $k){
+                        if (-not ($directive.category -in $category_list)){
+                            $category_list.Add($directive.category) | Out-Null
+                        }
+                        if ($categories[0] -eq '*') { $directives += 1 } elseif ($directive.category -in $categories) { $directives += 1 } else {
+                            continue
+                        }
+                    }
+                }
+            }
+            #$file_dir_count = $name | Measure-Object
         }
-        Log-Message "[+] File Collection Directives: $($file_dir_count.Count)"
+        Log-Message "[+] File Objectives: $directives"
     } else {
-        Log-Message "[+] File Collection Directives: 0"
+        Log-Message "[+] File Objectives: 0"
     }
     if ($data.registry){
+        $directives = 0
         ForEach ($i in $data.registry){
             $name = $i.psobject.Properties.Name
-            $reg_dir_count = $name | Measure-Object
+            #$reg_dir_count = $name | Measure-Object
+            ForEach ($j in $name){
+                ForEach ($k in $i.$j){
+                    ForEach ($directive in $k){
+                        if (-not ($directive.category -in $category_list)){
+                            $category_list.Add($directive.category) | Out-Null
+                        }
+                        if ($categories[0] -eq '*') { $directives += 1 } elseif ($directive.category -in $categories) { $directives += 1 } else {
+                            continue
+                        }
+                    }
+                }
+            }
         }
-        Log-Message "[+] Registry Collection Directives: $($reg_dir_count.Count)"
+        Log-Message "[+] Registry Objectives: $directives"
     } else {
-        Log-Message "[+] Registry Collection Directives: 0"
+        Log-Message "[+] Registry Objectives: 0"
     }
     if ($data.commands){
+        $directives = 0
         ForEach ($i in $data.commands){
             $name = $i.psobject.Properties.Name
-            $command_count = $name | Measure-Object
+            #$command_count = $name | Measure-Object
+            ForEach ($j in $name){
+                ForEach ($k in $i.$j){
+                    ForEach ($directive in $k){
+                        if (-not ($directive.category -in $category_list)){
+                            $category_list.Add($directive.category) | Out-Null
+                        }
+                        if ($categories[0] -eq '*') { $directives += 1 } elseif ($directive.category -in $categories) { $directives += 1 } else {
+                            continue
+                        }
+                    }
+                }
+            }
         }
-        Log-Message "[+] Command Collection Directives: $($command_count.Count)"
+        Log-Message "[+] Command Objectives: $directives"
     } else {
-        Log-Message "[+] Command Collection Directives: 0"
+        Log-Message "[+] Command Objectives: 0"
+    }
+    if ($categoryscan){
+        Log-Message "[!] Available Categories in Scanned Configs: $($category_list -join ', ')"
+        exit
     }
 }
 
@@ -218,11 +246,11 @@ function Get-Configuration {
     }#>
 
     try {
-    $file_list = Get-ChildItem -Path $config | Where-Object {! $_.PSIsContainer } | Select-Object -ExpandProperty FullName
+        $file_list = Get-ChildItem -Path $config | Where-Object {! $_.PSIsContainer } | Select-Object -ExpandProperty FullName
     } catch {
         Log-Message "[!] Error reading specified configuration path" $true
         Log-Message "[!] Exiting..."
-        #exit
+        exit
     }
     $module_first_seen = @{}
     if ($file_list.GetType().Name -eq "String"){
@@ -235,7 +263,6 @@ function Get-Configuration {
         ForEach ($module in $tmp_data){
             ForEach ($type in "files","registry","commands"){
                 if ($module.$type){
-                    $module.$type
                     ForEach ($item in $module.$type){
                         $name = $item.psobject.Properties.Name
                         ForEach ($n in $name){
@@ -250,17 +277,27 @@ function Get-Configuration {
         }
         Merge $data $tmp_data $counter
     }
-
     Summarize-Configuration $data
+    Log-Message "[!] Targeted Directive Categories: $categories"
+    Build-Registry-Script $data
+    return $data
+}
+
+function Build-Registry-Script ($data) {
 
     $tmp_timestamp = (Get-Date).toString("HH:mm:ss") -replace (":","_")
     $script:registry_output = "C:\Windows\temp\retrievir_registry_output_$tmp_timestamp.json"
-    $Serialized = [System.Management.Automation.PSSerializer]::Serialize($data.registry)
-    $Bytes = [System.Text.Encoding]::Unicode.GetBytes($Serialized)
-    $EncodedArguments = [Convert]::ToBase64String($Bytes)
+    $Serialized_reg_data = [System.Management.Automation.PSSerializer]::Serialize($data.registry)
+    $Bytes_reg_data = [System.Text.Encoding]::Unicode.GetBytes($Serialized_reg_data)
+    $EncodedRegData = [Convert]::ToBase64String($Bytes_reg_data)
+    $Serialized_category = [System.Management.Automation.PSSerializer]::Serialize($categories)
+    $bytes_categories = [System.Text.Encoding]::Unicode.GetBytes($Serialized_category)
+    $encoded_category = [Convert]::ToBase64String($bytes_categories)
     $script:read_registry_script = "
-    `$Serialized = [System.Text.Encoding]::Unicode.GetString([System.Convert]::FromBase64String('$EncodedArguments'))
+    `$Serialized = [System.Text.Encoding]::Unicode.GetString([System.Convert]::FromBase64String('$EncodedRegData'))
     `$directives  = [System.Management.Automation.PSSerializer]::Deserialize(`$Serialized)
+    `$Serialized_category = [System.Text.Encoding]::Unicode.GetString([System.Convert]::FromBase64String('$encoded_category'))
+    `$categories  = [System.Management.Automation.PSSerializer]::Deserialize(`$Serialized_category)
     `$output_path = '$registry_output'
     `$type_mapping = @{
         3 = 'BINARY'
@@ -283,6 +320,7 @@ function Get-Configuration {
                         category = `$inner_objective.category
                         items = New-Object -TypeName 'System.Collections.ArrayList'
                     }
+                    if (`$categories[0] -eq '*') { } elseif (`$inner_objective.category -in `$categories) { } else {continue }
                     `$recurse = `$inner_objective.recursive
                     `$category = `$inner_objective.category
                     `$paths = `$inner_objective.paths
@@ -354,7 +392,6 @@ function Get-Configuration {
     }
     `$primary_object | ConvertTo-Json -Depth 6 | Add-Content -Path `$output_path
     "
-    return $data
 }
 
 function Get-Targets {
@@ -382,6 +419,8 @@ function Get-Targets {
 }
 
 function Start-Jobs ($computer_targets){
+    $script:total_files_collected = 0
+    $script:total_file_size = 0
     Log-Message "[+] Starting Collection..."
 
     $evidence_dir_replace = $evidence_dir -Replace (":", "$")
@@ -397,7 +436,11 @@ function Start-Jobs ($computer_targets){
         Log-Message "[+] Targeting: $target"
         $current_evidence_dir = $evidence_dir + "\" + $target
         Create-Directory $current_evidence_dir
-        $status = Create-Shadow $target
+        if (-not $simulate){
+            $status = Create-Shadow $target
+        } else {
+            Log-Message "[!] Simulation Enabled"
+        }
         if ($status -eq 1){
             Log-Message "[!] [$target] Shadow Created Successfully!"
             Get-Files $target $current_evidence_dir $true
@@ -405,9 +448,18 @@ function Start-Jobs ($computer_targets){
             Log-Message "[!] [$target] Shadow Failure - System/Locked Files will be unavailable!"
             Get-Files $target $current_evidence_dir $false
         }
-        Run-Commands $target $current_evidence_dir
-        Get-Registry $target $current_evidence_dir
-        Delete-Shadow $target
+        if (-not $simulate){
+            Run-Commands $target $current_evidence_dir
+            Get-Registry $target $current_evidence_dir
+            Delete-Shadow $target
+        } else {
+            Log-Message "[!] Skipping Registry/Command Collection due to simulation!"
+        }
+    }
+    if ($simulate){
+        Log-Message "[!] Total Files to be Collected: $total_files_collected"
+        $size_in_mb = $total_file_size / 1MB
+        Log-Message "[!] Total File Size: $([math]::Round($size_in_mb, 2)) Megabytes"
     }
 }
 
@@ -447,14 +499,18 @@ function Get-Files ($target, $current_evidence_dir, $root_replace) {
     ForEach ($object in $global_configuration.config.files){
         $obj_names = $object.psobject.Properties.Name
         ForEach ($category in $obj_names){
-            Log-Message "[+] [$target] Collecting: $category"
             ForEach ($item in $object.$category){
                 ForEach ($directive in $item){
                     $file_evidence_dir = $current_evidence_dir + "\" + $directive.category + "\" + $category
-                    if (-not ($root_replace) -and $directive.shadow){
+                    if (-not ($root_replace) -and $directive.shadow -and -not $simulate){
                         Log-Message "[+] [$target] Skipping: $category - Requires Volume Shadow which was unsuccessful!"
                         continue
                     }
+                    if ($categories[0] -eq '*') { } elseif ($directive.category -in $categories) { } else {
+                        #Log-Message "[+] [$target] Skipping: $category - Not in specified arguments!"
+                        continue
+                    }
+                    Log-Message "[+] [$target] Collecting: $category"
                     ForEach ($path in $directive.paths){
                         if ($root_replace -and $directive.shadow){
                             $shadow_ok = $true
@@ -503,6 +559,11 @@ function Get-Files ($target, $current_evidence_dir, $root_replace) {
                         }
                         #Write-Host "FILES TO COPY: $($file_list.Count)"
                         ForEach ($file in $file_list){
+                            $script:total_files_collected += 1
+                            if ($simulate){
+                                $script:total_file_size += $file.Length
+                                continue
+                            }
                             # If the file we are attempting to copy exists under a specific user directory (Jumplists, etc) then we will store it under the relevant users name - $evidence_dir\jumplists\$USERNAME\$file
                             try {
                                 if ($($file.FullName) -match ".*\\users\\(?<user>[^\\]*)\\.*"){
@@ -550,8 +611,6 @@ function Get-Files ($target, $current_evidence_dir, $root_replace) {
                             #    Log-Message "[!] [$target] Error copying file: $($file.FullName)" $false "red"
                             #}
                         }
-
-
                     }
                 }
             }
@@ -588,6 +647,9 @@ function Run-Commands ($target, $current_evidence_dir) {
     ForEach ($item in $global_configuration.config.commands){
         $obj_names = $item.psobject.Properties.Name
         ForEach ($category in $obj_names){
+            if ($categories[0] -eq '*') { } elseif ($item.$category.category -in $categories) { } else {
+                #Log-Message "[+] [$target] Skipping: $($item.$category.category) - Not in specified arguments!"
+                continue }
             Log-Message "[+] [$target] Collecting: $category"
             $cmd_evidence_dir = $current_evidence_dir + "\" + $item.$category.category + "\" + $category
             Create-Directory $cmd_evidence_dir
@@ -637,7 +699,6 @@ function Run-Commands ($target, $current_evidence_dir) {
     }
 }
 
-
 function Get-Registry ($target, $current_evidence_dir) {
     # There are typically 3 classic ways to read the registry of a remote device:
     # 1 - InvokeCommand with classic PowerShell - requires WinRM, basically a non-starter for most endpoints
@@ -649,6 +710,25 @@ function Get-Registry ($target, $current_evidence_dir) {
 
     #$command_start = Execute-WMI-Command $full_command $target
     Log-Message "[*] [$target] Starting Registry Collection"
+    $collect_count = 0
+    ForEach ($object in $global_configuration.config.registry) {
+        $obj_names = $object.psobject.Properties.Name
+        ForEach ($module in $obj_names){
+            ForEach ($objective in $object.$module){
+                ForEach ($inner_objective in $objective){
+                    $category = $inner_objective.category
+                    if ($categories[0] -eq '*') { $collect_count += 1 } elseif ($category -in $categories) { $collect_count += 1 } else {
+                        #Log-Message "[+] [$target] Skipping: $($category) - Not in specified arguments!"
+                        continue }
+                }
+            }
+        }
+    }
+    if ($collect_count -eq 0){
+        Log-Message "[+] [$target] No Registry Directives match specified categories - skipping!"
+        return
+    }
+
     try {
         Log-Message "[*] [$target] Copying Script to Target"
         Set-Content -Path "\\$target\C$\Windows\temp\retrievir_registry_collection.ps1" -Value $read_registry_script
@@ -749,14 +829,12 @@ function Get-Registry ($target, $current_evidence_dir) {
     }#>
 }
 
-
 function Get-Credentials {
     $Credential = $host.ui.PromptForCredential("RetrievIR Credential Entry", "Please enter username and password.", "", "NetBiosUserName")
     #Write-Host $Credential.UserName
     #Write-Host $Credential.GetNetworkCredential().Password
     return $Credential
 }
-
 
 function Create-Shadow ($target){
     Log-Message "[+] [$target] Creating Shadow"
@@ -785,7 +863,12 @@ function Create-Shadow ($target){
 
 function Delete-Shadow ($target){
     Log-Message "[+] [$target] Deleting Shadow"
-    $shadow_start = Invoke-WmiMethod -ComputerName $target -Credential $global_configuration.credential -Class Win32_Process -Name Create -ArgumentList "$remove_shadow_command"
+    if ($global_configuration.credential){
+        $shadow_start = Invoke-WmiMethod -ComputerName $target -Credential $global_configuration.credential -Class Win32_Process -Name Create -ArgumentList "$remove_shadow_command"
+    } else {
+        $shadow_start = Invoke-WmiMethod -ComputerName $target -Class Win32_Process -Name Create -ArgumentList "$remove_shadow_command"
+    }
+
 }
 
 function Main{

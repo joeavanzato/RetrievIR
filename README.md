@@ -18,12 +18,13 @@ The tool is also designed to allow for flexible evidence specification via the i
 
 ### Usage
 
-To use, just download the RetrievIR.ps1 and either config.json or individual configs present in \configs - by default, RetrievIR will check for a configs directory in the script's root directory - if it is unable to find this, it will then check for a file named 'config.json' in the same directory.  If it is unable to find either of these and a parameter has not been provided, RetrievIR will not execute.
+To use, just download the latest release and unzip - by default, RetrievIR will check for a configs directory in the script's root directory - if it is unable to find this, it will then check for a file named 'config.json' in the same directory.  If it is unable to find either of these and a parameter has not been provided, RetrievIR will not execute.
 
 Common commandline parameters are documented below.
 
 ```
 .\RetrievIR.ps1 : Default Usage - collects all artifacts specified in JSON within 'configs' directory from the localhost into the current directory.
+.\RetrievIR.ps1 -tags sans_triage - Capture most artifacts described in the SANS Triage package within KAPE
 .\RetrievIR.ps1 -targets HOSTNAME1,HOSTNAME2 : Run RetrievIR against the provided hostnames.
 .\RetrievIR.ps1 -target_file C:\targets.txt : Run RetrievIR against the line-delimited targets present in the specified text file.
 .\RetrievIR.ps1 -creds : Tell RetrievIR to prompt the user for credentials to use - by default, RetrievIR runs with the current user context.
@@ -36,9 +37,10 @@ Common commandline parameters are documented below.
 .\RetrievIR.ps1 -tagscan : List all tags in provided configuration file(s).
 .\RetrievIR.ps1 -simulate : Tells RetrievIR to skip evidence collection and only determine how many files and total size of data that would be collected with specified categories/tags.
 ```
+
 ### What is collected in the default configuration files?
 
-The default configuration files are meant to be more 'complete' repositories of information - these should be trimmed and tailored to meet your teams Incident Response needs - additionally, a 'SANS Triage' configuration is included in this repository as 'sans_triage.json' - this attempts to mimic the standard KAPE SANS Triage artifact collection.
+The default configuration files are meant to be more 'complete' repositories of information - these should be trimmed and tailored to meet your teams Incident Response needs - additionally, a 'sans_triage' tag is applied to a select component of objectives - this tag attempts to mimic the standard KAPE SANS Triage artifact collection.
 
 * Jumplists
 * Prefetch Files
@@ -146,6 +148,13 @@ The default configuration files are meant to be more 'complete' repositories of 
   * UltraVNC
   * UltraViewer
   * ZoHo Assist / GoToMeeting
+* Browser Metadata
+  * Internet Explorer
+  * Edge
+  * Chrome
+  * Brave
+  * Opera
+  * Firefox
 * DNS Cache
 * Windows Services
 * TCP Connections
@@ -159,6 +168,15 @@ The default configuration files are meant to be more 'complete' repositories of 
 * Installed Software
 * ActiveScript/CommandLine WMI Consumers
 * Running Processes
+* USN Journal
+
+### TODO
+* $MFT
+* $J
+* $LogFile
+* $SDS
+* $Boot
+* $T
 
 ### Images
 

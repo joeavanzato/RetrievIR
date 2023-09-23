@@ -11,16 +11,24 @@ RetrievIR ['Retriever'] is a light-weight PowerShell script built to help Incide
 
 The tool is designed to gather as many 'raw' artifacts as possible for easier use in downstream data analysis pipelines.
 
-The tool is also designed to allow for flexible evidence specification via the input configuration file - collection directives can be one of three forms:
+RetrievIR is also designed to allow for flexible evidence specification via configuration file inputs - collection directives can be one of three forms:
 * Files - Specify file paths with filters and whether to check recursively or not.
 * Commands - Specify commands to run - commands should output to some type of file and are executed via the PowerShell interpreter.
 * Registry - Specify paths with relevant keys to filter on (if any) along with recursiveness.
 
+### Main Features
+* Flexible evidence collection based on customizable configuration files.
+* Ability to collect files, registry values and command outputs.
+* Allows for tagging of evidence-collection objectives for easy specification at run-time.
+* Capable of analyzing both local and remote forensic targets.
+* Simulation functionality to determine total data size to collect with specified configuration.
+* Minimum requirements - WMI and SMB for most capabilities - VSS optional for locked files.
+
 ### Usage
 
-To use, just download the latest release and unzip - by default, RetrievIR will check for a configs directory in the script's root directory - if it is unable to find this, it will then check for a file named 'config.json' in the same directory.  If it is unable to find either of these and a parameter has not been provided, RetrievIR will not execute.
+To use, just download the latest release, unzip and run RetrievIR.ps1 as an administrator - by default, RetrievIR will check for a configs directory in the script's root directory - if it is unable to find this, it will then check for a file named 'config.json' in the same directory.  If it is unable to find either of these and a parameter has not been provided, RetrievIR will exit.
 
-Common commandline parameters are documented below.
+Common commandline parameters are documented below with examples.
 
 ```
 .\RetrievIR.ps1 : Default Usage - collects all artifacts specified in JSON within 'configs' directory from the localhost into the current directory.

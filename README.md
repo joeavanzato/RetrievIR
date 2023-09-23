@@ -189,7 +189,7 @@ The default configuration files are meant to be more 'complete' repositories of 
 </p>
 
 <p align="center">
-<img src="assets/flow.png">
+<img src="assets/flow.png" height="250">
 </p>
 
 

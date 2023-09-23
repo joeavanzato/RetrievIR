@@ -55,7 +55,6 @@
 				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Kaseya\\Log\\KaseyaLiveConnect\\*",
 				"%HOMEDRIVE%\\ProgramData\\Kaseya\\Log\\Endpoint\\*",
 				"%HOMEDRIVE%\\Program Files*\\Kaseya\\*\\*.log",
-				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Temp\\*.log",
 				"%HOMEDRIVE%\\Windows\\Temp\\KASetup.log",
 				"%HOMEDRIVE%\\ProgramData\\Kaseya\\Log\\KaseyaEdgeServices\\*"
 			]

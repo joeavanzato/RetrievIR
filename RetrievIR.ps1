@@ -32,7 +32,7 @@ param
 	[Parameter(Mandatory = $false, HelpMessage = 'If specified, will prompt for credentials to use for remote operations (if not using current user). [TODO]')]
 	[switch]$creds,
 
-	[Parameter(Mandatory = $false, HelpMessage = 'If specified, will not create Shadow Copy to access locked system files. [TODO]')]
+	[Parameter(Mandatory = $false, HelpMessage = 'If specified, will not create Shadow Copy to access locked system files.')]
 	[switch]$noshadow,
 
 	[Parameter(Mandatory = $false, HelpMessage = 'Return information on how many files and total size of data that would be collected with specified configuration.')]
@@ -520,7 +520,7 @@ function Start-Jobs ($computer_targets){
         } else {
             Log-Message "[!] Simulation Enabled"
         }
-        if ($status -eq 1){
+        if ($status -eq 1 -and -not ($noshadow)){
             Log-Message "[!] [$target] Shadow Created Successfully!"
             Get-Files $target $current_evidence_dir $true
         } else {
@@ -633,13 +633,15 @@ function Get-Files ($target, $current_evidence_dir, $root_replace) {
                                         $files = Get-ChildItem -Path "$tmp_path" -Filter $filter -Force -ErrorVariable FailedItems -ErrorAction SilentlyContinue | Where {! $_.PSIsContainer }
                                     }
                                 } catch {
-                                    Log-Message $_.Exception.GetType().FullName $true
+                                    #Log-Message $_.Exception.GetType().FullName $true
                                 }
                                 ForEach ($failure in $FailedItems){
                                     if ($failure.Exception -is [UnauthorizedAccessException]){
                                         Log-Message "[!] [$target] Unauthorized Access Exception (Reading): $($failure.TargetObject)" $false "red"
                                     } elseif ($failure.Exception -is [ArgumentException]){
                                         Log-Message "[!] [$target] Invalid Argument Specified (Reading): $($failure.TargetObject)" $false "red"
+                                    } else {
+                                        Log-Message $_.Exception.GetType().FullName $true "red"
                                     }
                                 }
                                 foreach ($f in $files){

@@ -188,6 +188,10 @@ The default configuration files are meant to be more 'complete' repositories of 
 <img src="assets/usage_2.png">
 </p>
 
+<p align="center">
+<img src="assets/flow.png">
+</p>
+
 
 ### Building Custom Configurations
 

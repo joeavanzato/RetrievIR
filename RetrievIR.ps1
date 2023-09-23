@@ -1,17 +1,79 @@
-# Goals
-# Collect specified forensic evidence from local and remote devices
-# Collection of files based on JSON Configuration module
-# Requirements
-# WMI
-# SMB or WinRM for accessing files on remote hosts
-#
+<#
+    .SYNOPSIS
+    RetrievIR is an evidence-collection utility designed to collect forensic artifacts from local and remote hosts.
+
+    .PARAMETER evidence_dir
+    The fully-qualified file-path where evidence should be stored.
+
+    .PARAMETER config
+    The fully-qualified path to a JSON configuration file or a directory containing multiple configuration files.
+    Example: .\RetrievIR.ps1 -config C:\myconfig.json
+    Example: .\RetrievIR.ps1 -config C:\configs
+
+    .PARAMETER targets
+    Specify collection-targets as hostnames or IP addresses in a comma-delimited manner.
+    Example: .\RetrievIR.ps1 -targets hostname1,hostname2
+
+    .PARAMETER target_file
+    Specify a file containing line-delimited hostnames.
+    Example: .\RetrievIR.ps1 -target_file C:\targets.txt
+
+    .PARAMETER creds
+    Tells RetrievIR to prompt for new credentials to execute as.
+    Example: .\RetrievIR.ps1 -creds
+
+    .PARAMETER noshadow
+    Tells RetrievIR to not create a Shadow Copy - this will remove the capability to collect certain artifacts.
+    Example: .\RetrievIR.ps1 -noshadow
+
+    .PARAMETER simulate
+    Tells RetrievIR to skip actual collection actions and calculate the total size of data to be collected based on the specified configuration.
+    Example: .\RetrievIR.ps1 -simulate
+
+    .PARAMETER categoryscan
+    Tells RetrievIR to list out all categories available in the specified configuration.
+    Example: .\RetrievIR.ps1 -categoryscan
+
+    .PARAMETER tagscan
+    Tells RetrievIR to list out all tags available in the specified configuration.
+    Example: .\RetrievIR.ps1 -tagscan
+
+    .PARAMETER categories
+    Provide a comma-delimited list of categories - only objectives which match will be executed.
+    Example: .\RetrievIR.ps1 -categories antivirus,recentfiles
+
+    .PARAMETER tags
+    Provide a comma-delimited list of tags - only objectives which match will be executed.
+    Example: .\RetrievIR.ps1 -tags sans_triage
+
+    .EXAMPLE
+    .\RetrievIR.ps1 -tags sans_triage - Capture most artifacts described in the SANS Triage package within KAPE
+
+    .EXAMPLE
+    .\RetrievIR.ps1 -categories antivirus,recentfiles : Specify to only collect evidence when the category is within the provided values.
+
+    .EXAMPLE
+    .\RetrievIR.ps1 -tags sans_triage -simulate : Find out how much size the total data collection will consume without actually executing it.
+
+    .OUTPUTS
+    None
+
+    .NOTES
+    None
+
+    .INPUTS
+    None
+
+    .LINK
+    https://github.com/joeavanzato/RetrievIR
+#>
+
 
 # General Thought Process
 # Configuration file will specify files, registry keys or commands to execute on local or remote hosts
 # Target List will be provided via command-line or file - no list means localhost only
-# If targeting is specified, user should specify whether SMB or WinRM will be used for file-transfer capabilities to retrieve evidence from remote hosts
+# If targeting is specified, user should specify whether SMB or WinRM will be used for file-transfer capabilities to retrieve evidence from remote hosts (TODO)
 # If none is specified, SMB will be assumed.
-# First - Power
 
 
 [CmdletBinding()]

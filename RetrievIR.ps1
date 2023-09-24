@@ -210,7 +210,7 @@ function Summarize-Configuration ($data){
     $category_list = New-Object -TypeName 'System.Collections.ArrayList'
     $tag_list = New-Object -TypeName 'System.Collections.ArrayList'
     if ($data.files){
-        $directives = 0
+        $file_directives = 0
         ForEach ($object in $data.files){
             $name = $object.psobject.Properties.Name
             ForEach ($j in $name){
@@ -232,19 +232,19 @@ function Summarize-Configuration ($data){
                         if (-not ($categories[0] -eq '*') -and -not ($directive.category -in $categories)) {
                             continue
                         }
-                        $directives += 1
+                        $file_directives += 1
 
                     }
                 }
             }
             #$file_dir_count = $name | Measure-Object
         }
-        Log-Message "[+] File Objectives: $directives"
+        Log-Message "[+] File Objectives: $file_directives"
     } else {
         Log-Message "[+] File Objectives: 0"
     }
     if ($data.registry){
-        $directives = 0
+        $regdirectives = 0
         ForEach ($i in $data.registry){
             $name = $i.psobject.Properties.Name
             #$reg_dir_count = $name | Measure-Object
@@ -267,17 +267,17 @@ function Summarize-Configuration ($data){
                         if (-not ($categories[0] -eq '*') -and -not ($directive.category -in $categories)) {
                             continue
                         }
-                        $directives += 1
+                        $regdirectives += 1
                     }
                 }
             }
         }
-        Log-Message "[+] Registry Objectives: $directives"
+        Log-Message "[+] Registry Objectives: $regdirectives"
     } else {
         Log-Message "[+] Registry Objectives: 0"
     }
     if ($data.commands){
-        $directives = 0
+        $cmddirectives = 0
         ForEach ($i in $data.commands){
             $name = $i.psobject.Properties.Name
             #$command_count = $name | Measure-Object
@@ -300,12 +300,12 @@ function Summarize-Configuration ($data){
                         if (-not ($categories[0] -eq '*') -and -not ($directive.category -in $categories)) {
                             continue
                         }
-                        $directives += 1
+                        $cmddirectives += 1
                     }
                 }
             }
         }
-        Log-Message "[+] Command Objectives: $directives"
+        Log-Message "[+] Command Objectives: $cmddirectives"
     } else {
         Log-Message "[+] Command Objectives: 0"
     }
@@ -315,6 +315,11 @@ function Summarize-Configuration ($data){
     }
     if ($tagscan){
         Log-Message "[!] Available Tags in Scanned Configs: $($tag_list -join ', ')"
+        exit
+    }
+    if ($file_directives -eq 0 -and $regdirectives -eq 0 -and $cmddirectives -eq 0){
+        Log-Message "[!] No objectives match specified configs/categories/tags!"
+        Log-Message "[!] Exiting!"
         exit
     }
 }
@@ -980,9 +985,26 @@ function Get-Registry ($target, $current_evidence_dir) {
             ForEach ($objective in $object.$module){
                 ForEach ($inner_objective in $objective){
                     $category = $inner_objective.category
-                    if ($categories[0] -eq '*') { $collect_count += 1 } elseif ($category -in $categories) { $collect_count += 1 } else {
+                    if ($categories[0] -eq '*') { } elseif ($category -in $categories) { } else {
                         #Log-Message "[+] [$target] Skipping: $($category) - Not in specified arguments!"
                         continue }
+                    if ($tags[0] -eq "*"){
+                    } elseif ($tags){
+                        if ($inner_objective.tags){
+                            $pass = $true
+                            ForEach ($t in $inner_objective.tags){
+                                if ($t -in $tags){
+                                    $pass = $false
+                                }
+                            }
+                        } else {
+                            continue
+                        }
+                        if ($pass){
+                            continue
+                        }
+                    }
+                    $collect_count += 1
                 }
             }
         }

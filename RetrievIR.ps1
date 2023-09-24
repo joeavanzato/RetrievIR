@@ -578,21 +578,21 @@ function Start-Jobs ($computer_targets){
         $current_evidence_dir = $evidence_dir + "\" + $target
         Create-Directory $current_evidence_dir
         if (-not $simulate){
-            #$status = Create-Shadow $target
+            $status = Create-Shadow $target
         } else {
             Log-Message "[!] Simulation Enabled"
         }
         if ($status -eq 1 -and -not ($noshadow)){
             Log-Message "[!] [$target] Shadow Created Successfully!"
-            #Get-Files $target $current_evidence_dir $true
+            Get-Files $target $current_evidence_dir $true
         } else {
             Log-Message "[!] [$target] Shadow Failure - System/Locked Files will be unavailable!"
-            #Get-Files $target $current_evidence_dir $false
+            Get-Files $target $current_evidence_dir $false
         }
         if (-not $simulate){
             Run-Commands $target $current_evidence_dir
-            #Get-Registry $target $current_evidence_dir
-            #Delete-Shadow $target
+            Get-Registry $target $current_evidence_dir
+            Delete-Shadow $target
         } else {
             Log-Message "[!] Skipping Registry/Command Collection due to simulation!"
         }
@@ -797,8 +797,9 @@ function Execute-WMI-Command ($command, $target){
 
 function Run-Commands ($target, $current_evidence_dir) {
     # Responsible for executing commands on target host and collecting the output
-    # Commands are encoded into b64 and sent to the target via WMI process creation
+    # Commands are encoded into b64 and sent to the target via WMI process creation [OLD METHOD]
     # We send all of the commands simultaneously then iterate over the expected file-names waiting for results (presuming we do not get a failure to create the process from WMI)
+    # NEW METHOD - Add all commands into a single script, write that to target, run it and iterate over expected file names once the PID is no longer found on the target.
     # We set a limit on this to ensure we are not waiting for a 'broken' process
     $target_files = @{}
     $copy_location = @{}
@@ -848,7 +849,17 @@ function Run-Commands ($target, $current_evidence_dir) {
             $copy_location[$category] = $cmd_evidence_dir + "\" + $final_name
 
             $command_final = "try {"
-            $command_final += $item.$category.command -replace ("#FILEPATH#",$tmp_name)
+            if ($item.$category.command.StartsWith("file:")){
+                $splits = $item.$category.command -split ":"
+                try {
+                    $cmd = Get-Content -Raw -Path $splits[1]
+                    $command_final += $cmd -Replace ("#FILEPATH#", $tmp_name)
+                } catch {
+                    continue
+                }
+            } else {
+                $command_final += $item.$category.command -replace ("#FILEPATH#",$tmp_name)
+            }
             $command_final += "}catch{};"
             $script_block += $command_final
 
@@ -877,7 +888,8 @@ function Run-Commands ($target, $current_evidence_dir) {
         return
     }
 
-    $loops = 0
+    $loops = 1
+    $max_loops = 10
     while ($true){
         try{
             if ($global_configuration.credential){
@@ -886,7 +898,7 @@ function Run-Commands ($target, $current_evidence_dir) {
                 $process = Get-WmiObject -Query "SELECT CommandLine FROM Win32_Process WHERE ProcessID = $process_id" -Computer $target
             }
             if ($process){
-                Log-Message "[*] [$target] Waiting for PID $process_id to Finish!"
+                Log-Message "[*] [$target] Waiting for PID $process_id to Finish [$loops/10]"
                 Start-Sleep 10
                 $loops += 1
             } else {
@@ -896,7 +908,6 @@ function Run-Commands ($target, $current_evidence_dir) {
                     try {
                         if (Test-Path $i.Value){
                             Copy-Item $i.Value $copy_location[$i.Name] -Force
-                            $removals.Add($i.Name) | Out-Null
                         }
                     } catch {
                         $removals.Add($i.Name) | Out-Null
@@ -904,7 +915,7 @@ function Run-Commands ($target, $current_evidence_dir) {
                 }
                 break
             }
-            if ($loops -ge 10){
+            if ($max_loops -gt 10){
                 Log-Message "[!] [$target] Breaking to avoid infinite loop - target process still appears to be running (PID: $process_id)"
                 break
             }

@@ -303,7 +303,19 @@ An example directive is shown below:
 
 The directive above will launch the command on all targets and copy the resulting evidence into $EVIDENCE_DIR\Network\DNSCache\DNSCache.csv.
 
-Commands are launched as Base64 PowerShell via WMI Process Creation - keep in mind there is a command-line character limit so launching very long scripts through this method is not supported - a 'file-based' command-launch will be implemented in the future to help enable the usage of very complex scripts to augment Incident Response efforts.
+Commands are concatenated together into a single larger script and executed via WMI Process Creation.
+
+Commands can also reference a file such as seen below:
+
+```
+"PINGTEST": {
+    "category": "test",
+    "command": "file:test.ps1",
+    "output": "test.csv",
+    "tags": ["test"]
+}
+```
+In the above directive, the contents of file 'test.ps1' will be read from the current directory and may be a path such as 'file:C:\test.ps1' - the script should still output to a file as #FILEPATH# internally - this variable will be replaced as appropriate in the script with final output saved as per the 'output' key.
 
 #### Registry
 

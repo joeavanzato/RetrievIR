@@ -219,11 +219,20 @@ function Summarize-Configuration ($data){
                         if (-not ($directive.category -in $category_list)){
                             $category_list.Add($directive.category) | Out-Null
                         }
-                        if ($directive.tags){
-                            ForEach ($t in $directive.tags){
-                                if (-not ($t -in $tag_list)){
-                                    $tag_list.Add($t) | Out-Null
+                        if ($tags[0] -eq "*"){
+                        } elseif ($tags){
+                            if ($directive.tags){
+                                $pass = $true
+                                ForEach ($t in $directive.tags){
+                                    if ($t -in $tags){
+                                        $pass = $false
+                                    }
                                 }
+                            } else {
+                                continue
+                            }
+                            if ($pass){
+                                continue
                             }
                         }
                         if (-not ($tags[0] -eq '*') -and -not ($directive.tags -in $tags)) {
@@ -261,8 +270,21 @@ function Summarize-Configuration ($data){
                                 }
                             }
                         }
-                        if (-not ($tags[0] -eq '*') -and -not ($directive.tags -in $tags)) {
-                            continue
+                        if ($tags[0] -eq "*"){
+                        } elseif ($tags){
+                            if ($directive.tags){
+                                $pass = $true
+                                ForEach ($t in $directive.tags){
+                                    if ($t -in $tags){
+                                        $pass = $false
+                                    }
+                                }
+                            } else {
+                                continue
+                            }
+                            if ($pass){
+                                continue
+                            }
                         }
                         if (-not ($categories[0] -eq '*') -and -not ($directive.category -in $categories)) {
                             continue
@@ -294,8 +316,21 @@ function Summarize-Configuration ($data){
                                 }
                             }
                         }
-                        if (-not ($tags[0] -eq '*') -and -not ($directive.tags -in $tags)) {
-                            continue
+                        if ($tags[0] -eq "*"){
+                        } elseif ($tags){
+                            if ($directive.tags){
+                                $pass = $true
+                                ForEach ($t in $directive.tags){
+                                    if ($t -in $tags){
+                                        $pass = $false
+                                    }
+                                }
+                            } else {
+                                continue
+                            }
+                            if ($pass){
+                                continue
+                            }
                         }
                         if (-not ($categories[0] -eq '*') -and -not ($directive.category -in $categories)) {
                             continue
@@ -687,7 +722,7 @@ function Get-Files ($target, $current_evidence_dir, $root_replace) {
                             Write-Host "CREDS"
                             # TODO - possibly map drive but probably not required in most situations if access is already present.
                         }
-                        #try {
+                        try {
                             $file_list_map = @{}
                             $file_list = New-Object -TypeName "System.Collections.ArrayList"
                             ForEach ($filter in $directive.filter){
@@ -707,17 +742,18 @@ function Get-Files ($target, $current_evidence_dir, $root_replace) {
                                         Log-Message "[!] [$target] Unauthorized Access Exception (Reading): $($failure.TargetObject)" $false "red"
                                     } elseif ($failure.Exception -is [ArgumentException]){
                                         Log-Message "[!] [$target] Invalid Argument Specified (Reading): $($failure.TargetObject)" $false "red"
+                                    } elseif ($failure.Exception -is [ItemNotFoundException]){
                                     } else {
-                                        Log-Message $_.Exception.GetType().FullName $true "red"
+                                        Log-Message $failure.Exception.GetType().FullName $true "red"
                                     }
                                 }
                                 foreach ($f in $files){
                                     $file_list.Add($f) | Out-Null
                                 }
                             }
-                        #} catch {
-                        #    Log-Message "Error Processing Path: $tmp_path" $true
-                        #}
+                        } catch {
+                            Log-Message "Unknown Error Processing Path: $tmp_path" $true
+                        }
                         if ($file_list.Count -ne 0){
                             Create-Directory $file_evidence_dir
                         }
@@ -1159,6 +1195,37 @@ function Delete-Shadow ($target){
 
 }
 
+function Check-LongPaths {
+    try{
+        $data = Get-ItemProperty "Registry::HKLM\System\CurrentControlSet\Control\FileSystem"
+    } catch {
+        Log-Message "[!] Error reading registry key: HKLM\System\CurrentControlSet\Control\FileSystem"
+        return
+    }
+    if ($data.LongPathsEnabled -ne $null){
+        if ($data.LongPathsEnabled -eq 1){
+            return
+        }
+    } else {
+        Log-Message "[!] Could not find 'LongPathsEnabled' key in HKLM\System\CurrentControlSet\Control\FileSystem"
+        return
+    }
+    Log-Message "[!] WARNING: Long Paths not enabled (HKLM\System\CurrentControlSet\Control\FileSystem - LongPathsEnabled = 0)" $false "red"
+    Log-Message "[*] This will cause issues copying evidence from nested directories!" $false "red"
+    $response = Read-Host -Prompt "[!] Would you like to enable long paths? (Y/N)"
+    if ($response -eq "y" -or $response -eq "yes"){
+        Log-Message "[+] Enabling Long Paths..."
+        try {
+            New-ItemProperty -Path "Registry::HKLM\System\CurrentControlSet\Control\FileSystem" -Name "LongPathsEnabled" -Value 1 -PropertyType DWORD -Force | Out-Null
+        } catch {
+            Log-Message "[!] Error writing registry key: HKLM\System\CurrentControlSet\Control\FileSystem - LongPathsEnabled"
+        }
+    } else {
+        Log-Message "[!] Not enabling Long Paths - some evidence may not copy correctly!"
+        return
+    }
+}
+
 function Main{
     Log-Message "
         ____       __       _           ________
@@ -1174,12 +1241,13 @@ function Main{
     if ($creds){
         $global_configuration.credential = Get-Credentials
     }
+    Check-LongPaths
     #$global_configuration.credential = Get-Credentials
     $configuration_data = Get-Configuration
     $computer_targets = Get-Targets
     $global_configuration.config = $configuration_data
     $global_configuration.finished = 0
-    Start-Jobs $computer_targets
+    #Start-Jobs $computer_targets
     Log-Message "[!] Done! Evidence Directory: $evidence_dir"
 
     #$fns = Get-ChildItem function: | Where-Object { $_.Name -like "Create-Shadow" }

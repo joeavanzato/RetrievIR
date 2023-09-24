@@ -649,6 +649,12 @@
 			"command": "Get-LocalGroup | Select Name, SID, Description | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
 			"output": "LocalGroups.csv",
 			"tags": ["sans_triage"]
+		},
+		"USNJournal": {
+			"category": "Windows",
+			"command": "fsutil usn readjournal C: csv > '#FILEPATH#'",
+			"output": "USNJournal.csv",
+			"tags": ["heavy"]
 		}
 	},
 	"registry": {

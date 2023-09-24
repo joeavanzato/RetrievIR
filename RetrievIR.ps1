@@ -363,7 +363,7 @@ function Get-Configuration {
     }#>
 
     try {
-        $file_list = Get-ChildItem -Path $config | Where-Object {! $_.PSIsContainer } | Select-Object -ExpandProperty FullName
+        $file_list = Get-ChildItem -Path $config -Filter *.json | Where-Object {! $_.PSIsContainer } | Select-Object -ExpandProperty FullName
     } catch {
         Log-Message "[!] Error reading specified configuration path" $true
         Log-Message "[!] Exiting..."
@@ -687,7 +687,7 @@ function Get-Files ($target, $current_evidence_dir, $root_replace) {
                             Write-Host "CREDS"
                             # TODO - possibly map drive but probably not required in most situations if access is already present.
                         }
-                        try {
+                        #try {
                             $file_list_map = @{}
                             $file_list = New-Object -TypeName "System.Collections.ArrayList"
                             ForEach ($filter in $directive.filter){
@@ -715,9 +715,9 @@ function Get-Files ($target, $current_evidence_dir, $root_replace) {
                                     $file_list.Add($f) | Out-Null
                                 }
                             }
-                        } catch {
-                            Log-Message "Error Processing Path: $tmp_path" $true
-                        }
+                        #} catch {
+                        #    Log-Message "Error Processing Path: $tmp_path" $true
+                        #}
                         if ($file_list.Count -ne 0){
                             Create-Directory $file_evidence_dir
                         }
@@ -893,7 +893,7 @@ function Run-Commands ($target, $current_evidence_dir) {
     }
 
     $loops = 1
-    $max_loops = 10
+    $max_loops = 20
     while ($true){
         try{
             if ($global_configuration.credential){
@@ -916,10 +916,15 @@ function Run-Commands ($target, $current_evidence_dir) {
                     } catch {
                         $removals.Add($i.Name) | Out-Null
                     }
+                    try {
+                        Remove-Item -Path $i.Value -Force
+                    } catch {
+
+                    }
                 }
                 break
             }
-            if ($max_loops -gt 10){
+            if ($loops -gt $max_loops){
                 Log-Message "[!] [$target] Breaking to avoid infinite loop - target process still appears to be running (PID: $process_id)"
                 break
             }

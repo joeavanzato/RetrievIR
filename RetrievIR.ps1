@@ -842,7 +842,6 @@ function Run-Commands ($target, $current_evidence_dir) {
             $stamp = (Get-Date).toString("HH:mm:ss") -replace (":","_")
             # Assuming C$ is accessible drive here
             $tmp_name = "\\$target\C$\Windows\temp\$stamp`_$($item.$category.output)"
-            # TODO Uncomment for Real
             #$command_start = Execute-WMI-Command $command_final $target
 <#            if ($command_start.ReturnValue -eq 0){
                 $target_files[$category] = $tmp_name
@@ -853,7 +852,7 @@ function Run-Commands ($target, $current_evidence_dir) {
             $target_files[$category] = $tmp_name
             $copy_location[$category] = $cmd_evidence_dir + "\" + $final_name
 
-            $command_final = "try {"
+            $command_final = "try {`n"
             if ($item.$category.command.StartsWith("file:")){
                 $splits = $item.$category.command -split ":"
                 try {
@@ -865,7 +864,7 @@ function Run-Commands ($target, $current_evidence_dir) {
             } else {
                 $command_final += $item.$category.command -replace ("#FILEPATH#",$tmp_name)
             }
-            $command_final += "}catch{};"
+            $command_final += "`n}catch{};`n"
             $script_block += $command_final
 
         }
@@ -1033,7 +1032,7 @@ function Get-Registry ($target, $current_evidence_dir) {
         Log-Message "[!] [$target] Fatal Error invoking script!" $false "Red"
         return
     }
-    $loops = 0
+    $loops = 1
     while ($true){
         try{
             if ($global_configuration.credential){
@@ -1042,8 +1041,8 @@ function Get-Registry ($target, $current_evidence_dir) {
                 $process = Get-WmiObject -Query "SELECT CommandLine FROM Win32_Process WHERE ProcessID = $process_id" -Computer $target
             }
             if ($process){
-                Log-Message "[*] [$target] Waiting for Output..."
-                Start-Sleep 3
+                Log-Message "[*] [$target] Waiting for PID $process_id to Finish [$loops/10]"
+                Start-Sleep 10
                 $loops += 1
             } else {
                 $output_file = $registry_output -replace (":", "$")
@@ -1056,7 +1055,7 @@ function Get-Registry ($target, $current_evidence_dir) {
                 }
                 break
             }
-            if ($loops -ge 10){
+            if ($loops -gt 10){
                 Log-Message "[!] [$target] Breaking to avoid infinite loop - target process still appears to be running (PID: $process_id)"
                 Log-Message "[*] [$target] Check For Output File: \\$target\$output_file"
             }

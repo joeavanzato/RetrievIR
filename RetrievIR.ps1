@@ -118,14 +118,14 @@ $global_configuration.hostname = hostname
 $log_path = $PSScriptRoot + "\RetrievIRAudit.log"
 
 $shadow_stamp = (Get-Date).toString("HH:mm:ss") -replace (":","_")
-$shadowcopy_name = "rretrievir_copy_$shadow_stamp"
+$shadowcopy_name = "retrievir_copy_$shadow_stamp"
 $shadowcopy_output_status_file = "retrievir_vss_status_$shadow_stamp"
 
-# We will send the functions to a remote computer and output the result to a file at C:\Windows\temp\powerhaul_vss_check.txt
+# We will send the functions to a remote computer and output the result to $shadowcopy_output_status_file
 # If shadow creation is successful, file contents will contain below:
 # SUCCESS:$SHADOWID
 # If it is a failure, instead we will store only the below:
-# FAILURE
+# FAILURE:
 # Below functions modified From JJ Fulmer awesome answer at https://stackoverflow.com/questions/14207788/accessing-volume-shadow-copy-vss-snapshots-from-powershell
 
 $new_shadow_script = "
@@ -578,21 +578,21 @@ function Start-Jobs ($computer_targets){
         $current_evidence_dir = $evidence_dir + "\" + $target
         Create-Directory $current_evidence_dir
         if (-not $simulate){
-            $status = Create-Shadow $target
+            #$status = Create-Shadow $target
         } else {
             Log-Message "[!] Simulation Enabled"
         }
         if ($status -eq 1 -and -not ($noshadow)){
             Log-Message "[!] [$target] Shadow Created Successfully!"
-            Get-Files $target $current_evidence_dir $true
+            #Get-Files $target $current_evidence_dir $true
         } else {
             Log-Message "[!] [$target] Shadow Failure - System/Locked Files will be unavailable!"
-            Get-Files $target $current_evidence_dir $false
+            #Get-Files $target $current_evidence_dir $false
         }
         if (-not $simulate){
             Run-Commands $target $current_evidence_dir
-            Get-Registry $target $current_evidence_dir
-            Delete-Shadow $target
+            #Get-Registry $target $current_evidence_dir
+            #Delete-Shadow $target
         } else {
             Log-Message "[!] Skipping Registry/Command Collection due to simulation!"
         }
@@ -636,7 +636,7 @@ function Remove-Front-Dirs ($path, $count, $tmp_dir, $shadow){
 }
 
 function Get-Files ($target, $current_evidence_dir, $root_replace) {
-    # TODO - Make user dir for any path which falls under C:\users\ and use as appropriate as base evidence directory
+
     ForEach ($object in $global_configuration.config.files){
         $obj_names = $object.psobject.Properties.Name
         ForEach ($category in $obj_names){
@@ -803,6 +803,8 @@ function Run-Commands ($target, $current_evidence_dir) {
     $target_files = @{}
     $copy_location = @{}
     $process_ids = @{}
+    $script_block = ""
+    $collection_counts = 0
     ForEach ($item in $global_configuration.config.commands){
         $obj_names = $item.psobject.Properties.Name
         ForEach ($category in $obj_names){
@@ -825,6 +827,8 @@ function Run-Commands ($target, $current_evidence_dir) {
                     continue
                 }
             }
+            $collection_counts += 1
+
             Log-Message "[+] [$target] Collecting: $category"
             $cmd_evidence_dir = $current_evidence_dir + "\" + $item.$category.category + "\" + $category
             Create-Directory $cmd_evidence_dir
@@ -832,19 +836,91 @@ function Run-Commands ($target, $current_evidence_dir) {
             $stamp = (Get-Date).toString("HH:mm:ss") -replace (":","_")
             # Assuming C$ is accessible drive here
             $tmp_name = "\\$target\C$\Windows\temp\$stamp`_$($item.$category.output)"
-            $command_final = Build-Command-Script $item.$category.command $tmp_name
-            $command_start = Execute-WMI-Command $command_final $target
-            if ($command_start.ReturnValue -eq 0){
+            # TODO Uncomment for Real
+            #$command_start = Execute-WMI-Command $command_final $target
+<#            if ($command_start.ReturnValue -eq 0){
                 $target_files[$category] = $tmp_name
                 $copy_location[$category] = $cmd_evidence_dir + "\" + $final_name
                 $process_ids[$category] = $command_start.ProcessId
+            }#>
+            # these are the files we will attempt to retrieve and where we will copy them to if successful
+            $target_files[$category] = $tmp_name
+            $copy_location[$category] = $cmd_evidence_dir + "\" + $final_name
 
-            }
+            $command_final = "try {"
+            $command_final += $item.$category.command -replace ("#FILEPATH#",$tmp_name)
+            $command_final += "}catch{};"
+            $script_block += $command_final
+
         }
     }
-    # TODO - ProcID checks to determine if still running or not.
-    Log-Message "[*] [$target] Waiting for Output..."
+    ### NEW START
+    if ($collection_counts -eq 0){
+        Log-Message "[!] [$target] No Command Directives match filters, skipping!"
+        return
+    }
+    try {
+        Log-Message "[*] [$target] Copying Command Script to Target"
+        Set-Content -Path "\\$target\C$\Windows\temp\retrievir_command_collection.ps1" -Value $script_block
+    } catch {
+        Log-Message "[!] [$target] Fatal Error copying script!" $false "Red"
+        Log-Message "[!] [$target] Command Information will not be available!"
+        return
+    }
+    Log-Message "[*] [$target] Invoking Command Collection Script"
+    $invoke_cmd_script = "powershell.exe -NoLogo -NonInteractive -ExecutionPolicy Unrestricted -WindowStyle Hidden C:\Windows\Temp\retrievir_command_collection.ps1"
+    $command_start = Execute-WMI-Command $invoke_cmd_script $target
+    if ($command_start.ReturnValue -eq 0){
+        [string]$process_id = $command_start.ProcessId
+    } else {
+        Log-Message "[!] [$target] Fatal Error invoking script!" $false "Red"
+        return
+    }
+
     $loops = 0
+    while ($true){
+        try{
+            if ($global_configuration.credential){
+                $process = Get-WmiObject -Query "SELECT CommandLine FROM Win32_Process WHERE ProcessID = $process_id" -Computer $target -Credential $global_configuration.credential
+            } else {
+                $process = Get-WmiObject -Query "SELECT CommandLine FROM Win32_Process WHERE ProcessID = $process_id" -Computer $target
+            }
+            if ($process){
+                Log-Message "[*] [$target] Waiting for PID $process_id to Finish!"
+                Start-Sleep 10
+                $loops += 1
+            } else {
+                $removals = New-Object -TypeName "System.Collections.ArrayList"
+                Log-Message "[*] [$target] Retrieving Output Files..."
+                ForEach ($i in $target_files.GetEnumerator() ){
+                    try {
+                        if (Test-Path $i.Value){
+                            Copy-Item $i.Value $copy_location[$i.Name] -Force
+                            $removals.Add($i.Name) | Out-Null
+                        }
+                    } catch {
+                        $removals.Add($i.Name) | Out-Null
+                    }
+                }
+                break
+            }
+            if ($loops -ge 10){
+                Log-Message "[!] [$target] Breaking to avoid infinite loop - target process still appears to be running (PID: $process_id)"
+                break
+            }
+        } catch {
+            Log-Message "[!] [$target] Fatal Error Processing Command Retrieval!" $false "Red"
+            break
+        }
+    }
+    ForEach ($object in $removals){
+        Log-Message "[!] [$target] Unable to Retrieve: $object"
+    }
+
+    ### NEW END
+
+    ### OLD
+<#    $loops = 0
     while ($true){
         if ($target_files.Count -eq 0){
             break
@@ -871,7 +947,8 @@ function Run-Commands ($target, $current_evidence_dir) {
             }
             break
         }
-    }
+    }#>
+
 }
 
 function Get-Registry ($target, $current_evidence_dir) {
@@ -879,7 +956,7 @@ function Get-Registry ($target, $current_evidence_dir) {
     # 1 - InvokeCommand with classic PowerShell - requires WinRM, basically a non-starter for most endpoints
     # 2 - WMI Built-Ins - Doable as long as WMI is available (mostly it is), but limited.
     # 3 - Remote Registry Service - This is typically disabled by default but we could check the state via WMI, enable then re-disable once we are done collecting data.
-    # 4 - We could take a similar approach as for running commands - package each registry check into a command, pass it via WMI and check for an output file - this will be the easiest and most flexible way.
+    # We could take a similar approach as for running commands - package each registry check into a command, pass it via WMI and check for an output file - this will be the easiest and most flexible way.
     # By default, we will take option 4 - it allows for the most flexibility when specifying paths to check (recursiveness, wildcards, etc via Get-ChildItem).
     # Since this will be too big to run in a single command-line - we will instead copy the actual script to execute over to the target host then in the WMI we will have it dynamically load the script and execute the specified content.
 
@@ -953,7 +1030,6 @@ function Get-Registry ($target, $current_evidence_dir) {
         } catch {
             Log-Message "[!] [$target] Fatal Error Processing Registry Retrieval!" $false "Red"
         }
-
     }
 
 

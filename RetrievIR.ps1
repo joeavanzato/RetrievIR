@@ -1247,7 +1247,7 @@ function Main{
     $computer_targets = Get-Targets
     $global_configuration.config = $configuration_data
     $global_configuration.finished = 0
-    #Start-Jobs $computer_targets
+    Start-Jobs $computer_targets
     Log-Message "[!] Done! Evidence Directory: $evidence_dir"
 
     #$fns = Get-ChildItem function: | Where-Object { $_.Name -like "Create-Shadow" }

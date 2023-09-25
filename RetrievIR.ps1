@@ -621,7 +621,7 @@ function Start-Jobs ($computer_targets){
         $current_evidence_dir = $evidence_dir + "\" + $target
         Create-Directory $current_evidence_dir
         if (-not $simulate){
-            $status = Create-Shadow $target
+            #$status = Create-Shadow $target
         } else {
             Log-Message "[!] Simulation Enabled"
         }
@@ -635,7 +635,7 @@ function Start-Jobs ($computer_targets){
         if (-not $simulate){
             Run-Commands $target $current_evidence_dir
             Get-Registry $target $current_evidence_dir
-            Delete-Shadow $target
+            #Delete-Shadow $target
         } else {
             Log-Message "[!] Skipping Registry/Command Collection due to simulation!"
         }
@@ -683,13 +683,10 @@ function Get-Files ($target, $current_evidence_dir, $root_replace) {
     ForEach ($object in $global_configuration.config.files){
         $obj_names = $object.psobject.Properties.Name
         ForEach ($category in $obj_names){
+            $collected = 0
             ForEach ($item in $object.$category){
                 ForEach ($directive in $item){
                     $file_evidence_dir = $current_evidence_dir + "\" + $directive.category + "\" + $category
-                    if (-not ($root_replace) -and $directive.shadow -and -not $simulate){
-                        Log-Message "[+] [$target] Skipping: $category - Requires Volume Shadow which was unsuccessful!"
-                        continue
-                    }
                     if ($categories[0] -eq '*') { } elseif ($directive.category -in $categories) { } else {
                         #Log-Message "[+] [$target] Skipping: $category - Not in specified arguments!"
                         continue
@@ -710,7 +707,15 @@ function Get-Files ($target, $current_evidence_dir, $root_replace) {
                             continue
                         }
                     }
-                    Log-Message "[+] [$target] Collecting: $category"
+                    if (-not ($root_replace) -and $directive.shadow -and -not $simulate){
+                        Log-Message "[+] [$target] Skipping: $category - Requires Volume Shadow which was unsuccessful!"
+                        continue
+                    }
+                    if ($collected -eq 0){
+                        Log-Message "[+] [$target] Collecting: $category"
+                        $collected = 1
+                    }
+                    #Log-Message "[+] [$target] Collecting: $category"
                     ForEach ($path in $directive.paths){
                         if ($root_replace -and $directive.shadow){
                             $shadow_ok = $true
@@ -795,6 +800,7 @@ function Get-Files ($target, $current_evidence_dir, $root_replace) {
                             #Write-Host "DEST: $dest_path"
                             $FailedCopies = $null
                             try {
+                                Log-Message "COPYING: $($file.FullName)"
                                 Copy-Item "$($file.FullName)" "$dest_path" -Force -ErrorVariable FailedCopies -ErrorAction SilentlyContinue
                             } catch {}
                             ForEach ($failure in $FailedCopies){
@@ -932,19 +938,19 @@ function Run-Commands ($target, $current_evidence_dir) {
     }
 
     $loops = 1
-    $max_loops = 20
+    # Defines how many loops we will wait for registry output
+    $max_loops = 30
+    # Defines how long we sleep between loops in seconds
+    $sleep_time = 10
     while ($true){
-        try{
-            if ($global_configuration.credential){
-                $process = Get-WmiObject -Query "SELECT CommandLine FROM Win32_Process WHERE ProcessID = $process_id" -Computer $target -Credential $global_configuration.credential
-            } else {
-                $process = Get-WmiObject -Query "SELECT CommandLine FROM Win32_Process WHERE ProcessID = $process_id" -Computer $target
-            }
-            if ($process){
+        #try{
+            $pid_exist = Check-PID-WMI $target $process_id
+            if ($pid_exist){
                 Log-Message "[*] [$target] Waiting for PID $process_id to Finish [$loops/$max_loops]"
-                Start-Sleep 10
+                Start-Sleep $sleep_time
                 $loops += 1
             } else {
+                Start-Sleep 5
                 $removals = New-Object -TypeName "System.Collections.ArrayList"
                 Log-Message "[*] [$target] Retrieving Output Files..."
                 ForEach ($i in $target_files.GetEnumerator() ){
@@ -967,10 +973,10 @@ function Run-Commands ($target, $current_evidence_dir) {
                 Log-Message "[!] [$target] Breaking to avoid infinite loop - target process still appears to be running (PID: $process_id)"
                 break
             }
-        } catch {
-            Log-Message "[!] [$target] Fatal Error Processing Command Retrieval!" $false "Red"
-            break
-        }
+        #} catch {
+        #    Log-Message "[!] [$target] Fatal Error Processing Command Retrieval!" $false "Red"
+        #    break
+        #}
     }
     ForEach ($object in $removals){
         Log-Message "[!] [$target] Unable to Retrieve: $object"
@@ -1008,6 +1014,19 @@ function Run-Commands ($target, $current_evidence_dir) {
         }
     }#>
 
+}
+
+function Check-PID-WMI ($target, $processid){
+    if ($global_configuration.credential){
+        $process = Get-WmiObject -Query "SELECT CommandLine FROM Win32_Process WHERE ProcessID = $processid" -Computer $target -Credential $global_configuration.credential
+    } else {
+        $process = Get-WmiObject -Query "SELECT CommandLine FROM Win32_Process WHERE ProcessID = $processid" -Computer $target
+    }
+    if ($process){
+        return $true
+    } else {
+        return $false
+    }
 }
 
 function Get-Registry ($target, $current_evidence_dir) {
@@ -1077,17 +1096,16 @@ function Get-Registry ($target, $current_evidence_dir) {
         return
     }
     $loops = 1
+    # Defines how many loops we will wait for registry output
     $max_loops = 20
+    # Defines how long we sleep between loops in seconds
+    $sleep_time = 10
     while ($true){
         try{
-            if ($global_configuration.credential){
-                $process = Get-WmiObject -Query "SELECT CommandLine FROM Win32_Process WHERE ProcessID = $process_id" -Computer $target -Credential $global_configuration.credential
-            } else {
-                $process = Get-WmiObject -Query "SELECT CommandLine FROM Win32_Process WHERE ProcessID = $process_id" -Computer $target
-            }
-            if ($process){
+            $pid_exist = Check-PID-WMI $target $process_id
+            if ($pid_exist){
                 Log-Message "[*] [$target] Waiting for PID $process_id to Finish [$loops/$max_loops]"
-                Start-Sleep 10
+                Start-Sleep $sleep_time
                 $loops += 1
             } else {
                 $output_file = $registry_output -replace (":", "$")

@@ -616,12 +616,15 @@ function Start-Jobs ($computer_targets){
     $full_command = "powershell.exe -NoLogo -NonInteractive -ExecutionPolicy Unrestricted -WindowStyle Hidden -EncodedCommand "+$base64_script
     #Write-Host $full_command
 
+    $file_success_output = $evidence_dir + "\successful_file_copies.csv"
+    $script:file_copy_success_main = New-Object -TypeName 'System.Collections.ArrayList'
+    $script:file_copy_failures_main = New-Object -TypeName 'System.Collections.ArrayList'
     foreach ($target in $computer_targets){
         Log-Message "[+] Targeting: $target"
         $current_evidence_dir = $evidence_dir + "\" + $target
         Create-Directory $current_evidence_dir
         if (-not $simulate){
-            #$status = Create-Shadow $target
+            $status = Create-Shadow $target
         } else {
             Log-Message "[!] Simulation Enabled"
         }
@@ -635,7 +638,7 @@ function Start-Jobs ($computer_targets){
         if (-not $simulate){
             Run-Commands $target $current_evidence_dir
             Get-Registry $target $current_evidence_dir
-            #Delete-Shadow $target
+            Delete-Shadow $target
         } else {
             Log-Message "[!] Skipping Registry/Command Collection due to simulation!"
         }
@@ -645,6 +648,8 @@ function Start-Jobs ($computer_targets){
         $size_in_mb = $total_file_size / 1MB
         Log-Message "[!] Total File Size: $([math]::Round($size_in_mb, 2)) Megabytes"
     }
+    $file_copy_success_main | Export-Csv -NoTypeInformation -Path "$file_success_output"
+
 }
 
 function Remove-Front-Dirs ($path, $count, $tmp_dir, $shadow){
@@ -679,7 +684,6 @@ function Remove-Front-Dirs ($path, $count, $tmp_dir, $shadow){
 }
 
 function Get-Files ($target, $current_evidence_dir, $root_replace) {
-
     ForEach ($object in $global_configuration.config.files){
         $obj_names = $object.psobject.Properties.Name
         ForEach ($category in $obj_names){
@@ -796,12 +800,21 @@ function Get-Files ($target, $current_evidence_dir, $root_replace) {
                                 Log-Message "[!] [$target] Error processing file: $($file.FullName)" $false "red"
                                 continue
                             }
-                            #Write-Host "SOURCE: $($file.FullName)"
-                            #Write-Host "DEST: $dest_path"
                             $FailedCopies = $null
                             try {
-                                Log-Message "COPYING: $($file.FullName)"
                                 Copy-Item "$($file.FullName)" "$dest_path" -Force -ErrorVariable FailedCopies -ErrorAction SilentlyContinue
+                                #file_copy_success_main
+
+                                $tmp = [PSCustomObject]@{
+                                    DirectiveName = $category
+                                    Computer = $target
+                                    FileName = "$dest_path\$(Split-Path -Leaf $file.FullName)"
+                                    Category = if($directive.category){$directive.category}else{'N/A'}
+                                    Type = if($directive.type){$directive.type}else{'N/A'}
+                                    Parser = if($directive.parser){$directive.parser}else{'N/A'}
+                                    ParserCmd = if($directive.parse_cmdline){$directive.parse_cmdline}else{'N/A'}
+                                }
+                                $script:file_copy_success_main.Add($tmp) | Out-Null
                             } catch {}
                             ForEach ($failure in $FailedCopies){
                                 if ($failure.Exception -is [UnauthorizedAccessException]){
@@ -812,13 +825,6 @@ function Get-Files ($target, $current_evidence_dir, $root_replace) {
                                         Log-Message "[!] [$target] Unable to access in-use file (Copying): $($failure.TargetObject)" $false "red"
                                 }
                             }
-                            #try {
-                            #    Copy-Item "$($file.FullName)" "$dest_path" -Force
-                            #} catch {
-                            #    Write-Host "SOURCE: $($file.FullName)"
-                            #    Write-Host "DEST: $dest_path"
-                            #    Log-Message "[!] [$target] Error copying file: $($file.FullName)" $false "red"
-                            #}
                         }
                     }
                 }
@@ -964,7 +970,6 @@ function Run-Commands ($target, $current_evidence_dir) {
                     try {
                         Remove-Item -Path $i.Value -Force
                     } catch {
-
                     }
                 }
                 break
@@ -1108,13 +1113,24 @@ function Get-Registry ($target, $current_evidence_dir) {
                 Start-Sleep $sleep_time
                 $loops += 1
             } else {
+                Start-Sleep 5
                 $output_file = $registry_output -replace (":", "$")
                 Log-Message "[*] [$target] Retrieving Output File: \\$target\$output_file"
                 try {
-                    Copy-Item  "\\$target\$output_file" "$copy_location"
-                    Log-Message "[*] [$target] Retrieved Successfully"
+                    if (Test-Path "\\$target\$output_file"){
+                        Copy-Item  "\\$target\$output_file" "$copy_location"
+                        Log-Message "[*] [$target] Retrieved Successfully"
+                    } else {
+                        Log-Message "[*] [$target] No Registry Output Detected"
+                    }
                 } catch {
                     Log-Message "[!] [$target] Fatal Error Copying Evidence File: \\$target\$output_file" $false "Red"
+                }
+                try {
+                    if (Test-Path "\\$target\$output_file") {
+                        Remove-Item -Path "\\$target\$output_file" -Force
+                    }
+                } catch {
                 }
                 break
             }

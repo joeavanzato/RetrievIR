@@ -803,12 +803,18 @@ function Get-Files ($target, $current_evidence_dir, $root_replace) {
                             $FailedCopies = $null
                             try {
                                 Copy-Item "$($file.FullName)" "$dest_path" -Force -ErrorVariable FailedCopies -ErrorAction SilentlyContinue
-                                #file_copy_success_main
-
+                                $tmp_success_name = Split-Path -Leaf $file.FullName
+                                $tmp_dest_leaf = Split-Path -Leaf $dest_path
+                                $tmp_destination_name = "$dest_path\$tmp_success_name"
+                                if ($tmp_dest_leaf -eq $tmp_success_name){
+                                    $destination_file_path = $dest_path
+                                } else {
+                                    $destination_file_path = $tmp_destination_name
+                                }
                                 $tmp = [PSCustomObject]@{
                                     DirectiveName = $category
                                     Computer = $target
-                                    FileName = "$dest_path\$(Split-Path -Leaf $file.FullName)"
+                                    FileName = $destination_file_path
                                     Category = if($directive.category){$directive.category}else{'N/A'}
                                     Type = if($directive.type){$directive.type}else{'N/A'}
                                     Parser = if($directive.parser){$directive.parser}else{'N/A'}
@@ -817,6 +823,14 @@ function Get-Files ($target, $current_evidence_dir, $root_replace) {
                                 $script:file_copy_success_main.Add($tmp) | Out-Null
                             } catch {}
                             ForEach ($failure in $FailedCopies){
+                                $tmp = [PSCustomObject]@{
+                                    DirectiveName = $category
+                                    Computer = $target
+                                    FileName = $file.FullName
+                                    Category = if($directive.category){$directive.category}else{'N/A'}
+                                    Type = if($directive.type){$directive.type}else{'N/A'}
+                                }
+                                $script:file_copy_failures_main.Add($tmp) | Out-Null
                                 if ($failure.Exception -is [UnauthorizedAccessException]){
                                     Log-Message "[!] [$target] Unauthorized Access Exception (Copying): $($failure.TargetObject)" $false "red"
                                 } elseif ($failure.Exception -is [ArgumentException]){

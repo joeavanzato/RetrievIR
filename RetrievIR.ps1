@@ -97,6 +97,9 @@ param
 	[Parameter(Mandatory = $false, HelpMessage = 'If specified, will not create Shadow Copy to access locked system files.')]
 	[switch]$noshadow,
 
+	[Parameter(Mandatory = $false, HelpMessage = 'If specified, will skip any "interactive" prompts.')]
+	[switch]$nointeract,
+
 	[Parameter(Mandatory = $false, HelpMessage = 'Return information on how many files and total size of data that would be collected with specified configuration.')]
 	[switch]$simulate,
 
@@ -742,7 +745,7 @@ function Get-Files ($target, $current_evidence_dir, $root_replace) {
                                         Log-Message "[!] [$target] Unauthorized Access Exception (Reading): $($failure.TargetObject)" $false "red"
                                     } elseif ($failure.Exception -is [ArgumentException]){
                                         Log-Message "[!] [$target] Invalid Argument Specified (Reading): $($failure.TargetObject)" $false "red"
-                                    } elseif ($failure.Exception -is [ItemNotFoundException]){
+                                    } elseif ($failure.Exception -is [System.Management.Automation.ItemNotFoundException]){
                                     } else {
                                         Log-Message $failure.Exception.GetType().FullName $true "red"
                                     }
@@ -938,7 +941,7 @@ function Run-Commands ($target, $current_evidence_dir) {
                 $process = Get-WmiObject -Query "SELECT CommandLine FROM Win32_Process WHERE ProcessID = $process_id" -Computer $target
             }
             if ($process){
-                Log-Message "[*] [$target] Waiting for PID $process_id to Finish [$loops/10]"
+                Log-Message "[*] [$target] Waiting for PID $process_id to Finish [$loops/$max_loops]"
                 Start-Sleep 10
                 $loops += 1
             } else {
@@ -1074,6 +1077,7 @@ function Get-Registry ($target, $current_evidence_dir) {
         return
     }
     $loops = 1
+    $max_loops = 20
     while ($true){
         try{
             if ($global_configuration.credential){
@@ -1082,7 +1086,7 @@ function Get-Registry ($target, $current_evidence_dir) {
                 $process = Get-WmiObject -Query "SELECT CommandLine FROM Win32_Process WHERE ProcessID = $process_id" -Computer $target
             }
             if ($process){
-                Log-Message "[*] [$target] Waiting for PID $process_id to Finish [$loops/10]"
+                Log-Message "[*] [$target] Waiting for PID $process_id to Finish [$loops/$max_loops]"
                 Start-Sleep 10
                 $loops += 1
             } else {
@@ -1096,7 +1100,7 @@ function Get-Registry ($target, $current_evidence_dir) {
                 }
                 break
             }
-            if ($loops -gt 10){
+            if ($loops -gt $max_loops){
                 Log-Message "[!] [$target] Breaking to avoid infinite loop - target process still appears to be running (PID: $process_id)"
                 Log-Message "[*] [$target] Check For Output File: \\$target\$output_file"
             }
@@ -1212,6 +1216,9 @@ function Check-LongPaths {
     }
     Log-Message "[!] WARNING: Long Paths not enabled (HKLM\System\CurrentControlSet\Control\FileSystem - LongPathsEnabled = 0)" $false "red"
     Log-Message "[*] This will cause issues copying evidence from nested directories!" $false "red"
+    if ($nointeract){
+        return
+    }
     $response = Read-Host -Prompt "[!] Would you like to enable long paths? (Y/N)"
     if ($response -eq "y" -or $response -eq "yes"){
         Log-Message "[+] Enabling Long Paths..."

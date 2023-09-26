@@ -627,6 +627,7 @@ function Start-Jobs ($computer_targets){
     #Write-Host $full_command
 
     $file_success_output = $evidence_dir + "\successful_file_copies.csv"
+    $file_failures_output = $evidence_dir + "\failed_file_copies.csv"
     $script:file_copy_success_main = New-Object -TypeName 'System.Collections.ArrayList'
     $script:file_copy_failures_main = New-Object -TypeName 'System.Collections.ArrayList'
     foreach ($target in $computer_targets){
@@ -659,6 +660,7 @@ function Start-Jobs ($computer_targets){
         Log-Message "[!] Total File Size: $([math]::Round($size_in_mb, 2)) Megabytes"
     }
     $file_copy_success_main | Export-Csv -NoTypeInformation -Path "$file_success_output"
+    $file_copy_failures_main | Export-Csv -NoTypeInformation -Path "$file_failures_output"
 
 }
 
@@ -826,17 +828,19 @@ function Get-Files ($target, $current_evidence_dir, $root_replace) {
                                 } else {
                                     $destination_file_path = $tmp_destination_name
                                 }
-                                $tmp = [PSCustomObject]@{
-                                    DirectiveName = $category
-                                    Computer = $target
-                                    FileName = $destination_file_path
-                                    Category = if($directive.category){$directive.category}else{'N/A'}
-                                    Type = if($directive.type){$directive.type}else{'N/A'}
-                                    Parser = if($directive.parser){$directive.parser}else{'N/A'}
-                                    ParserCmd = if($directive.parse_cmdline){$directive.parse_cmdline}else{'N/A'}
-                                    User = $username
+                                if (Test-Path $destination_file_path){
+                                    $tmp = [PSCustomObject]@{
+                                        DirectiveName = $category
+                                        Computer = $target
+                                        FileName = $destination_file_path
+                                        Category = if($directive.category){$directive.category}else{'N/A'}
+                                        Type = if($directive.type){$directive.type}else{'N/A'}
+                                        Parser = if($directive.parser){$directive.parser}else{'N/A'}
+                                        ParserCmd = if($directive.parse_cmdline){$directive.parse_cmdline}else{'N/A'}
+                                        User = $username
+                                    }
+                                    $script:file_copy_success_main.Add($tmp) | Out-Null
                                 }
-                                $script:file_copy_success_main.Add($tmp) | Out-Null
                             } catch {}
                             ForEach ($failure in $FailedCopies){
                                 $tmp = [PSCustomObject]@{
@@ -845,6 +849,7 @@ function Get-Files ($target, $current_evidence_dir, $root_replace) {
                                     FileName = $file.FullName
                                     Category = if($directive.category){$directive.category}else{'N/A'}
                                     Type = if($directive.type){$directive.type}else{'N/A'}
+                                    Reason = $failure.Exception.GetType().FullName
                                 }
                                 $script:file_copy_failures_main.Add($tmp) | Out-Null
                                 if ($failure.Exception -is [UnauthorizedAccessException]){

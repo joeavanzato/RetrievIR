@@ -82,7 +82,7 @@ param
 	[Parameter(Mandatory = $false, HelpMessage = 'The fully-qualified file-path where evidence should be stored, defaults to $PSScriptRoot\evidence')]
 	[string]$evidence_dir = "$PSScriptRoot\evidence",
 
-	[Parameter(Mandatory = $false, HelpMessage = 'The fully-qualified file-path for the configuration file, defaults to $PSScriptRoot\config.json')]
+	[Parameter(Mandatory = $false, HelpMessage = 'The fully-qualified file-path for the configuration file, defaults to $PSScriptRoot\configs')]
 	[string]$config = "$PSScriptRoot\configs",
 
 	[Parameter(Mandatory = $false, HelpMessage = 'Comma-delimited list of target computers - leaving blank will only target "127.0.0.1" (localhost).')]
@@ -115,6 +115,12 @@ param
 	[Parameter(Mandatory = $false, HelpMessage = 'Select specific directive-categories to run using comma-delimited arguments - only directives which are contained within the list will be executed.')]
 	[array]$categories = @("*")
 )
+if ($tags.GetType().Name -eq "String"){
+    $tags = @($tags)
+}
+if ($categories.GetType().Name -eq "String"){
+    $categories = @($categories)
+}
 
 $global_configuration = [hashtable]::Synchronized(@{})
 $global_configuration.hostname = hostname
@@ -222,6 +228,13 @@ function Summarize-Configuration ($data){
                         if (-not ($directive.category -in $category_list)){
                             $category_list.Add($directive.category) | Out-Null
                         }
+                        if ($directive.tags){
+                            ForEach ($t in $directive.tags){
+                                if (-not ($t -in $tag_list)){
+                                    $tag_list.Add($t) | Out-Null
+                                }
+                            }
+                        }
                         if ($tags[0] -eq "*"){
                         } elseif ($tags){
                             if ($directive.tags){
@@ -237,9 +250,6 @@ function Summarize-Configuration ($data){
                             if ($pass){
                                 continue
                             }
-                        }
-                        if (-not ($tags[0] -eq '*') -and -not ($directive.tags -in $tags)) {
-                            continue
                         }
                         if (-not ($categories[0] -eq '*') -and -not ($directive.category -in $categories)) {
                             continue
@@ -684,6 +694,9 @@ function Remove-Front-Dirs ($path, $count, $tmp_dir, $shadow){
 }
 
 function Get-Files ($target, $current_evidence_dir, $root_replace) {
+    # Iterates through configuration and finds appropriate directives based on categories and tags specified at input
+    # Finds relevant files based on directive objectives
+    #
     ForEach ($object in $global_configuration.config.files){
         $obj_names = $object.psobject.Properties.Name
         ForEach ($category in $obj_names){
@@ -780,6 +793,7 @@ function Get-Files ($target, $current_evidence_dir, $root_replace) {
                             try {
                                 if ($($file.FullName) -match ".*\\users\\(?<user>[^\\]*)\\.*"){
                                     $tmp_user_evidence_dir = $file_evidence_dir + "\" + $Matches.user
+                                    $username = $Matches.user
                                     Create-Directory $tmp_user_evidence_dir
                                     if ($directive.dir_removals){
                                         $new_dest_path = Remove-Front-Dirs $file.FullName $directive.dir_removals $tmp_user_evidence_dir $shadow_ok
@@ -788,6 +802,7 @@ function Get-Files ($target, $current_evidence_dir, $root_replace) {
                                         $dest_path = $tmp_user_evidence_dir
                                     }
                                 } else {
+                                    $username = "N/A"
                                     if ($directive.dir_removals){
                                         $new_dest_path = Remove-Front-Dirs $file.FullName $directive.dir_removals $file_evidence_dir $shadow_ok
                                         $dest_path = $file_evidence_dir + "\" + $new_dest_path
@@ -819,6 +834,7 @@ function Get-Files ($target, $current_evidence_dir, $root_replace) {
                                     Type = if($directive.type){$directive.type}else{'N/A'}
                                     Parser = if($directive.parser){$directive.parser}else{'N/A'}
                                     ParserCmd = if($directive.parse_cmdline){$directive.parse_cmdline}else{'N/A'}
+                                    User = $username
                                 }
                                 $script:file_copy_success_main.Add($tmp) | Out-Null
                             } catch {}

@@ -23,6 +23,7 @@ RetrievIR is also designed to allow for flexible evidence specification via conf
 * Capable of analyzing both local and remote forensic targets.
 * Simulation functionality to determine total data size to collect with specified configuration.
 * Minimum requirements - WMI and SMB for most capabilities - VSS optional for locked files.
+* Evidence Parsing Script - ParseIR - included to generate human/machine-readable information from raw evidence.
 
 ### Usage
 
@@ -32,18 +33,45 @@ Common commandline parameters are documented below with examples.
 
 ```
 .\RetrievIR.ps1 : Default Usage - collects all artifacts specified in JSON within 'configs' directory from the localhost into the current directory.
+
 .\RetrievIR.ps1 -tags sans_triage - Capture most artifacts described in the SANS Triage package within KAPE
+
 .\RetrievIR.ps1 -targets HOSTNAME1,HOSTNAME2 : Run RetrievIR against the provided hostnames.
+
 .\RetrievIR.ps1 -target_file C:\targets.txt : Run RetrievIR against the line-delimited targets present in the specified text file.
+
 .\RetrievIR.ps1 -creds : Tell RetrievIR to prompt the user for credentials to use - by default, RetrievIR runs with the current user context.
+
 .\RetrievIR.ps1 -evidence_dir C:\evidence : Tell RetrievIR where to store collected evidence - by default, evidence will be stored in PSScriptRoot\evidence
+
 .\RetrievIR.ps1 -config C:\my_config.json : Specify the path to a custom configuration file to use - by default, RetrievIR will look for all JSON files within the 'configs' directory in PSScriptRoot (current executing directory).
+
 .\RetrievIR.ps1 -config C:\RetrievIRConfigs : Specify the path to a directory containing 1 or more customer configuration JSON to use - by default, RetrievIR will look for all JSON files within the 'configs' directory in PSScriptRoot (current executing directory).
+
 .\RetrievIR.ps1 -categories antivirus,recentfiles : Specify to only collect evidence when the category is within the provided values.
+
 .\RetrievIR.ps1 -categoryscan : List all categories in provided configuration file(s).
+
 .\RetrievIR.ps1 -tags sans_triage : Specify to only collect evidence when the directive contains a provided tag.
+
 .\RetrievIR.ps1 -tagscan : List all tags in provided configuration file(s).
+
 .\RetrievIR.ps1 -simulate : Tells RetrievIR to skip evidence collection and only determine how many files and total size of data that would be collected with specified categories/tags.
+```
+
+After collection, to parse evidence, execute 'ParseIR.ps1' - this will check for the default parsing configuration file 'parsing_config.json' in $PSScriptRoot - command-line options for this utility are presented below.
+
+```
+
+.\ParseIR.ps1 -evidence_dir : Path to the collected evidence directory - defaults to $PSScriptRoot\evidence
+
+.\ParseIR.ps1 -parsed_evidence_dir : Where parsed evidence should be stored - defaults to $PSScriptRoot\parsed_evidence
+
+.\ParseIR.ps1 -config example.json : Where to find the parsing configuration file - defaults to $PSScriptRoot\parsing_config.json
+
+.\ParseIR.ps1 -ignoremissing : Tells ParseIR to ignore missing dependencies that are detected.
+
+.\ParseIR.ps1 -utilities_dir : Tells ParseIR where to store/locate third-party dependencies.
 ```
 
 ### What is collected in the default configuration files?
@@ -178,13 +206,16 @@ The default configuration files are meant to be more 'complete' repositories of 
 * Running Processes
 * USN Journal
 
+### What is parsed in the default configuration files?
+
+
 ### TODO
-* $MFT
 * $J
 * $LogFile
 * $SDS
 * $Boot
 * $T
+* ?
 
 ### Images
 
@@ -198,6 +229,10 @@ The default configuration files are meant to be more 'complete' repositories of 
 
 <p align="center">
 <img src="assets/flow.png" height="250">
+</p>
+
+<p align="center">
+<img src="assets/parsed_1.PNG">
 </p>
 
 
@@ -380,3 +415,4 @@ Registry directives are bundled into a single large script that is executed on t
 * https://github.com/EricZimmerman/KapeFiles/tree/master/Targets
 * https://www.sans.org/
 * https://github.com/ForensicArtifacts/artifacts
+* https://gist.github.com/secabstraction/4044f4aadd3ef21f0ca9

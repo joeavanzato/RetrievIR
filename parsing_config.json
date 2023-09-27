@@ -1,0 +1,134 @@
+{
+  "AmcacheParser":{
+    "name": "AmCacheParser",
+    "evidence_type": "AmCache",
+    "executable": "AmcacheParser.exe",
+    "cmdline": "#PARSER# -f #SOURCE_FILE# --csv #DESTINATION_DIR# -i --mp",
+    "url": "https://f001.backblazeb2.com/file/EricZimmermanTools/AmcacheParser.zip",
+    "dl_type": "zip",
+    "if_missing": "download",
+    "operates_on": "file",
+    "file_filter": ["Amcache.hve"]
+  },
+  "AppCompatCacheParser":{
+    "name": "AppCompatCacheParser",
+    "evidence_type": "AppCompatCache",
+    "executable": "AppCompatCacheParser.exe",
+    "cmdline": "#PARSER# -f #SOURCE_FILE# --csv #DESTINATION_DIR#",
+    "url": "https://f001.backblazeb2.com/file/EricZimmermanTools/AppCompatCacheParser.zip",
+    "dl_type": "zip",
+    "if_missing": "download",
+    "operates_on": "file",
+    "file_filter": ["SYSTEM"]
+  },
+  "JLECmd":{
+    "name": "JLECmd",
+    "evidence_type": "JumpLists",
+    "executable": "JLECmd.exe",
+    "cmdline": "#PARSER# -d #SOURCE_DIR# --csv #DESTINATION_DIR# -q --mp",
+    "url": "https://f001.backblazeb2.com/file/EricZimmermanTools/JLECmd.zip",
+    "dl_type": "zip",
+    "if_missing": "download",
+    "operates_on": "dir",
+    "file_filter": ["*"]
+  },
+  "LECmd":{
+    "name": "LECmd",
+    "evidence_type": "LNKs",
+    "executable": "LECmd.exe",
+    "cmdline": "#PARSER# -d #SOURCE_DIR# --csv #DESTINATION_DIR# -q --mp",
+    "url": "https://f001.backblazeb2.com/file/EricZimmermanTools/LECmd.zip",
+    "dl_type": "zip",
+    "if_missing": "download",
+    "operates_on": "dir",
+    "file_filter": ["*.lnk"]
+  },
+  "PECmd":{
+    "name": "PECmd",
+    "evidence_type": "Prefetch",
+    "executable": "PECmd.exe",
+    "cmdline": "#PARSER# -d #SOURCE_DIR# --csv #DESTINATION_DIR# -q --mp",
+    "url": "https://f001.backblazeb2.com/file/EricZimmermanTools/PECmd.zip",
+    "dl_type": "zip",
+    "if_missing": "download",
+    "operates_on": "dir",
+    "file_filter": ["*.pf"]
+  },
+  "RBCmd":{
+    "name": "RBCmd",
+    "evidence_type": "RecycleBin",
+    "executable": "RBCmd.exe",
+    "cmdline": "#PARSER# -d #SOURCE_DIR# --csv #DESTINATION_DIR# -q",
+    "url": "https://f001.backblazeb2.com/file/EricZimmermanTools/RBCmd.zip",
+    "dl_type": "zip",
+    "if_missing": "download",
+    "operates_on": "dir",
+    "file_filter": ["*"]
+  },
+  "RecentFileCacheParser":{
+    "name": "RecentFileCacheParser",
+    "evidence_type": "FileCacheBCF",
+    "executable": "RecentFileCacheParser.exe",
+    "cmdline": "#PARSER# -f #SOURCE_FILE# --csv #DESTINATION_DIR#",
+    "url": "https://f001.backblazeb2.com/file/EricZimmermanTools/RecentFileCacheParser.zip",
+    "dl_type": "zip",
+    "if_missing": "download",
+    "operates_on": "file",
+    "file_filter": ["*.bcf"]
+  },
+  "SBECmd":{
+    "name": "SBECmd",
+    "evidence_type": "ShellBag",
+    "executable": "SBECmd.exe",
+    "cmdline": "#PARSER# -d #SOURCE_DIR# --csv #DESTINATION_DIR#",
+    "url": "https://f001.backblazeb2.com/file/EricZimmermanTools/SBECmd.zip",
+    "dl_type": "zip",
+    "if_missing": "download",
+    "operates_on": "dir",
+    "file_filter": ["*"]
+  },
+  "SrumECmd":{
+    "name": "SrumECmd",
+    "evidence_type": "SRUM",
+    "executable": "SrumECmd.exe",
+    "cmdline": "#PARSER# -f #SOURCE_DIR# --csv #DESTINATION_DIR#",
+    "url": "https://f001.backblazeb2.com/file/EricZimmermanTools/SrumECmd.zip",
+    "dl_type": "zip",
+    "if_missing": "download",
+    "operates_on": "dir",
+    "file_filter": ["*"]
+  },
+  "SumECmd":{
+    "name": "SumECmd",
+    "evidence_type": "SUM",
+    "executable": "SumECmd.exe",
+    "cmdline": "#PARSER# -f #SOURCE_DIR# --csv #DESTINATION_DIR#",
+    "url": "https://f001.backblazeb2.com/file/EricZimmermanTools/SumECmd.zip",
+    "dl_type": "zip",
+    "if_missing": "download",
+    "operates_on": "dir",
+    "file_filter": ["*"]
+  },
+  "WxTCmd":{
+    "name": "WxTCmd",
+    "evidence_type": "Timeline_Cache",
+    "executable": "WxTCmd.exe",
+    "cmdline": "#PARSER# -f #SOURCE_FILE# --csv #DESTINATION_DIR#",
+    "url": "https://f001.backblazeb2.com/file/EricZimmermanTools/WxTCmd.zip",
+    "dl_type": "zip",
+    "if_missing": "download",
+    "operates_on": "file",
+    "file_filter": ["*"]
+  },
+  "EvtxECmd":{
+    "name": "EvtxECmd",
+    "evidence_type": "WindowsEvents",
+    "executable": "EvtxECmd.exe",
+    "cmdline": "#PARSER# -d #SOURCE_DIR# --csv #DESTINATION_DIR#",
+    "url": "https://f001.backblazeb2.com/file/EricZimmermanTools/EvtxECmd.zip",
+    "dl_type": "zip",
+    "if_missing": "download",
+    "operates_on": "dir",
+    "file_filter": ["*.evtx"]
+  }
+}

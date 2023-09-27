@@ -8,7 +8,8 @@
     "dl_type": "zip",
     "if_missing": "download",
     "operates_on": "file",
-    "file_filter": ["Amcache.hve"]
+    "file_filter": ["Amcache.hve"],
+    "type": "inline"
   },
   "AppCompatCacheParser":{
     "name": "AppCompatCacheParser",
@@ -19,7 +20,8 @@
     "dl_type": "zip",
     "if_missing": "download",
     "operates_on": "file",
-    "file_filter": ["SYSTEM"]
+    "file_filter": ["SYSTEM"],
+    "type": "inline"
   },
   "JLECmd":{
     "name": "JLECmd",
@@ -30,7 +32,8 @@
     "dl_type": "zip",
     "if_missing": "download",
     "operates_on": "dir",
-    "file_filter": ["*"]
+    "file_filter": ["*"],
+    "type": "inline"
   },
   "LECmd":{
     "name": "LECmd",
@@ -41,7 +44,8 @@
     "dl_type": "zip",
     "if_missing": "download",
     "operates_on": "dir",
-    "file_filter": ["*.lnk"]
+    "file_filter": ["*.lnk"],
+    "type": "inline"
   },
   "PECmd":{
     "name": "PECmd",
@@ -52,7 +56,8 @@
     "dl_type": "zip",
     "if_missing": "download",
     "operates_on": "dir",
-    "file_filter": ["*.pf"]
+    "file_filter": ["*.pf"],
+    "type": "inline"
   },
   "RBCmd":{
     "name": "RBCmd",
@@ -63,7 +68,8 @@
     "dl_type": "zip",
     "if_missing": "download",
     "operates_on": "dir",
-    "file_filter": ["*"]
+    "file_filter": ["*"],
+    "type": "inline"
   },
   "RecentFileCacheParser":{
     "name": "RecentFileCacheParser",
@@ -74,7 +80,8 @@
     "dl_type": "zip",
     "if_missing": "download",
     "operates_on": "file",
-    "file_filter": ["*.bcf"]
+    "file_filter": ["*.bcf"],
+    "type": "inline"
   },
   "SBECmd":{
     "name": "SBECmd",
@@ -85,18 +92,20 @@
     "dl_type": "zip",
     "if_missing": "download",
     "operates_on": "dir",
-    "file_filter": ["*"]
+    "file_filter": ["*"],
+    "type": "inline"
   },
   "SrumECmd":{
     "name": "SrumECmd",
     "evidence_type": "SRUM",
     "executable": "SrumECmd.exe",
-    "cmdline": "#PARSER# -f #SOURCE_DIR# --csv #DESTINATION_DIR#",
+    "cmdline": "#PARSER# -f #SOURCE_FILE# --csv #DESTINATION_DIR#",
     "url": "https://f001.backblazeb2.com/file/EricZimmermanTools/SrumECmd.zip",
     "dl_type": "zip",
     "if_missing": "download",
-    "operates_on": "dir",
-    "file_filter": ["*"]
+    "operates_on": "file",
+    "file_filter": ["*"],
+    "type": "inline"
   },
   "SumECmd":{
     "name": "SumECmd",
@@ -107,18 +116,20 @@
     "dl_type": "zip",
     "if_missing": "download",
     "operates_on": "dir",
-    "file_filter": ["*"]
+    "file_filter": ["*"],
+    "type": "inline"
   },
   "WxTCmd":{
     "name": "WxTCmd",
-    "evidence_type": "Timeline_Cache",
+    "evidence_type": "Timeline",
     "executable": "WxTCmd.exe",
     "cmdline": "#PARSER# -f #SOURCE_FILE# --csv #DESTINATION_DIR#",
     "url": "https://f001.backblazeb2.com/file/EricZimmermanTools/WxTCmd.zip",
     "dl_type": "zip",
     "if_missing": "download",
     "operates_on": "file",
-    "file_filter": ["*"]
+    "file_filter": ["*"],
+    "type": "inline"
   },
   "EvtxECmd":{
     "name": "EvtxECmd",
@@ -129,6 +140,43 @@
     "dl_type": "zip",
     "if_missing": "download",
     "operates_on": "dir",
-    "file_filter": ["*.evtx"]
+    "file_filter": ["*.evtx"],
+    "type": "inline"
+  },
+  "MFTECmd":{
+    "name": "MFTECmd",
+    "evidence_type": "MFT",
+    "executable": "MFTECmd.exe",
+    "cmdline": "#PARSER# -d #SOURCE_FILE# --csv #DESTINATION_DIR#",
+    "url": "https://f001.backblazeb2.com/file/EricZimmermanTools/MFTECmd.zip",
+    "dl_type": "zip",
+    "if_missing": "download",
+    "operates_on": "file",
+    "file_filter": ["*.evtx"],
+    "type": "inline"
+  },
+  "CSVOutputCollector":{
+    "name": "CSVOutputCollector",
+    "evidence_type": "CommandOutput",
+    "executable": "powershell.exe",
+    "cmdline": "Copy-Item #SOURCE_FILE# #DESTINATION_DIR#",
+    "url": "N/A",
+    "dl_type": "N/A",
+    "if_missing": "skip",
+    "operates_on": "file",
+    "file_filter": ["*.csv"],
+    "type": "native"
+  },
+  "ChromeExtensionsParser":{
+    "name": "ChromeExtensionsParser",
+    "evidence_type": "ChromeExtensions",
+    "executable": "ChromeExtensionsParser.ps1",
+    "cmdline": "#PARSER# -base_evidence_dir #EVIDENCE_DIR# -parsed_evidence_dir #PARSED_EVIDENCE_DIR#",
+    "url": "N/A",
+    "dl_type": "N/A",
+    "if_missing": "skip",
+    "operates_on": "file",
+    "file_filter": ["*"],
+    "type": "standalone"
   }
 }

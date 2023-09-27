@@ -9,7 +9,9 @@
 				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\Microsoft\\Windows\\Recent\\CustomDestinations\\*"
 			],
 			"dir_removals": 8,
-			"tags": ["sans_triage"]
+			"tags": ["sans_triage"],
+			"type": "JumpLists",
+			"parser": "JLECmd"
 		},
 		"Prefetch": {
 			"category": "RecentFiles",
@@ -18,7 +20,9 @@
 			"paths": [
 				"%HOMEDRIVE%\\Windows\\Prefetch\\*"
 			],
-			"tags": ["sans_triage"]
+			"tags": ["sans_triage"],
+			"type": "Prefetch",
+			"parser": "PECmd"
 		},
 		"Amcache": [
 			{
@@ -82,7 +86,9 @@
 			"paths": [
 				"%HOMEDRIVE%\\Windows\\AppCompat\\Programs\\*"
 			],
-			"tags": ["sans_triage"]
+			"tags": ["sans_triage"],
+			"type": "FileCache",
+			"parser": "RecentFileCacheParser"
 		},
 		"SRUDB": {
 			"category": "RecentFiles",
@@ -91,7 +97,9 @@
 			"paths": [
 				"%HOMEDRIVE%\\Windows\\System32\\sru\\*"
 			],
-			"tags": ["sans_triage"]
+			"tags": ["sans_triage"],
+			"type": "SRUM",
+			"parser": "SrumECmd"
 		},
 		"UAL": {
 			"category": "RecentFiles",
@@ -100,7 +108,9 @@
 			"paths": [
 				"%HOMEDRIVE%\\Windows\\System32\\LogFiles\\Sum\\*"
 			],
-			"tags": ["sans_triage"]
+			"tags": ["sans_triage"],
+			"type": "UserAccessLogging",
+			"parser": "SumECmd"
 		},
 		"SnipCache": {
 			"category": "RecentFiles",
@@ -122,7 +132,9 @@
 				"%HOMEDRIVE%\\Users\\*\\Desktop\\*",
 				"%HOMEDRIVE%\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\*"
 			],
-			"tags": ["sans_triage"]
+			"tags": ["sans_triage"],
+			"type": "LNKFile",
+			"parser": "LECmd"
 		},
 		"ProgramCompatAssistant": {
 			"category": "RecentFiles",

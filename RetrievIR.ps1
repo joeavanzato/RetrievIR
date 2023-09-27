@@ -634,9 +634,10 @@ function Start-Jobs ($computer_targets){
         Log-Message "[+] Targeting: $target"
         $current_evidence_dir = $evidence_dir + "\" + $target
         Create-Directory $current_evidence_dir
-        if (-not $simulate){
+        if (-not $simulate -and -not $noshadow){
             $status = Create-Shadow $target
-        } else {
+        }
+        if ($simulate){
             Log-Message "[!] Simulation Enabled"
         }
         if ($status -eq 1 -and -not ($noshadow)){
@@ -649,9 +650,11 @@ function Start-Jobs ($computer_targets){
         if (-not $simulate){
             Run-Commands $target $current_evidence_dir
             Get-Registry $target $current_evidence_dir
-            Delete-Shadow $target
         } else {
             Log-Message "[!] Skipping Registry/Command Collection due to simulation!"
+        }
+        if (-not $simulate -and -not $noshadow){
+            Delete-Shadow $target
         }
     }
     if ($simulate){
@@ -836,7 +839,6 @@ function Get-Files ($target, $current_evidence_dir, $root_replace) {
                                         Category = if($directive.category){$directive.category}else{'N/A'}
                                         Type = if($directive.type){$directive.type}else{'N/A'}
                                         Parser = if($directive.parser){$directive.parser}else{'N/A'}
-                                        ParserCmd = if($directive.parse_cmdline){$directive.parse_cmdline}else{'N/A'}
                                         User = $username
                                     }
                                     $script:file_copy_success_main.Add($tmp) | Out-Null
@@ -897,6 +899,7 @@ function Run-Commands ($target, $current_evidence_dir) {
     $target_files = @{}
     $copy_location = @{}
     $process_ids = @{}
+    $directive_data = @{}
     $script_block = ""
     $collection_counts = 0
     ForEach ($item in $global_configuration.config.commands){
@@ -922,6 +925,14 @@ function Run-Commands ($target, $current_evidence_dir) {
                 }
             }
             $collection_counts += 1
+
+            $tmp_dir = [PSCustomObject]@{
+                DirectiveName = $category
+                Category = $item.$category.category
+                Type = if($item.$category.type){$item.$category.type}else{'N/A'}
+                Parser = if($item.$category.parser){$item.$category.parser}else{'N/A'}
+            }
+            $directive_data[$category] = $tmp_dir
 
             Log-Message "[+] [$target] Collecting: $category"
             $cmd_evidence_dir = $current_evidence_dir + "\" + $item.$category.category + "\" + $category
@@ -1000,6 +1011,16 @@ function Run-Commands ($target, $current_evidence_dir) {
                     try {
                         if (Test-Path $i.Value){
                             Copy-Item $i.Value $copy_location[$i.Name] -Force
+                            # TODO
+                            $tmp = [PSCustomObject]@{
+                                DirectiveName = $i.Name
+                                Computer = $target
+                                FileName = $copy_location[$i.Name]
+                                Category = $directive_data[$i.Name].Category
+                                Type =  $directive_data[$i.Name].Type
+                                Parser =  $directive_data[$i.Name].Parser
+                            }
+                            $script:file_copy_success_main.Add($tmp) | Out-Null
                         }
                     } catch {
                         $removals.Add($i.Name) | Out-Null

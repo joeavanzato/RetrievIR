@@ -858,6 +858,8 @@ function Get-Files ($target, $current_evidence_dir, $root_replace) {
                                         Log-Message "[!] [$target] Invalid Argument Specified (Copying): $($failure.TargetObject)" $false "red"
                                 } elseif ($failure.Exception -is [System.IO.IOException]){
                                         Log-Message "[!] [$target] Unable to access in-use file (Copying): $($failure.TargetObject)" $false "red"
+                                } else {
+                                    Log-Message $failure.Exception.GetType().FullName $true "red"
                                 }
                             }
                         }

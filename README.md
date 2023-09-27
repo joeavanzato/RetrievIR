@@ -207,7 +207,19 @@ The default configuration files are meant to be more 'complete' repositories of 
 * USN Journal
 
 ### What is parsed in the default configuration files?
-
+* Amcache
+* AppCompatCache
+* JumpLists
+* LNK Files
+* Prefetch Files
+* RecycleBin Info Files
+* RecentFileCache (BCF)
+* ShellBags
+* SRUM
+* User Activity Logging
+* ActivitiesCache
+* $MFT
+* Chrome Extensions
 
 ### TODO
 * $J

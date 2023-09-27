@@ -204,34 +204,56 @@ function Start-Processing ($parse_config, $file_data, $exe_locations){
             # Skip parsing files that don't have an assigned parser in their output
             continue
         }
-        if (-not ($parse_config.$($record.Parser))){
-            Log-Message "No Available Parser Configured for type: $($record.Parser)" $false "Red"
-            continue
+        if ($record.Parser -match ".*,.*"){
+            $parsers = $record.Parser -split ","
+        } else {
+            $parsers = @($record.Parser)
         }
-        $parse_object = $parse_config.$($record.Parser)
-        $base_evidence_path = $parsed_evidence_dir + "\" + $record.Computer
-        #Write-Host $base_evidence_path
-        #if (-not (Test-Path ))
-        if ($parse_object.operates_on -eq "dir"){
-            $source_target = Split-Path -Parent $record.FileName
-            if ($source_target -in $dirs_parsed){
+        ForEach ($parser in $parsers){
+            if (-not ($parse_config.$parser)){
+                Log-Message "No Available Parser Configured for type: $parser" $false "Red"
                 continue
             }
-            $dirs_parsed.Add($source_target) | Out-Null
+            $parse_object = $parse_config.$($parser)
+            $pass = $true
+            $file_basename = Split-Path -Leaf $record.FileName
+            if ($parse_object.file_filter[0] -eq "*"){
+                $pass = $false
+            }else{
+                ForEach ($filter in $parse_object.file_filter){
+                    if ($file_basename -like $filter){
+                        $pass = $false
+                    }
+                }
+            }
+            if ($pass){
+                continue
+            }
+            $base_evidence_path = $parsed_evidence_dir + "\" + $record.Computer
+            #Write-Host $base_evidence_path
+            #if (-not (Test-Path ))
+            if ($parse_object.operates_on -eq "dir"){
+                $source_target = Split-Path -Parent $record.FileName
+                if ($source_target -in $dirs_parsed){
+                    continue
+                }
+                $dirs_parsed.Add($source_target) | Out-Null
 
-        } elseif ($parse_object.operates_on -eq "file") {
-            $source_target = $record.FileName
-            if ($source_target -in $files_parsed){
-                continue
+            } elseif ($parse_object.operates_on -eq "file") {
+                $source_target = $record.FileName
+                if ($source_target -in $files_parsed){
+                    continue
+                }
+                $files_parsed.Add($source_target) | Out-Null
             }
-            $files_parsed.Add($source_target) | Out-Null
+            Parse $parse_object $record $base_evidence_path $source_target $exe_locations[$parser]
         }
-        Parse $parse_object $record $base_evidence_path $source_target $exe_locations[$record.Parser]
 
     }
 }
 
 function Parse ($parser, $record, $base_evidence_dir, $target, $exe_full_path){
+    Log-Message "[+] Parsing: $($record.FileName)"
     $tmp_evidence_storage = $base_evidence_dir + "\" + $parser.evidence_type
     Create-Directory $tmp_evidence_storage
     $current_location = Get-Location
@@ -251,7 +273,10 @@ function Parse ($parser, $record, $base_evidence_dir, $target, $exe_full_path){
     } elseif ($commandline -match ".*#DESTINATION_FILE#.*"){
         $commandline = $commandline -replace ("#DESTINATION_FILE#", "`"$tmp_evidence_storage`"")
     }
-    cmd.exe /c $commandline
+    #Write-Host $commandline
+    & cmd.exe /c $commandline
+    #Start-Job {cmd.exe /c $commandline}
+
 
 }
 

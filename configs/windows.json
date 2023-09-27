@@ -455,7 +455,9 @@
 			"paths": [
 				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\ConnectedDevicesPlatform\\*\\*"
 			],
-			"tags": ["sans_triage"]
+			"tags": ["sans_triage"],
+			"type": "ActivitiesCache",
+			"parser": "WxTCmd"
 		},
 		"WinSearchIndex": {
 			"category": "Windows",
@@ -584,109 +586,145 @@
 			"category": "Network",
 			"command": "Get-NetTcpConnection -ErrorAction SilentlyContinue | Select * | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
 			"output": "DNSCache.csv",
-			"tags": ["sans_triage", "light"]
+			"tags": ["sans_triage", "light"],
+			"type": "DNS",
+			"parser": "CSVOutputCollector"
 		},
 		"Services": {
 			"category": "Windows",
 			"command": "Get-WmiObject win32_service -ErrorAction SilentlyContinue | Select-Object * | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
 			"output": "Services.csv",
-			"tags": ["sans_triage", "light"]
+			"tags": ["sans_triage", "light"],
+			"type": "Services",
+			"parser": "CSVOutputCollector"
 		},
 		"TCPConnections": {
 			"category": "Network",
 			"command": "Get-NetTcpConnection -ErrorAction SilentlyContinue | Select * | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
 			"output": "TCPConnections.csv",
-			"tags": ["sans_triage", "light"]
+			"tags": ["sans_triage", "light"],
+			"type": "TCPConnections",
+			"parser": "CSVOutputCollector"
 		},
 		"SMBShares": {
 			"category": "Network",
 			"command": "Get-SmbShare -ErrorAction SilentlyContinue | Select-Object * | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
 			"output": "SMBShares.csv",
-			"tags": ["sans_triage", "light"]
+			"tags": ["sans_triage", "light"],
+			"type": "SMBShares",
+			"parser": "CSVOutputCollector"
 		},
 		"ScheduledTasksFormatted": {
 			"category": "Windows",
 			"command": "Get-ScheduledTask -ErrorAction SilentlyContinue | Select-Object * | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
 			"output": "ScheduledTasks.csv",
-			"tags": ["sans_triage", "light"]
+			"tags": ["sans_triage", "light"],
+			"type": "Tasks",
+			"parser": "CSVOutputCollector"
 		},
 		"Defender": {
 			"category": "AntiVirus",
 			"command": "Get-MpThreatDetection -ErrorAction SilentlyContinue | Select-Object * | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
 			"output": "DefenderDetections.csv",
-			"tags": ["sans_triage", "light"]
+			"tags": ["sans_triage", "light"],
+			"type": "DefenderDetections",
+			"parser": "CSVOutputCollector"
 		},
 		"Startups": {
 			"category": "Windows",
 			"command": "Get-WMIObject Win32_StartupCommand -ErrorAction SilentlyContinue | Select-Object PSComputerName,Caption,Command,Description,Location,Name,User,UserSID | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
 			"output": "Startups.csv",
-			"tags": ["sans_triage", "light"]
+			"tags": ["sans_triage", "light"],
+			"type": "Autoruns",
+			"parser": "CSVOutputCollector"
 		},
 		"FirewallRules": {
 			"category": "Network",
 			"command": "Get-NetFirewallRule -ErrorAction SilentlyContinue | Select * | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
 			"output": "FirewallRules.csv",
-			"tags": ["sans_triage", "light"]
+			"tags": ["sans_triage", "light"],
+			"type": "FirewallRules",
+			"parser": "CSVOutputCollector"
 		},
 		"ARPCache": {
 			"category": "Network",
 			"command": "Get-NetNeighbor -ErrorAction SilentlyContinue | Select * | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
 			"output": "ARPCache.csv",
-			"tags": ["sans_triage", "light"]
+			"tags": ["sans_triage", "light"],
+			"type": "ARPCache",
+			"parser": "CSVOutputCollector"
 		},
 		"SuspiciousFiles": {
 			"category": "RecentFiles",
 			"command": "Get-ChildItem -Path %HOMEDRIVE%\\temp,%HOMEDRIVE%\\windows\\system32,%HOMEDRIVE%\\windows\\temp,%HOMEDRIVE%\\Users,%HOMEDRIVE%\\programdata -Include *.htm,*.vbs,*.hta,*.chm,*.exe,*.bat,*.ps1,*.zip,*.gz,*.7z,*.vba,*.ps,*.psm1,*.docm,*.xlsm,*.pptm,*.potm,*.ppam,*.ppsm,*.sldm,*.dotm,*.xltm,*.xlam,*.lnk,*.vb,*.pdf,*.jar,*.msi,*.msp,*.gadget,*.cmd,*.vbe,*.jsp,*.scr,*.rar,*.msh,*.wsh,*.wsf,*.scf -File -Recurse -ErrorAction SilentlyContinue | Where-Object { $_.CreationTime -lt (Get-Date).AddDays(-15) } | Select-Object PSPath, PSParentPath, PSChildName, PSDrive, PSProvider, PSIsContainer, Mode, LinkType, Name, Length, DirectoryName, Directory, IsReadOnly, Exists, FullName, Extension, CreationTime, CreationTimeUtc, LastAccessTime, LastAccessTimeUtc, LastWriteTime, LastWriteTimeUtc | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
 			"output": "SuspiciousFiles.csv",
-			"tags": ["sans_triage", "light"]
+			"tags": ["sans_triage", "light"],
+			"type": "Files",
+			"parser": "CSVOutputCollector"
 		},
 		"InstalledSoftware": {
 			"category": "Windows",
 			"command": "Get-WmiObject -Class Win32_Product | Select Name,Version,InstallState,Caption,Description,InstallDate,InstallLocation,InstallSource,LocalPackage,PackageName,Vendor | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
 			"output": "InstalledSoftware.csv",
-			"tags": ["sans_triage", "light"]
+			"tags": ["sans_triage", "light"],
+			"type": "Software",
+			"parser": "CSVOutputCollector"
 		},
 		"ActiveScriptConsumers": {
 			"category": "WMI",
 			"command": "Get-WmiObject ActiveScriptEventConsumer -Namespace root\\subscription  -ErrorAction SilentlyContinue | Select-Object * | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
 			"output": "ActiveScriptConsumers.csv",
-			"tags": ["sans_triage", "light"]
+			"tags": ["sans_triage", "light"],
+			"type": "WMI-ActiveScriptConsumers",
+			"parser": "CSVOutputCollector"
 		},
 		"CommandLineConsumers": {
 			"category": "WMI",
 			"command": "Get-WmiObject CommandLineEventConsumer -Namespace root\\subscription  -ErrorAction SilentlyContinue | Select-Object * | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
 			"output": "CommandLineEventConsumers.csv",
-			"tags": ["sans_triage", "light"]
+			"tags": ["sans_triage", "light"],
+			"type": "WMI-CommandlineConsumers",
+			"parser": "CSVOutputCollector"
 		},
 		"RunningProcesses": {
 			"category": "Windows",
 			"command": "Get-WmiObject Win32_Process -ErrorAction SilentlyContinue | Select-Object * | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
 			"output": "RunningProcesses.csv",
-			"tags": ["sans_triage", "light"]
+			"tags": ["sans_triage", "light"],
+			"type": "Processes",
+			"parser": "CSVOutputCollector"
 		},
 		"LocalAdmins": {
 			"category": "Windows",
 			"command": "Get-LocalGroupMember -Group 'Administrators' | Select Name, SID, PrincipalSource, Description | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
 			"output": "LocalAdmins.csv",
-			"tags": ["sans_triage", "light"]
+			"tags": ["sans_triage", "light"],
+			"type": "LocalAdmins",
+			"parser": "CSVOutputCollector"
 		},
 		"LocalGroups": {
 			"category": "Windows",
 			"command": "Get-LocalGroup | Select Name, SID, Description | Export-Csv -NoTypeInformation -Path '#FILEPATH#'",
 			"output": "LocalGroups.csv",
-			"tags": ["sans_triage", "light"]
+			"tags": ["sans_triage", "light"],
+			"type": "LocalGroups",
+			"parser": "CSVOutputCollector"
 		},
 		"USNJournal": {
 			"category": "Windows",
 			"command": "fsutil usn readjournal C: csv > '#FILEPATH#'",
 			"output": "USNJournal.csv",
-			"tags": ["sans_triage", "heavy"]
+			"tags": ["sans_triage", "heavy"],
+			"type": "USNJournal",
+			"parser": "CSVOutputCollector"
 		},
 		"$MFT": {
 			"category": "Windows",
 			"command": "file:configs\\Export-MFT.ps1",
 			"output": "MFT",
-			"tags": ["sans_triage", "heavy"]
+			"tags": ["sans_triage", "heavy"],
+			"type": "MFT",
+			"parser": "MFTECmd"
 		}
 	},
 	"registry": {

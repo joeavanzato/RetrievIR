@@ -8,7 +8,8 @@
 				"%HOMEDRIVE%\\Windows\\apppatch\\Custom\\*",
 				"%HOMEDRIVE%\\Windows\\apppatch\\Custom\\Custom64\\*"
 			],
-			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/SDB.tkape"
+			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/SDB.tkape",
+			"type": "shim_sdb"
 		},
 		"DeletedWindowsAppX": {
 			"category": "AppX",
@@ -18,7 +19,8 @@
 				"%HOMEDRIVE%\\Program Files\\WindowsApps\\Deleted*\\*"
 			],
 			"dir_removals": 4,
-			"shadow": true
+			"shadow": true,
+			"type": "deleted_appx"
 		},
 		"InstalledSystemAppX": {
 			"category": "AppX",
@@ -28,7 +30,8 @@
 				"%HOMEDRIVE%\\Windows\\SystemApps\\*"
 			],
 			"dir_removals": 3,
-			"shadow": true
+			"shadow": true,
+			"type": "system_appx"
 		},
 		"InstalledUserAppX": {
 			"category": "AppX",
@@ -38,7 +41,8 @@
 				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Packages\\*"
 			],
 			"dir_removals": 6,
-			"shadow": true
+			"shadow": true,
+			"type": "user_appx"
 		},
 		"AppXStateRepository": {
 			"category": "AppX",
@@ -48,7 +52,8 @@
 				"%HOMEDRIVE%\\ProgramData\\Microsoft\\Windows\\AppRepository\\Packages\\*"
 			],
 			"dir_removals": 6,
-			"shadow": true
+			"shadow": true,
+			"type": "appx_state"
 		},
 		"AppXProgramData": {
 			"category": "AppX",
@@ -58,7 +63,8 @@
 				"%HOMEDRIVE%\\ProgramData\\Packages\\*"
 			],
 			"dir_removals": 3,
-			"shadow": true
+			"shadow": true,
+			"type": "appx_programdata"
 		},
 		"ScheduledTasks": [
 			{
@@ -70,17 +76,17 @@
 				"%HOMEDRIVE%\\Windows\\SysWOW64\\Tasks\\*"
 			],
 			"dir_removals": 2,
-			"tags": ["sans_triage"]
+			"tags": ["sans_triage"],
+			"type": "task_xml"
 			},
 			{
 			"category": "Windows",
 			"filter": ["*"],
-			"recursive": true,
+			"recursive": false,
 			"paths": [
 				"%HOMEDRIVE%\\Windows\\Tasks\\*.job",
 				"%HOMEDRIVE%\\Windows\\SchedLgU.txt"
 			],
-			"dir_removals": 2,
 			"tags": ["sans_triage"]
 			}
 		],
@@ -301,18 +307,33 @@
 			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/CertUtil.tkape",
 			"dir_removals": 7
 		},
-		"USER_Hives": {
+		"USER_Hives": [
+			{
 			"category": "Users",
-			"filter": ["NTUSER.DAT*", "UsrClass.*"],
+			"filter": ["NTUSER.DAT*"],
 			"recursive": false,
 			"paths": [
-				"%HOMEDRIVE%\\Users\\*\\*",
-				"%HOMEDRIVE%\\Users\\AppData\\Local\\Microsoft\\Windows\\*"
+				"%HOMEDRIVE%\\Users\\*\\*"
 			],
 			"shadow": true,
-			"tags": ["sans_triage"]
-		},
-		"SYSTEM_Hives": {
+			"tags": ["sans_triage","hives"],
+			"type": "NTHives"
+			},
+			{
+			"category": "Users",
+			"filter": ["UsrClass.*"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Microsoft\\Windows\\*"
+			],
+			"shadow": true,
+			"tags": ["sans_triage","hives"],
+			"type": "UsrClass",
+			"parser": "SBECmd"
+			}
+		],
+		"SYSTEM_Hives": [
+			{
 			"category": "Users",
 			"filter": ["SAM*", "SECURITY*", "SOFTWARE*", "SYSTEM*", "NTUSER*", "DEFAULT*"],
 			"recursive": false,
@@ -322,8 +343,11 @@
 				"%HOMEDRIVE%\\Windows\\ServiceProfiles\\*\\*"
 			],
 			"shadow": true,
-			"tags": ["sans_triage"]
-		},
+			"tags": ["sans_triage", "hives"],
+			"type": "RegistryHive",
+			"parser": "AppCompatCacheParser"
+			}
+		],
 		"SignatureCatalog": {
 			"category": "Windows",
 			"filter": ["*"],
@@ -420,7 +444,9 @@
 			"paths": [
 				"%HOMEDRIVE%\\Windows\\System32\\winevt\\logs\\*"
 			],
-			"tags": ["sans_triage"]
+			"tags": ["sans_triage", "event_logs"],
+			"type": "EventLogs",
+			"parser": "EvtxECmd"
 		},
 		"WinTimeline": {
 			"category": "Windows",
@@ -654,7 +680,7 @@
 			"category": "Windows",
 			"command": "fsutil usn readjournal C: csv > '#FILEPATH#'",
 			"output": "USNJournal.csv",
-			"tags": ["heavy"]
+			"tags": ["sans_triage", "heavy"]
 		},
 		"$MFT": {
 			"category": "Windows",

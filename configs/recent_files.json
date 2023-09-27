@@ -20,16 +20,31 @@
 			],
 			"tags": ["sans_triage"]
 		},
-		"Amcache": {
+		"Amcache": [
+			{
 			"category": "RecentFiles",
-			"filter": ["Amcache.*","EncapsulationLogging.*"],
+			"filter": ["Amcache.*"],
 			"recursive": false,
 			"paths": [
 				"%HOMEDRIVE%\\Windows\\AppCompat\\Programs\\*"
 			],
 			"shadow": true,
-			"tags": ["sans_triage"]
-		},
+			"tags": ["sans_triage"],
+			"type": "AmCache",
+			"parser": "AmcacheParser"
+			},
+			{
+			"category": "RecentFiles",
+			"filter": ["EncapsulationLogging.*"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Windows\\AppCompat\\Programs\\*"
+			],
+			"shadow": true,
+			"tags": ["sans_triage"],
+			"type": "encapsulation_logging"
+			}
+		],
 		"Syscache": {
 			"category": "RecentFiles",
 			"filter": ["syscache.*"],

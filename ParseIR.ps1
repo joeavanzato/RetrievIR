@@ -1,4 +1,10 @@
 
+
+# The successful file copies csv is used as a basis for telling ParseIR which files should be parsed by which utility
+# The 'name' of  the JSON object is used to match the 'parser' configuration in the evidence collection JSON
+# In Evidence Collection directives, parser can be a comma-delimited list of values - but still string, not array.
+# A 'parser' can be any type of script invoked by cmd.exe \c - powershell scripts, etc.
+
 [CmdletBinding()]
 param
 (
@@ -148,7 +154,7 @@ function Check-Tools ($config_data){
     if (-not (Test-Path $utilities_dir)){
         Create-Directory $utilities_dir
     }
-    $util_contents = Get-ChildItem -Path $utilities_dir -Filter *.exe -Recurse | Where {! $_.PSIsContainer }
+    $util_contents = Get-ChildItem -Path $utilities_dir -Recurse | Where {! $_.PSIsContainer }
     if ($util_contents.GetType().Name -eq "String"){
         $util_contents = @($util_contents)
     }
@@ -166,7 +172,7 @@ function Check-Tools ($config_data){
             }
             if (-not ($found) -and ($object.$name.if_missing -eq "download")){
                 Download-Binary $object.$name.url $utilities_dir $object.$name.executable $object.$name.dl_type
-            } elseif (-not ($found)){
+            } elseif (-not ($found) -and -not ($object.$name.type -eq "native")){
                 Log-Message "[!] Missing Executable without downloading: $exe_name"
             } else {
                 Log-Message "[!] Found Executable: $exe_name"
@@ -174,7 +180,7 @@ function Check-Tools ($config_data){
         }
     }
     $parser_locations = @{}
-    $util_contents = Get-ChildItem -Path $utilities_dir -Recurse -Filter *.exe | Where {! $_.PSIsContainer }
+    $util_contents = Get-ChildItem -Path $utilities_dir -Recurse | Where {! $_.PSIsContainer }
     if ($util_contents.GetType().Name -eq "String"){
         $util_contents = @($util_contents)
     }
@@ -200,6 +206,8 @@ function Start-Processing ($parse_config, $file_data, $exe_locations){
     $files_parsed = New-Object -TypeName 'System.Collections.ArrayList'
     $dirs_parsed = New-Object -TypeName 'System.Collections.ArrayList'
     ForEach ($record in $file_data){
+        #continue
+        # TODO - Remove Above
         if ($record.Parser -eQ "N/A"){
             # Skip parsing files that don't have an assigned parser in their output
             continue
@@ -215,6 +223,9 @@ function Start-Processing ($parse_config, $file_data, $exe_locations){
                 continue
             }
             $parse_object = $parse_config.$($parser)
+            if ($parse_object.type -eq "standalone"){
+                continue
+            }
             $pass = $true
             $file_basename = Split-Path -Leaf $record.FileName
             if ($parse_object.file_filter[0] -eq "*"){
@@ -229,6 +240,7 @@ function Start-Processing ($parse_config, $file_data, $exe_locations){
             if ($pass){
                 continue
             }
+
             $base_evidence_path = $parsed_evidence_dir + "\" + $record.Computer
             #Write-Host $base_evidence_path
             #if (-not (Test-Path ))
@@ -248,8 +260,37 @@ function Start-Processing ($parse_config, $file_data, $exe_locations){
             }
             Parse $parse_object $record $base_evidence_path $source_target $exe_locations[$parser]
         }
-
     }
+
+
+    #Standalone Parsers
+    ForEach ($object in $parse_config) {
+        $object_name = $object.psobject.Properties.Name
+        ForEach ($name in $object_name) {
+            $exe_name = $object.$name.executable
+            $type = $object.$name.type
+            if($type -ne "standalone"){
+                continue
+            }
+            Execute-Standalone-Parser $object.$name $exe_locations[$name]
+        }
+    }
+}
+
+function Execute-Standalone-Parser ($parser, $bin_loc){
+    $commandline = $parser.cmdline
+    if ($commandline -match ".*#EVIDENCE_DIR#.*"){
+        $commandline = $commandline -replace ("#EVIDENCE_DIR#", "`"$evidence_dir`"")
+    }
+    if ($commandline -match ".*#PARSER#.*"){
+        $commandline = $commandline -replace ("#PARSER#", "`"$bin_loc`"")
+    }
+    if ($commandline -match ".*#PARSED_EVIDENCE_DIR#.*"){
+        $commandline = $commandline -replace ("#PARSED_EVIDENCE_DIR#", "`"$parsed_evidence_dir`"")
+    }
+    Log-Message "[+] Executing: $commandline"
+    & powershell.exe $commandline
+
 }
 
 function Parse ($parser, $record, $base_evidence_dir, $target, $exe_full_path){
@@ -267,14 +308,24 @@ function Parse ($parser, $record, $base_evidence_dir, $target, $exe_full_path){
     } elseif ($commandline -match ".*#SOURCE_DIR#.*"){
         $commandline = $commandline -replace ("#SOURCE_DIR#", "`"$target`"")
     }
-    $commandline = $commandline -replace ("#PARSER#", "`"$exe_full_path`"")
+    if ($exe_full_path){
+        $commandline = $commandline -replace ("#PARSER#", "`"$exe_full_path`"")
+    } else {
+        $commandline = $commandline -replace ("#PARSER#", "`"$($parser.executable)`"")
+    }
     if ($commandline -match ".*#DESTINATION_DIR#.*"){
         $commandline = $commandline -replace ("#DESTINATION_DIR#", "`"$tmp_evidence_storage`"")
     } elseif ($commandline -match ".*#DESTINATION_FILE#.*"){
         $commandline = $commandline -replace ("#DESTINATION_FILE#", "`"$tmp_evidence_storage`"")
     }
     #Write-Host $commandline
-    & cmd.exe /c $commandline
+    Log-Message "[+] Executing: $commandline"
+    if ($parser.type -eq "inline"){
+        & cmd.exe /c $commandline
+    } elseif ($parser.type -eq "native"){
+        Invoke-Expression $commandline
+    }
+    #& cmd.exe /c $commandline
     #Start-Job {cmd.exe /c $commandline}
 
 

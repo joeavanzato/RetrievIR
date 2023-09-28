@@ -93,116 +93,151 @@ function Parse-Extension-Manifest ($manifest_json, $extension, $user, $target, $
 }
 
 function Find-Extension-Manifest ($target){
-    $chrome_extensions = New-Object -TypeName 'System.Collections.ArrayList'
-    $parser_storage_dir = "Browser"
-    $output_filename = "ChromeExtensions.csv"
+    $browsers = @{
+        "ChromeUserData" = "Chrome"
+        "EdgeUserData" = "Edge"
+    }
+    foreach ($key in $browsers.Keys) {
+        $bwsr = $browsers[$key]
 
-    try {
-        $extension_dirs = Get-ChildItem -Path "$base_evidence_dir\$target\Browsers\ChromeUserData\*\User Data\Default\Extensions"
-    } catch {
-        Write-Host "[!] [$target] Could not find Browsers\ChromeUserData\*\User Data\Default\Extensions Directory!"
-        continue
-    }
-    $tmp_evidence_dir = "$parsed_evidence_dir\$target\$parser_storage_dir"
-    $output_file ="$tmp_evidence_dir\$output_filename"
-    if (-not (Test-Path $tmp_evidence_dir)){
-        New-Item -Path $tmp_evidence_dir -ItemType Directory | Out-Null
-    }
-    ForEach ($dir in $extension_dirs){
-        if ($dir -match ".*\\ChromeUserData\\(?<user>[^\\]*)\\.*") {
-            $user = $Matches.user
-        } else {
-            $user = "N/A"
+        $chrome_extensions = New-Object -TypeName 'System.Collections.ArrayList'
+        $parser_storage_dir = "Browser"
+        $output_filename = "$bwsr`Extensions.csv"
+
+        try {
+            $extension_dirs = Get-ChildItem -Path "$base_evidence_dir\$target\Browsers\$key\*\User Data\Default\Extensions"
         }
-        $extension_dirs = Get-ChildItem $dir | Where { $_.PSIsContainer }
-        ForEach ($extension in $extension_dirs){
-            $manifest = Get-ChildItem -Path $extension.FullName -filter manifest.json -Recurse
-            try {
-                $manifest_json = Get-Content -Path $manifest.FullName -Raw | ConvertFrom-Json
-            } catch {
-                Write-Host "[!] Error Reading Chrome Extension Manifest: $($manifest.FullName)"
-                continue
+        catch {
+            Write-Host "[!] [$target] Could not find Browsers\$key\*\User Data\Default\Extensions Directory!"
+            continue
+        }
+        $tmp_evidence_dir = "$parsed_evidence_dir\$target\$parser_storage_dir"
+        $output_file = "$tmp_evidence_dir\$output_filename"
+        if (-not(Test-Path $tmp_evidence_dir)) {
+            New-Item -Path $tmp_evidence_dir -ItemType Directory | Out-Null
+        }
+        ForEach ($dir in $extension_dirs) {
+            if ($dir -match ".*\\$key\\(?<user>[^\\]*)\\.*") {
+                $user = $Matches.user
             }
-            Parse-Extension-Manifest $manifest_json $extension $user $target $chrome_extensions
+            else {
+                $user = "N/A"
+            }
+            $extension_dirs = Get-ChildItem $dir | Where { $_.PSIsContainer }
+            ForEach ($extension in $extension_dirs) {
+                $manifest = Get-ChildItem -Path $extension.FullName -filter manifest.json -Recurse
+                try {
+                    $manifest_json = Get-Content -Path $manifest.FullName -Raw | ConvertFrom-Json
+                }
+                catch {
+                    Write-Host "[!] Error Reading Extension Manifest: $( $manifest.FullName )"
+                    continue
+                }
+                Parse-Extension-Manifest $manifest_json $extension $user $target $chrome_extensions
 
+            }
         }
+        $chrome_extensions | Export-Csv -NoTypeInformation -Path $output_file -Append
     }
-    $chrome_extensions | Export-Csv -NoTypeInformation -Path $output_file -Append
 }
 ### END SECTION: EXTENSION PARSING
 
 ### START SECTION: HISTORY PARSING
-function Parse-Chrome-History ($target){
+function Parse-History ($target){
     $parser_storage_dir = "Browser"
     $tmp_evidence_dir = "$parsed_evidence_dir\$target\$parser_storage_dir"
 
-    $url_table_objects = New-Object -TypeName 'System.Collections.ArrayList'
-    $url_output_filename = "ChromeHistory_URLs.csv"
-    $url_output_file ="$tmp_evidence_dir\$url_output_filename"
-
-    $downloads_table_objects = New-Object -TypeName 'System.Collections.ArrayList'
-    $downloads_output_filename = "ChromeHistory_Downloads.csv"
-    $downloads_output_file ="$tmp_evidence_dir\$downloads_output_filename"
-
-    $keyword_search_table_objects = New-Object -TypeName 'System.Collections.ArrayList'
-    $keywords_output_filename = "ChromeHistory_KeywordTerms.csv"
-    $keywords_output_file ="$tmp_evidence_dir\$keywords_output_filename"
-
-    $visits_table_objects = New-Object -TypeName 'System.Collections.ArrayList'
-    $visits_output_filename = "ChromeHistory_Visits.csv"
-    $visits_output_file ="$tmp_evidence_dir\$visits_output_filename"
-
-    if (-not (Test-Path $tmp_evidence_dir)){
-        New-Item -Path $tmp_evidence_dir -ItemType Directory | Out-Null
+    $browsers = @{
+        "ChromeUserData" = "Chrome"
+        "EdgeUserData" = "Edge"
     }
-    try {
-        $sqldll = Get-ChildItem -Path $PSScriptRoot -Filter "System.Data.SQLite.dll" -Recurse | Where {! $_.PSIsContainer }
-        if (-not $sqldll){
+
+    foreach ($key in $browsers.Keys)
+    {
+        $bwsr = $browsers[$key]
+
+
+        $url_table_objects = New-Object -TypeName 'System.Collections.ArrayList'
+        $url_output_filename = "$bwsr`History_URLs.csv"
+        $url_output_file = "$tmp_evidence_dir\$url_output_filename"
+
+        $downloads_table_objects = New-Object -TypeName 'System.Collections.ArrayList'
+        $downloads_output_filename = "$bwsr`History_Downloads.csv"
+        $downloads_output_file = "$tmp_evidence_dir\$downloads_output_filename"
+
+        $keyword_search_table_objects = New-Object -TypeName 'System.Collections.ArrayList'
+        $keywords_output_filename = "$bwsr`History_KeywordTerms.csv"
+        $keywords_output_file = "$tmp_evidence_dir\$keywords_output_filename"
+
+        $visits_table_objects = New-Object -TypeName 'System.Collections.ArrayList'
+        $visits_output_filename = "$bwsr`History_Visits.csv"
+        $visits_output_file = "$tmp_evidence_dir\$visits_output_filename"
+
+        if (-not(Test-Path $tmp_evidence_dir))
+        {
+            New-Item -Path $tmp_evidence_dir -ItemType Directory | Out-Null
+        }
+        try
+        {
+            $sqldll = Get-ChildItem -Path $PSScriptRoot -Filter "System.Data.SQLite.dll" -Recurse | Where { !$_.PSIsContainer }
+            if (-not$sqldll)
+            {
+                Write-Host "[!] Could not find System.Data.SQLite.dll!"
+                return
+            }
+        }
+        catch
+        {
             Write-Host "[!] Could not find System.Data.SQLite.dll!"
             return
         }
-    } catch {
-        Write-Host "[!] Could not find System.Data.SQLite.dll!"
-        return
-    }
-    $sqlite_dll_location = $sqldll.FullName
-    [Reflection.Assembly]::LoadFile($sqlite_dll_location) | Out-Null
-    try {
-        $history_files = Get-ChildItem -Path "$base_evidence_dir\$target\Browsers\ChromeUserData\*\User Data\Default\History"
-    } catch {
-        Write-Host "[!] [$target] Could not find Browsers\ChromeUserData\*\User Data\Default\History!"
-        return
-    }
-
-    if ($history_files.GetType().Name -eq "String"){
-        $history_files = @($history_files)
-    }
-    ForEach ($file in $history_files) {
-        if ($file.FullName -match ".*\\ChromeUserData\\(?<user>[^\\]*)\\.*") {
-            $user = $Matches.user
+        $sqlite_dll_location = $sqldll.FullName
+        [Reflection.Assembly]::LoadFile($sqlite_dll_location) | Out-Null
+        try
+        {
+            $history_files = Get-ChildItem -Path "$base_evidence_dir\$target\Browsers\$key\*\User Data\Default\History"
         }
-        else {
-            $user = "N/A"
+        catch
+        {
+            Write-Host "[!] [$target] Could not find Browsers\$key\*\User Data\Default\History!"
+            return
         }
-        $queries = @{
-            "urls" = "SELECT * from urls"
+
+        if ($history_files.GetType().Name -eq "String")
+        {
+            $history_files = @($history_files)
         }
-        $dbString=[string]::Format("data source={0}",$file.FullName)
-        $dbConnection = New-Object System.Data.SQLite.SQLiteConnection
-        $dbConnection.ConnectionString = $dbString
-        $dbConnection.open()
+        ForEach ($file in $history_files)
+        {
+            if ($file.FullName -match ".*\\$key\\(?<user>[^\\]*)\\.*")
+            {
+                $user = $Matches.user
+            }
+            else
+            {
+                $user = "N/A"
+            }
+            $queries = @{
+                "urls" = "SELECT * from urls"
+            }
+            $dbString = [string]::Format("data source={0}", $file.FullName)
+            $dbConnection = New-Object System.Data.SQLite.SQLiteConnection
+            $dbConnection.ConnectionString = $dbString
+            $dbConnection.open()
 
-        Parse-URLs-Table $target $user $dbConnection $url_table_objects
-        Parse-Downloads-Table $target $user $dbConnection $downloads_table_objects
-        Parse-Keyword-Search-Terms-Table $target $user $dbConnection $keyword_search_table_objects
-        Parse-Visits-Table $target $user $dbConnection $visits_table_objects
+            Parse-URLs-Table $target $user $dbConnection $url_table_objects
+            Parse-Downloads-Table $target $user $dbConnection $downloads_table_objects
+            Parse-Keyword-Search-Terms-Table $target $user $dbConnection $keyword_search_table_objects
+            Parse-Visits-Table $target $user $dbConnection $visits_table_objects
 
-        $dbConnection.Close()
+            $dbConnection.Close()
+        }
+        $url_table_objects | Export-Csv -NoTypeInformation -Path $url_output_file -Append
+        $downloads_table_objects | Export-Csv -NoTypeInformation -Path $downloads_output_file -Append
+        $keyword_search_table_objects | Export-Csv -NoTypeInformation -Path $keywords_output_file -Append
+        $visits_table_objects | Export-Csv -NoTypeInformation -Path $visits_output_file -Append
+
     }
-    $url_table_objects | Export-Csv -NoTypeInformation -Path $url_output_file -Append
-    $downloads_table_objects | Export-Csv -NoTypeInformation -Path $downloads_output_file -Append
-    $keyword_search_table_objects | Export-Csv -NoTypeInformation -Path $keywords_output_file -Append
-    $visits_table_objects | Export-Csv -NoTypeInformation -Path $visits_output_file -Append
 }
 
 function Parse-Visits-Table ($target, $user, $dbConnection, $visits_table_objects){
@@ -333,7 +368,6 @@ function Parse-Downloads-Table ($target, $user, $dbConnection, $downloads_table_
     }
     $dbReader.Close()
 }
-
 ### END SECTION: HISTORY PARSING
 
 function Main {
@@ -343,7 +377,7 @@ function Main {
     ForEach ($target in $targets){
         Write-Host "[+] Processing: $target"
         Find-Extension-Manifest $target
-        Parse-Chrome-History $target
+        Parse-History $target
     }
 }
 

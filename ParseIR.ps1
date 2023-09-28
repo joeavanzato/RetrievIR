@@ -137,7 +137,7 @@ function Create-Directory ($dir) {
     }
 }
 
-function Download-Binary($url, $destination_dir, $final_name, $type) {
+function Download-Binary($url, $destination_dir, $final_name, $type, $parse_type) {
     Log-Message "[+] Downloading $final_name from $url"
     if ($type -eq "zip"){
         $zip_path = "$destination_dir\$final_name.zip"
@@ -147,6 +147,14 @@ function Download-Binary($url, $destination_dir, $final_name, $type) {
     } elseif ($type -eq "exe"){
         $exe_path = "$destination_dir\$final_name"
         Invoke-WebRequest "$url" -OutFile $exe_path
+    }
+    if ($parse_type -eq "standalone"){
+        Start-Sleep 1
+        try {
+            Move-Item -Path "$destination_dir\$final_name" -Destination "$destination_dir\standalone"
+        } catch {
+            Log-Message "[!] Unable to move directory/item to standalones!"
+        }
     }
 }
 
@@ -171,11 +179,11 @@ function Check-Tools ($config_data){
                 }
             }
             if (-not ($found) -and ($object.$name.if_missing -eq "download")){
-                Download-Binary $object.$name.url $utilities_dir $object.$name.executable $object.$name.dl_type
+                Download-Binary $object.$name.url $utilities_dir $object.$name.executable $object.$name.dl_type $object.$name.type
             } elseif (-not ($found) -and -not ($object.$name.type -eq "native")){
-                Log-Message "[!] Missing Executable without downloading: $exe_name"
+                Log-Message "[!] Missing Binary without downloading: $exe_name"
             } else {
-                Log-Message "[!] Found Executable: $exe_name"
+                Log-Message "[!] Found Binary: $exe_name"
             }
         }
     }
@@ -208,7 +216,7 @@ function Start-Processing ($parse_config, $file_data, $exe_locations){
     ForEach ($record in $file_data){
         #continue
         # TODO - Remove Above
-        if ($record.Parser -eQ "N/A"){
+        if ($record.Parser -eq "N/A"){
             # Skip parsing files that don't have an assigned parser in their output
             continue
         }
@@ -240,7 +248,6 @@ function Start-Processing ($parse_config, $file_data, $exe_locations){
             if ($pass){
                 continue
             }
-
             $base_evidence_path = $parsed_evidence_dir + "\" + $record.Computer
             #Write-Host $base_evidence_path
             #if (-not (Test-Path ))
@@ -279,6 +286,9 @@ function Start-Processing ($parse_config, $file_data, $exe_locations){
 
 function Execute-Standalone-Parser ($parser, $bin_loc){
     $commandline = $parser.cmdline
+    if ($commandline -eq "N/A"){
+        return
+    }
     if ($commandline -match ".*#EVIDENCE_DIR#.*"){
         $commandline = $commandline -replace ("#EVIDENCE_DIR#", "`"$evidence_dir`"")
     }
@@ -313,6 +323,7 @@ function Parse ($parser, $record, $base_evidence_dir, $target, $exe_full_path){
     } else {
         $commandline = $commandline -replace ("#PARSER#", "`"$($parser.executable)`"")
     }
+    $tmp_evidence_storage = $tmp_evidence_storage.TrimEnd("\")
     if ($commandline -match ".*#DESTINATION_DIR#.*"){
         $commandline = $commandline -replace ("#DESTINATION_DIR#", "`"$tmp_evidence_storage`"")
     } elseif ($commandline -match ".*#DESTINATION_FILE#.*"){

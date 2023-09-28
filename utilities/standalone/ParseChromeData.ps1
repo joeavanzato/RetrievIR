@@ -152,8 +152,7 @@ function Parse-History ($target){
         "EdgeUserData" = "Edge"
     }
 
-    foreach ($key in $browsers.Keys)
-    {
+    foreach ($key in $browsers.Keys) {
         $bwsr = $browsers[$key]
 
 
@@ -173,12 +172,10 @@ function Parse-History ($target){
         $visits_output_filename = "$bwsr`History_Visits.csv"
         $visits_output_file = "$tmp_evidence_dir\$visits_output_filename"
 
-        if (-not(Test-Path $tmp_evidence_dir))
-        {
+        if (-not(Test-Path $tmp_evidence_dir)) {
             New-Item -Path $tmp_evidence_dir -ItemType Directory | Out-Null
         }
-        try
-        {
+        try {
             $sqldll = Get-ChildItem -Path $PSScriptRoot -Filter "System.Data.SQLite.dll" -Recurse | Where { !$_.PSIsContainer }
             if (-not$sqldll)
             {
@@ -186,35 +183,28 @@ function Parse-History ($target){
                 return
             }
         }
-        catch
-        {
+        catch {
             Write-Host "[!] Could not find System.Data.SQLite.dll!"
             return
         }
         $sqlite_dll_location = $sqldll.FullName
         [Reflection.Assembly]::LoadFile($sqlite_dll_location) | Out-Null
-        try
-        {
-            $history_files = Get-ChildItem -Path "$base_evidence_dir\$target\Browsers\$key\*\User Data\Default\History"
+        try {
+            $history_files = Get-ChildItem -Path "$base_evidence_dir\$target\Browsers\$key\*\User Data\*\History"
         }
-        catch
-        {
+        catch {
             Write-Host "[!] [$target] Could not find Browsers\$key\*\User Data\Default\History!"
             return
         }
 
-        if ($history_files.GetType().Name -eq "String")
-        {
+        if ($history_files.GetType().Name -eq "String") {
             $history_files = @($history_files)
         }
-        ForEach ($file in $history_files)
-        {
-            if ($file.FullName -match ".*\\$key\\(?<user>[^\\]*)\\.*")
-            {
+        ForEach ($file in $history_files) {
+            if ($file.FullName -match ".*\\$key\\(?<user>[^\\]*)\\.*") {
                 $user = $Matches.user
             }
-            else
-            {
+            else {
                 $user = "N/A"
             }
             $queries = @{
@@ -242,7 +232,8 @@ function Parse-History ($target){
 
 function Parse-Visits-Table ($target, $user, $dbConnection, $visits_table_objects){
     $dbCmd = $dbConnection.CreateCommand()
-    $dbCmd.Commandtext = "SELECT visits.id,urls.url,title,visit_time,from_visit,visit_duration,external_referrer_url FROM visits INNER JOIN urls ON visits.url = urls.id"
+    # Chrome has 'external_referrer_url, edge does not I guess?
+    $dbCmd.Commandtext = "SELECT visits.id,urls.url,title,visit_time,from_visit,visit_duration FROM visits INNER JOIN urls ON visits.url = urls.id"
     $dbCmd.CommandType = [System.Data.CommandType]::Text
     $dbReader = $dbCmd.ExecuteReader()
     #$dbReader.GetValues()

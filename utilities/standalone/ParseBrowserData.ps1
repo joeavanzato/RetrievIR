@@ -1,4 +1,7 @@
 
+## We use SQLECmd to do some default parsing with built-in maps elsewhere
+## This script is used to help aggregate all information into a single CSV for all basic browsing information
+
 [CmdletBinding()]
 param
 (
@@ -11,6 +14,7 @@ param
 
 ### START SECTION: EXTENSION PARSING
 function Parse-Extension-Manifest ($manifest_json, $extension, $user, $target, $chrome_extensions){
+    # Read individual manifest and add to list
     if ($manifest_json.app.background.scripts){
         $background_scripts = $manifest_json.app.background.scripts -Join ","
     } else {
@@ -93,6 +97,7 @@ function Parse-Extension-Manifest ($manifest_json, $extension, $user, $target, $
 }
 
 function Find-Extension-Manifest ($target){
+    # Find Extension Manifests in default evidence directory - need to change this if module name is changed in the collection process, TODO - Make modular.
     $browsers = @{
         "ChromeUserData" = "Chrome"
         "EdgeUserData" = "Edge"

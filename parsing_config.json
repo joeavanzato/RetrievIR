@@ -147,12 +147,36 @@
     "name": "MFTECmd",
     "evidence_type": "MFT",
     "executable": "MFTECmd.exe",
-    "cmdline": "#PARSER# -d #SOURCE_FILE# --csv #DESTINATION_DIR#",
+    "cmdline": "#PARSER# -f #SOURCE_FILE# --csv #DESTINATION_DIR#",
     "url": "https://f001.backblazeb2.com/file/EricZimmermanTools/MFTECmd.zip",
     "dl_type": "zip",
     "if_missing": "download",
     "operates_on": "file",
-    "file_filter": ["*.evtx"],
+    "file_filter": ["*"],
+    "type": "inline"
+  },
+  "ChromeMetadata":{
+    "name": "ChromeMetadata",
+    "evidence_type": "ChromeMetadata",
+    "executable": "SQLECmd.exe",
+    "cmdline": "#PARSER# -f #SOURCE_FILE# --csv #DESTINATION_DIR#",
+    "url": "https://f001.backblazeb2.com/file/EricZimmermanTools/SQLECmd.zip",
+    "dl_type": "zip",
+    "if_missing": "download",
+    "operates_on": "file",
+    "file_filter": ["Bookmarks*","Cookies*","Session*","DownloadMetadata","Extension Cookies","Favicons*","History","Last Session", "Last Tabs", "Login Data", "Media History*", "Network Action Predictor", "Network Persistent State", "Preferences", "QuotaManager", "Reporting and NEL", "Shortcuts*", "Top Sites*", "SyncData.sqlite3", "Visited Links", "Web Data*"],
+    "type": "inline"
+  },
+  "EdgeMetadata":{
+    "name": "EdgeMetadata",
+    "evidence_type": "EdgeMetadata",
+    "executable": "SQLECmd.exe",
+    "cmdline": "#PARSER# -f #SOURCE_FILE# --csv #DESTINATION_DIR#",
+    "url": "https://f001.backblazeb2.com/file/EricZimmermanTools/SQLECmd.zip",
+    "dl_type": "zip",
+    "if_missing": "download",
+    "operates_on": "file",
+    "file_filter": ["Bookmarks*","Cookies*","Session*","DownloadMetadata","Extension Cookies","Favicons*","History","Last Session", "Last Tabs", "Login Data", "Media History*", "Network Action Predictor", "Network Persistent State", "Preferences", "QuotaManager", "Reporting and NEL", "Shortcuts*", "Top Sites*", "SyncData.sqlite3", "Visited Links", "Web Data*"],
     "type": "inline"
   },
   "CSVOutputCollector":{
@@ -167,16 +191,30 @@
     "file_filter": ["*.csv"],
     "type": "native"
   },
-  "ChromeExtensionsParser":{
-    "name": "ChromeExtensionsParser",
-    "evidence_type": "ChromeExtensions",
-    "executable": "ChromeExtensionsParser.ps1",
+  "ParseBrowserData":{
+    "name": "ParseBrowserData",
+    "evidence_type": "Browser",
+    "executable": "ParseBrowserData.ps1",
     "cmdline": "#PARSER# -base_evidence_dir #EVIDENCE_DIR# -parsed_evidence_dir #PARSED_EVIDENCE_DIR#",
     "url": "N/A",
     "dl_type": "N/A",
     "if_missing": "skip",
     "operates_on": "file",
     "file_filter": ["*"],
-    "type": "standalone"
+    "type": "standalone",
+    "output_dir": "Browser"
+  },
+  "SQLiteDLL":{
+    "name": "SQLiteDLL",
+    "evidence_type": "N/A",
+    "executable": "System.Data.SQLite.dll",
+    "cmdline": "N/A",
+    "url": "https://system.data.sqlite.org/blobs/1.0.118.0/sqlite-netFx45-binary-x64-2012-1.0.118.0.zip",
+    "dl_type": "zip",
+    "if_missing": "download",
+    "operates_on": "N/A",
+    "file_filter": ["N/A"],
+    "type": "standalone",
+    "output_dir": "N/A"
   }
 }

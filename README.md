@@ -206,7 +206,7 @@ The default configuration files are meant to be more 'complete' repositories of 
 * Running Processes
 * USN Journal
 
-### What is parsed in the default configuration files?
+### What is parsed in the default configuration files for ParseIR?
 * Amcache
 * AppCompatCache
 * JumpLists
@@ -219,7 +219,17 @@ The default configuration files are meant to be more 'complete' repositories of 
 * User Activity Logging
 * ActivitiesCache
 * $MFT
-* Chrome Extensions
+* Chrome/Edge User Data
+  * Extensions
+  * Visits
+  * URLs
+  * Search Terms
+  * Downloads
+  * FavIcons
+  * OmniboxShortcuts
+  * AutoFills
+
+Most artifact parsing is done using the Zimmerman toolset - some custom parsing is also being implemented for other artifacts as required.
 
 ### TODO
 * $J
@@ -270,6 +280,8 @@ There are a few optional parameters designed to help augment the parsing of evid
 * shadow [boolean] - Specifies whether the evidence must be collected from a newly-created Shadow Copy
 * dir_removals [int] - Specifies how many path segments to remove from the front of the path
   * Example: Specifying dir_removal = 5 for a target evidence path such as C:\Users\*\AppData\Local\Apps\* will remove C:, Users, the username, AppData and Local, copying the remaining directory structure of Apps\* into the directive evidence location.
+* type [string] - Used in the file export CSV to categorize evidence further.
+* parser [string] - Comma-delimited string indicating the names of parsers in parsing_config.json that will be called when scanning collected evidence.
 
 Any evidence path containing the pattern '\Users\*\' will be automatically added into a per-user folder undernear the primary evidence path. 
 
@@ -332,7 +344,12 @@ Command directives are intended to specify commands which should run on the targ
 * category [string] - The category of the command, similar to files - this will group evidence at the parent-level directory.
 * command [string] - The command to execute - each command must output to a file designated as '#FILEPATH#' - this is replaced dynamically in-line.
 * output [string] - The final file name that the resulting evidence will be stored as.
+
+Optional properties:
+
 * tags [array of strings] - Specifies tags applied to the objective.
+* type [string] - Used in the file export CSV to categorize evidence further.
+* parser [string] - Comma-delimited string indicating the names of parsers in parsing_config.json that will be called when scanning collected evidence.
 
 An example directive is shown below:
 
@@ -423,8 +440,18 @@ Registry directives are bundled into a single large script that is executed on t
 * SMB - Used for transferring data from remote hosts (Access via Drive Mapping such as \\\TARGET\C$\).
 * VSS/ShadowCopies for targeting locked system files - otherwise these will be inaccessible.
 
+### Third-Party Dependencies
+* https://system.data.sqlite.org/downloads/1.0.118.0/sqlite-netFx45-binary-x64-2012-1.0.118.0.zip
+  * For parsing SQLite databases in PowerShell/.NET - DLL stored at utilities\standalone\System.Data.SQLite.dll
+* https://ericzimmerman.github.io/#!index.md
+  * Used for parsing various artifacts - downloaded dynamically by ParseIR.ps1 if missing from utilities directory.
+
 ### References
 * https://github.com/EricZimmerman/KapeFiles/tree/master/Targets
+  * General Artifact References
 * https://www.sans.org/
+  * General Artifact References
 * https://github.com/ForensicArtifacts/artifacts
+  * General Artifact References
 * https://gist.github.com/secabstraction/4044f4aadd3ef21f0ca9
+  * For carving MFT in PowerShell

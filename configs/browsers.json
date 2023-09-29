@@ -1,15 +1,30 @@
 {
 	"files": {
-		"ChromeUserData": {
+		"ChromeUserData": [
+			{
 			"category": "Browsers",
 			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Google\\Chrome\\User Data\\*\\Extensions",
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Google\\Chrome\\User Data\\*\\Sessions"
+			],
+			"dir_removals": 7,
+			"tags": ["sans_triage"]
+			},
+			{
+			"category": "Browsers",
+			"filter": ["Bookmarks*","Cookies*","Session*","Tabs*","DownloadMetadata","Extension Cookies","Favicons*","History*","Last Session", "Last Tabs", "Login Data", "Media History*", "Network Action Predictor", "Network Persistent State", "Preferences", "QuotaManager", "Reporting and NEL", "Shortcuts*", "Top Sites*", "SyncData.sqlite3", "Visited Links", "Web Data*"],
 			"recursive": true,
 			"paths": [
 				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Google\\Chrome\\User Data\\*\\*"
 			],
 			"dir_removals": 7,
-			"tags": ["sans_triage"]
-		},
+			"tags": ["sans_triage"],
+			"type": "ChromeMeta",
+			"parser": "ChromeMetadata"
+			}
+		],
 		"Edge": {
 			"category": "Browsers",
 			"filter": ["*"],
@@ -20,16 +35,20 @@
 			"dir_removals": 7,
 			"tags": ["sans_triage"]
 		},
-		"EdgeUserData": {
+		"EdgeUserData": [
+			{
 			"category": "Browsers",
-			"filter": ["*"],
+			"filter": ["Bookmarks*","collectionsSQLite","Cookies*", "Current Session", "Current Tabs", "Favicons*", "History*", "Last Session", "Last Tabs", "Media History*", "Login Data", "Network Action Predictor", "Preferences", "Top Sites*", "SyncData.sqlite3", "Bookmarks*", "Visited Links", "Web Data*"],
 			"recursive": true,
 			"paths": [
 				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Microsoft\\Edge\\User Data\\*\\*"
 			],
 			"dir_removals": 7,
-			"tags": ["sans_triage"]
-		},
+			"tags": ["sans_triage"],
+			"type": "EdgeMeta",
+			"parser": "EdgeMetadata"
+			}
+		],
 		"BraveUserData": {
 			"category": "Browsers",
 			"filter": ["*"],

@@ -442,15 +442,15 @@ When ParseIR runs, it looks for "successful_file_copies.csv" in the root of the 
 If using default directories for RetrievIR, just run ParseIR.ps1 after completion and it will find the relevant configuration/evidence directories - otherwise, see arguments below:
 
 ```
-	.\ParseIR.ps1 -evidence_dir : Where raw evidence is stored - defaults to "$PSScriptRoot\evidence"
+.\ParseIR.ps1 -evidence_dir : Where raw evidence is stored - defaults to "$PSScriptRoot\evidence"
 
-	.\ParseIR.ps1 -parsed_evidence_dir : Where to store parsed evidence -defaults to "$PSScriptRoot\parsed_evidence"
+.\ParseIR.ps1 -parsed_evidence_dir : Where to store parsed evidence -defaults to "$PSScriptRoot\parsed_evidence"
 
-	.\ParseIR.ps1 -config : Where to find the parsing configuration file - defaults to $PSScriptRoot\parsing_config.json
+.\ParseIR.ps1 -config : Where to find the parsing configuration file - defaults to $PSScriptRoot\parsing_config.json
 
-	.\ParseIR.ps1 -ignoremissing : Ignore missing dependencies and do not attempt to download.
+.\ParseIR.ps1 -ignoremissing : Ignore missing dependencies and do not attempt to download.
 
-	.\ParseIR.ps1 -utilities_dir : The fully-qualified directory where third-party parsers are/will be stored - defaults to .\utilities
+.\ParseIR.ps1 -utilities_dir : The fully-qualified directory where third-party parsers are/will be stored - defaults to .\utilities
 ```
 
 An example configuration is shown below:

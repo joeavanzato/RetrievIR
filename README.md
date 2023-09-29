@@ -433,6 +433,72 @@ Registry directives are bundled into a single large script that is executed on t
 ]
 ```
 
+### ParseIR
+
+ParseIR is designed to automate the processing of raw evidence to human/machine readable information for direct importing to a SIEM or other centralized information store.  ParseIR consists of a configuration file which specifies named Parsers - each 'parser' is then invoked either inline when processing collected files, as a standalone mechanism or as a 'native' command invoked through PowerShell.  
+
+When ParseIR runs, it looks for "successful_file_copies.csv" in the root of the collected evidence folder - when evidence is copied, if there is a 'parser' applied in the specific collection directive, this label will be added into the CSV for the relevant files.  As ParseIR reads this CSV, it looks for a parser with the same name - if one is found, replacements are made for either the filename or directory depending on what is specified in the parser's configuration.
+
+An example configuration is shown below:
+
+```
+  "MFTECmd":{
+    "name": "MFTECmd",
+    "evidence_type": "MFT",
+    "executable": "MFTECmd.exe",
+    "cmdline": "#PARSER# -f #SOURCE_FILE# --csv #DESTINATION_DIR#",
+    "url": "https://f001.backblazeb2.com/file/EricZimmermanTools/MFTECmd.zip",
+    "dl_type": "zip",
+    "if_missing": "download",
+    "operates_on": "file",
+    "file_filter": ["*"],
+    "type": "inline"
+  }
+```
+This parser object will be invoked for any **file** which has an associated parser label that includes 'MFTECmd' - then replacements are made for both the parser exe, the source file and the destination directory and the commandline is invoked.
+
+Additional filters can be applied so that parsers only operate on specifically named files.  
+
+An example of a 'standalone' parser object is shown below:
+
+```
+  "ParseBrowserData":{
+    "name": "ParseBrowserData",
+    "evidence_type": "Browser",
+    "executable": "ParseBrowserData.ps1",
+    "cmdline": "#PARSER# -base_evidence_dir #EVIDENCE_DIR# -parsed_evidence_dir #PARSED_EVIDENCE_DIR#",
+    "url": "N/A",
+    "dl_type": "N/A",
+    "if_missing": "skip",
+    "operates_on": "file",
+    "file_filter": ["*"],
+    "type": "standalone",
+    "output_dir": "Browser"
+  }
+```
+
+This type of parser is invoked independently of collected files and operates in an independent manner to look for associated evidence to process as appropriate.
+
+A final example of a native command parser is shown below:
+
+```
+  "CSVOutputCollector":{
+    "name": "CSVOutputCollector",
+    "evidence_type": "CommandOutput",
+    "executable": "powershell.exe",
+    "cmdline": "Copy-Item #SOURCE_FILE# #DESTINATION_DIR#",
+    "url": "N/A",
+    "dl_type": "N/A",
+    "if_missing": "skip",
+    "operates_on": "file",
+    "file_filter": ["*.csv"],
+    "type": "native"
+  }
+```
+This parser is still operated on as records are iterated over but specifies native PowerShell code to run rather than a standalone executable.
+
+Parsers can be downloaded and unpacked automatically based on the specified url, dl_type and if_missing options in each parser object.
+
 ### Requirements
 
 * WMI - Used for launching processes / querying data on remote hosts.

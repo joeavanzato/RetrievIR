@@ -1,0 +1,49 @@
+{
+	"files": {
+		"PowerShellProfiles": {
+			"category": "PowerShell",
+			"filter": ["*profile.ps1"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\Documents\\WindowsPowerShell\\*",
+				"%HOMEDRIVE%\\Windows\\System32\\WindowsPowerShell\\v1.0\\*"
+			],
+			"tags": ["persistence", "powershell"]
+		},
+		"PowerShell7Config": {
+			"category": "PowerShell",
+			"filter": ["powershell.config.json"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Program Files\\PowerShell\\7\\*"
+			],
+			"tags": ["powershell"]
+		},
+		"PowerShellTranscripts": {
+			"category": "PowerShell",
+			"filter": ["PowerShell_transcript.*.txt"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\Documents\\20*\\",
+				"%HOMEDRIVE%\\Windows\\SysWOW64\\*\\*",
+				"%HOMEDRIVE%\\Windows\\System32\\*\\*",
+				"%HOMEDRIVE%\\Program Files\\Amazon\\Ec2ConfigService\\Scripts\\*\\*"
+			],
+			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/PowerShellTranscripts.tkape",
+			"tags": ["powershell"]
+		},
+		"ConsoleHistory": {
+			"category": "PowerShell",
+			"filter": ["*"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\Microsoft\\Windows\\PowerShell\\PSReadLine\\*"
+			],
+			"tags": ["sans_triage", "powershell"]
+		}
+	},
+	"commands": {
+	},
+	"registry": {
+	}
+}

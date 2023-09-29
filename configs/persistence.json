@@ -1,0 +1,76 @@
+{
+	"files": {
+		"SuspiciousFiles": [
+			{
+			"category": "Files",
+			"filter": ["*.exe", "*.dll","*.ps1", "*.psm1","*.bat","*.cmd","*.hta","*.htm","*.vbs"],
+			"recursive": true,
+			"paths": [
+					"%HOMEDRIVE%\\users\\administrator\\*",
+					"%HOMEDRIVE%\\users\\default\\*",
+					"%HOMEDRIVE%\\users\\public\\*"
+			],
+			"tags": ["persistence"]
+			},
+			{
+			"category": "Files",
+			"filter": ["*.exe", "*.dll","*.ps1", "*.psm1","*.bat","*.cmd","*.hta","*.htm","*.vbs"],
+			"recursive": false,
+			"paths": [
+					"%HOMEDRIVE%\\windows\\debug\\*",
+					"%HOMEDRIVE%\\windows\\fonts\\*",
+					"%HOMEDRIVE%\\windows\\media\\*",
+					"%HOMEDRIVE%\\windows\\repair\\*",
+					"%HOMEDRIVE%\\windows\\servicing\\*",
+					"%HOMEDRIVE%\\windows\\temp\\*",
+					"%HOMEDRIVE%\\recycle.bin\\*"
+			],
+			"dir_removals": 1,
+			"tags": ["persistence"]
+			}
+		]
+	},
+	"commands": {
+	},
+	"registry": {
+		"CommonStartups": {
+			"category": "Persistence",
+			"paths": [
+				"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",
+				"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\RunOnce",
+				"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\RunEx",
+				"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\RunOnceEx",
+				"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\RunServices",
+				"HKU\\*\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",
+				"HKU\\*\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\RunOnce",
+				"HKU\\*\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\RunEx",
+				"HKU\\*\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\RunOnceEx",
+				"HKU\\*\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\RunServices"
+			],
+			"recursive": true,
+			"keys": ["*"],
+			"store_empty": true,
+			"tags" : ["persistence", "startups"]
+		},
+		"Debuggers": {
+			"category": "Persistence",
+			"paths": [
+				"HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AeDebug",
+				"HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AeDebugProtected",
+				"HKLM\\SOFTWARE\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\AeDebug",
+				"HKLM\\SOFTWARE\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\AeDebugProtected",
+				"HKLM\\SOFTWARE\\Microsoft\\.NETFramework",
+				"HKLM\\SOFTWARE\\Wow6432Node\\Microsoft\\.NETFramework",
+				"HKLM\\SOFTWARE\\Classes\\CLSID\\{834128A2-51F4-11D0-8F20-00805F2CD064}\\LocalServer32",
+				"HKCR\\CLSID\\{834128A2-51F4-11D0-8F20-00805F2CD064}\\LocalServer32",
+				"HKLM\\SOFTWARE\\Classes\\CLSID\\{78A51822-51F4-11D0-8F20-00805F2CD064}\\LocalServer32",
+				"HKCR\\CLSID\\{78A51822-51F4-11D0-8F20-00805F2CD064}\\LocalServer32",
+				"HKLM\\SOFTWARE\\Microsoft\\Windows\\Windows Error Reporting\\Hangs"
+			],
+			"recursive": false,
+			"keys": ["ProtectedDebugger","Debugger","DbgManagedDebugger","@", "(default)"],
+			"store_empty": false,
+			"tags" : ["persistence"]
+		}
+	}
+}

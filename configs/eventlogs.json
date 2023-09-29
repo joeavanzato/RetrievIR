@@ -1,0 +1,38 @@
+{
+	"files": {
+		"EventLogs": {
+			"category": "Windows",
+			"filter": [
+				"Security.evtx",
+				"Application.evtx",
+				"System.evtx",
+				"Microsoft-Windows-TaskScheduler%4Operational.evtx",
+				"Microsoft-Windows-PowerShell*.evtx",
+				"Microsoft-Windows-Shell-Core%4Operational.evtx",
+				"Microsoft-Windows-TerminalServices-*.evtx",
+				"Microsoft-Windows-RemoteDesktopServices-*.evtx",
+				"Microsoft-Windows-Windows Defender*.evtx",
+				"Microsoft-Windows-RemoteAssistance*",
+				"DNS Server.evtx",
+				"Microsoft-Windows-remoteapp*",
+				"Microsoft-Windows-Security-netlogon*",
+				"Microsoft-Windows-SMB*",
+				"Microsoft-Windows-WinRM*",
+				"OpenSSH*",
+				"Microsoft-Windows-WMI*",
+				"*SYSMON*"
+			],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Windows\\System32\\winevt\\logs\\*"
+			],
+			"tags": ["sans_triage", "event_logs"],
+			"type": "EventLogs",
+			"parser": "EvtxECmd"
+		}
+	},
+	"commands": {
+	},
+	"registry": {
+	}
+}

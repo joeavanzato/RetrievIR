@@ -90,15 +90,6 @@
 			"tags": ["sans_triage"]
 			}
 		],
-		"ConsoleHistory": {
-			"category": "PowerShell",
-			"filter": ["*"],
-			"recursive": false,
-			"paths": [
-				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\Microsoft\\Windows\\PowerShell\\PSReadLine\\*"
-			],
-			"tags": ["sans_triage"]
-		},
 		"WindowsDrivers": {
 			"category": "Windows",
 			"filter": ["*.sys"],
@@ -217,56 +208,6 @@
 			"tags": ["sans_triage"]
 			}
 		],
-		"OfficeBackstage": {
-			"category": "Office",
-			"filter": ["*"],
-			"recursive": true,
-			"paths": [
-				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Microsoft\\Office\\*\\BackstageinAppNavCache\\*"
-			],
-			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/MicrosoftOfficeBackstage.tkape"
-		},
-		"OfficeDocumentCache": {
-			"category": "Office",
-			"filter": ["*"],
-			"recursive": true,
-			"paths": [
-				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Microsoft\\Office\\*\\OfficeFileCache\\*"
-			]
-		},
-		"OfficeDiagnostics": [
-			{
-			"category": "Office",
-			"filter": ["PCW.debugreport.xml"],
-			"recursive": false,
-			"paths": [
-				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Diagnostics\\*",
-				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\ElevatedDiagnostics\\*"
-			],
-			"shadow": true
-			},
-			{
-			"category": "Office",
-			"filter": ["*"],
-			"recursive": true,
-			"paths": [
-				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\temp\\Diagnostics\\*"
-			],
-			"shadow": true
-			}
-		],
-		"OfficeAutosaves": {
-			"category": "Office",
-			"filter": ["*"],
-			"recursive": true,
-			"paths": [
-				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\Microsoft\\Word\\*",
-				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\Microsoft\\Excel\\*",
-				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\Microsoft\\Powerpoint\\*",
-				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\Microsoft\\Publisher\\*"
-			],
-			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/OfficeAutosave.tkape"
-		},
 		"WindowsPushNotificationService": {
 			"category": "Windows",
 			"filter": ["appdb.dat","wpndatabase.db"],
@@ -275,34 +216,14 @@
 				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Microsoft\\Windows\\Notifications\\*"
 			]
 		},
-		"PowerShellProfiles": {
-			"category": "PowerShell",
-			"filter": ["*profile.ps1"],
+		"OutlookStartupOTM": {
+			"category": "Outlook",
+			"filter": ["*"],
 			"recursive": false,
 			"paths": [
-				"%HOMEDRIVE%\\Users\\*\\Documents\\WindowsPowerShell\\*",
-				"%HOMEDRIVE%\\Windows\\System32\\WindowsPowerShell\\v1.0\\*"
-			]
-		},
-		"PowerShell7Config": {
-			"category": "PowerShell",
-			"filter": ["powershell.config.json"],
-			"recursive": false,
-			"paths": [
-				"%HOMEDRIVE%\\Program Files\\PowerShell\\7\\*"
-			]
-		},
-		"PowerShellTranscripts": {
-			"category": "PowerShell",
-			"filter": ["PowerShell_transcript.*.txt"],
-			"recursive": false,
-			"paths": [
-				"%HOMEDRIVE%\\Users\\*\\Documents\\20*\\",
-				"%HOMEDRIVE%\\Windows\\SysWOW64\\*\\*",
-				"%HOMEDRIVE%\\Windows\\System32\\*\\*",
-				"%HOMEDRIVE%\\Program Files\\Amazon\\Ec2ConfigService\\Scripts\\*\\*"
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\Microsoft\\Outlook\\VbaProject.OTM"
 			],
-			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/PowerShellTranscripts.tkape"
+			"tags": ["persistence"]
 		},
 		"CertutilCache": {
 			"category": "Windows",
@@ -426,36 +347,6 @@
 			],
 			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/GroupPolicy.tkape",
 			"tags": ["sans_triage"]
-		},
-		"EventLogs": {
-			"category": "Windows",
-			"filter": [
-				"Security.evtx",
-				"Application.evtx",
-				"System.evtx",
-				"Microsoft-Windows-TaskScheduler%4Operational.evtx",
-				"Microsoft-Windows-PowerShell*.evtx",
-				"Microsoft-Windows-Shell-Core%4Operational.evtx",
-				"Microsoft-Windows-TerminalServices-*.evtx",
-				"Microsoft-Windows-RemoteDesktopServices-*.evtx",
-				"Microsoft-Windows-Windows Defender*.evtx",
-				"Microsoft-Windows-RemoteAssistance*",
-				"DNS Server.evtx",
-				"Microsoft-Windows-remoteapp*",
-				"Microsoft-Windows-Security-netlogon*",
-				"Microsoft-Windows-SMB*",
-				"Microsoft-Windows-WinRM*",
-				"OpenSSH*",
-				"Microsoft-Windows-WMI*",
-				"*SYSMON*"
-			],
-			"recursive": false,
-			"paths": [
-				"%HOMEDRIVE%\\Windows\\System32\\winevt\\logs\\*"
-			],
-			"tags": ["sans_triage", "event_logs"],
-			"type": "EventLogs",
-			"parser": "EvtxECmd"
 		},
 		"WinTimeline": {
 			"category": "Windows",

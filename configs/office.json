@@ -1,0 +1,63 @@
+{
+	"files": {
+		"OfficeDocumentCache": {
+			"category": "Office",
+			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Microsoft\\Office\\*\\OfficeFileCache\\*"
+			],
+			"tags": ["office"]
+		},
+		"OfficeDiagnostics": [
+			{
+			"category": "Office",
+			"filter": ["PCW.debugreport.xml"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Diagnostics\\*",
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\ElevatedDiagnostics\\*"
+			],
+			"shadow": true,
+			"tags": ["office"]
+			},
+			{
+			"category": "Office",
+			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\temp\\Diagnostics\\*"
+			],
+			"shadow": true,
+			"tags": ["office"]
+			}
+		],
+		"OfficeAutosaves": {
+			"category": "Office",
+			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\Microsoft\\Word\\*",
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\Microsoft\\Excel\\*",
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\Microsoft\\Powerpoint\\*",
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Roaming\\Microsoft\\Publisher\\*"
+			],
+			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/OfficeAutosave.tkape",
+			"tags": ["office"]
+		},
+		"OfficeBackstage": {
+			"category": "Office",
+			"filter": ["*"],
+			"recursive": true,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Microsoft\\Office\\*\\BackstageinAppNavCache\\*"
+			],
+			"reference": "https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/MicrosoftOfficeBackstage.tkape",
+			"tags": ["office"]
+		}
+    },
+	"commands": {
+	},
+	"registry": {
+	}
+}

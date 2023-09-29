@@ -112,6 +112,9 @@ param
 	[Parameter(Mandatory = $false, HelpMessage = 'Only use directives which have one or more of the specified tags.')]
 	[array]$tags = @("*"),
 
+	[Parameter(Mandatory = $false, HelpMessage = 'If specified, RetrievIR will hash all collected files via SHA256.')]
+	[switch]$hash,
+
 	[Parameter(Mandatory = $false, HelpMessage = 'Select specific directive-categories to run using comma-delimited arguments - only directives which are contained within the list will be executed.')]
 	[array]$categories = @("*")
 )
@@ -454,10 +457,48 @@ function Build-Registry-Script ($data) {
     # This script block will process all registry directives based on category/tag filters and output the results to a single JSON file, described at $registry_output
     # The script relies on a serialized version of the registry directives, category filter and tag filter to function correctly.
 
+    $directive_list = New-Object -TypeName 'System.Collections.ArrayList'
+    ForEach ($object in $data.registry) {
+        $obj_names = $object.psobject.Properties.Name
+        ForEach ($module in $obj_names){
+            ForEach ($objective in $object.$module){
+                $components = New-Object -TypeName 'System.Collections.ArrayList'
+                ForEach ($inner_objective in $objective){
+                    if ($categories[0] -eq '*') { } elseif ($inner_objective.category -in $categories) { } else {continue }
+                    if ($tags[0] -eq '*'){
+                    } elseif ($tags){
+                        if ($inner_objective.tags){
+                            $pass = $true
+                            ForEach ($t in $inner_objective.tags){
+                                if ($t -in $tags){
+                                    $pass = $false
+                                }
+                            }
+                        } else {
+                            continue
+                        }
+                        if ($pass){
+                            continue
+                        } else {
+                            $components.Add($inner_objective) | Out-Null
+                        }
+                    }
+                }
+                if ($components.Count -ne 0){
+                    $tmp = [pscustomobject]@{
+                        name = $module
+                        objects = $components
+                    }
+                    $directive_list.Add($tmp) | Out-Null
+                }
+            }
+        }
+    }
+
     $tmp_timestamp = (Get-Date).toString("HH:mm:ss") -replace (":","_")
     $script:registry_output = "C:\Windows\temp\retrievir_registry_output_$tmp_timestamp.json"
 
-    $Serialized_reg_data = [System.Management.Automation.PSSerializer]::Serialize($data.registry)
+    $Serialized_reg_data = [System.Management.Automation.PSSerializer]::Serialize($directive_list)
     $Bytes_reg_data = [System.Text.Encoding]::Unicode.GetBytes($Serialized_reg_data)
     $EncodedRegData = [Convert]::ToBase64String($Bytes_reg_data)
 
@@ -469,6 +510,8 @@ function Build-Registry-Script ($data) {
     $bytes_tags = [System.Text.Encoding]::Unicode.GetBytes($Serialized_tags)
     $encoded_tags = [Convert]::ToBase64String($bytes_tags)
 
+    # Old method - all detected directives sent over in file and iterated through at target - instead, we will only find relevant ones that match provides tags/categories and send those.
+    if ($blah){
     $script:read_registry_script = "
     `$Serialized = [System.Text.Encoding]::Unicode.GetString([System.Convert]::FromBase64String('$EncodedRegData'))
     `$directives  = [System.Management.Automation.PSSerializer]::Deserialize(`$Serialized)
@@ -586,6 +629,108 @@ function Build-Registry-Script ($data) {
     }
     `$primary_object | ConvertTo-Json -Depth 6 | Add-Content -Path `$output_path
     "
+    }
+
+    $script:read_registry_script = "
+    `$Serialized = [System.Text.Encoding]::Unicode.GetString([System.Convert]::FromBase64String('$EncodedRegData'))
+    `$directives  = [System.Management.Automation.PSSerializer]::Deserialize(`$Serialized)
+    `$Serialized_category = [System.Text.Encoding]::Unicode.GetString([System.Convert]::FromBase64String('$encoded_category'))
+    `$categories  = [System.Management.Automation.PSSerializer]::Deserialize(`$Serialized_category)
+    `$Serialized_tags = [System.Text.Encoding]::Unicode.GetString([System.Convert]::FromBase64String('$encoded_tags'))
+    `$tags  = [System.Management.Automation.PSSerializer]::Deserialize(`$Serialized_tags)
+    `$output_path = '$registry_output'
+    `$type_mapping = @{
+        3 = 'BINARY'
+        4 = 'DWORD'
+        2 = 'EXPAND_SZ'
+        7 = 'MULTI_SZ'
+        -1 = 'NONE'
+        11 = 'QWORD'
+        1 = 'SZ'
+        0 = 'UNKNOWN'
+    }
+    `$primary_object = New-Object -TypeName 'System.Collections.ArrayList'
+    ForEach (`$object in `$directives) {
+        `$module = `$object.name
+        `$primary_module_object = [PSCustomObject]@{
+            name = `$module
+            category = `$inner_objective.category
+            items = New-Object -TypeName 'System.Collections.ArrayList'
+        }
+        ForEach (`$inner_objective in `$object.objects){
+            `$recurse = `$inner_objective.recursive
+            `$category = `$inner_objective.category
+            `$paths = `$inner_objective.paths
+            `$key_filter = `$inner_objective.keys
+            `$data_list = New-Object -TypeName 'System.Collections.ArrayList'
+            ForEach (`$path in `$paths){
+                if (-not (Test-Path `"Registry::`$path`")){
+                    continue
+                }
+                `$data = `$null
+                if (`$recurse){
+                    `$data = Get-ChildItem -Path `"Registry::`$path`" -Recurse -ErrorAction SilentlyContinue
+                } else {
+                    `$data = Get-ChildItem -Path `"Registry::`$path`" -ErrorAction SilentlyContinue
+                }
+                `$current = `$null
+                `$current = Get-Item -Path `"Registry::`$path`" -ErrorAction SilentlyContinue
+                if (`$data){
+                    ForEach (`$1 in `$data){
+                        `$data_list.Add(`$1) | Out-Null
+                    }
+                }
+                if (`$current){
+                    ForEach (`$1 in `$current){
+                        `$data_list.Add(`$1) | Out-Null
+                    }
+                }
+                ForEach (`$item in `$data_list){
+                    `$key_object = [PSCustomObject]@{
+                        path = `$item.Name
+                        values = New-Object -TypeName 'System.Collections.ArrayList'
+                    }
+                    try{
+                        `$values = `$item.GetValueNames()
+                    } catch {
+                        `$values = @()
+                        `$new_value = @{
+                            name = 'ERROR RETRIEVING VALUES'
+                            value = 'ERROR RETRIEVING VALUES'
+                        }
+                        `$key_object.values.Add(`$new_value) | Out-Null
+                    }
+                    if (`$values.Count -eq 0 -and -not `$directive.store_empty){
+                        continue
+                    }
+                    ForEach (`$value in `$values){
+                        if (-not (`$key_filter -contains `$value) -and `$key_filter[0] -ne '*'){
+                            continue
+                        }
+                        try{
+                            `$new_value = @{
+                                name = `$value
+                                value = `$item.GetValue(`$value)
+                                type = `$type_mapping[[int]`$item.GetValueKind(`$value)]
+                            }
+                        } catch {
+                            `$new_value = @{
+                                name = `$value
+                                value = 'ERROR RETRIEVING VALUE'
+                                type = 'ERROR RETRIEVING TYPE'
+                            }
+                        }
+                        `$key_object.values.Add(`$new_value) | Out-Null
+                    }
+                    `$primary_module_object.items.Add(`$key_object) | Out-Null
+                }
+            }
+            `$primary_object.Add(`$primary_module_object) | Out-Null
+        }
+    }
+    `$primary_object | ConvertTo-Json -Depth 6 | Add-Content -Path `$output_path
+    "
+
 }
 
 function Get-Targets {
@@ -609,6 +754,19 @@ function Get-Targets {
             $target_list.Add($targets) | Out-Null
             return $target_list
         }
+    }
+}
+
+function Hash-File ($file){
+    if ($hash){
+        try {
+            $t = Get-FileHash -Path "$file" -Algorithm SHA256
+            return $t.Hash
+        } catch {
+            return "N/A"
+        }
+    } else {
+        return "N/A"
     }
 }
 
@@ -832,6 +990,7 @@ function Get-Files ($target, $current_evidence_dir, $root_replace) {
                                     $destination_file_path = $tmp_destination_name
                                 }
                                 if (Test-Path $destination_file_path){
+
                                     $tmp = [PSCustomObject]@{
                                         DirectiveName = $category
                                         Computer = $target
@@ -840,20 +999,25 @@ function Get-Files ($target, $current_evidence_dir, $root_replace) {
                                         Type = if($directive.type){$directive.type}else{'N/A'}
                                         Parser = if($directive.parser){$directive.parser}else{'N/A'}
                                         User = $username
+                                        Hash = Hash-File $destination_file_path
                                     }
                                     $script:file_copy_success_main.Add($tmp) | Out-Null
                                 }
                             } catch {}
                             ForEach ($failure in $FailedCopies){
-                                $tmp = [PSCustomObject]@{
-                                    DirectiveName = $category
-                                    Computer = $target
-                                    FileName = $file.FullName
-                                    Category = if($directive.category){$directive.category}else{'N/A'}
-                                    Type = if($directive.type){$directive.type}else{'N/A'}
-                                    Reason = $failure.Exception.GetType().FullName
+                                try {
+                                    $tmp = [PSCustomObject]@{
+                                        DirectiveName = $category
+                                        Computer = $target
+                                        FileName = $file.FullName
+                                        Category = if($directive.category){$directive.category}else{'N/A'}
+                                        Type = if($directive.type){$directive.type}else{'N/A'}
+                                        Reason = $failure.Exception.GetType().FullName
+                                    }
+                                    $script:file_copy_failures_main.Add($tmp) | Out-Null
+                                }catch {
+
                                 }
-                                $script:file_copy_failures_main.Add($tmp) | Out-Null
                                 if ($failure.Exception -is [UnauthorizedAccessException]){
                                     Log-Message "[!] [$target] Unauthorized Access Exception (Copying): $($failure.TargetObject)" $false "red"
                                 } elseif ($failure.Exception -is [ArgumentException]){
@@ -861,7 +1025,11 @@ function Get-Files ($target, $current_evidence_dir, $root_replace) {
                                 } elseif ($failure.Exception -is [System.IO.IOException]){
                                         Log-Message "[!] [$target] Unable to access in-use file (Copying): $($failure.TargetObject)" $false "red"
                                 } else {
-                                    Log-Message $failure.Exception.GetType().FullName $true "red"
+                                    try{
+                                        Log-Message $failure.Exception.GetType().FullName $true "red"
+                                    } catch {
+
+                                    }
                                 }
                             }
                         }
@@ -1019,6 +1187,8 @@ function Run-Commands ($target, $current_evidence_dir) {
                                 Category = $directive_data[$i.Name].Category
                                 Type =  $directive_data[$i.Name].Type
                                 Parser =  $directive_data[$i.Name].Parser
+                                User = "N/A"
+                                Hash = "N/A"
                             }
                             $script:file_copy_success_main.Add($tmp) | Out-Null
                         }
@@ -1160,9 +1330,10 @@ function Get-Registry ($target, $current_evidence_dir) {
     }
     $loops = 1
     # Defines how many loops we will wait for registry output
-    $max_loops = 20
+    $max_loops = 30
     # Defines how long we sleep between loops in seconds
-    $sleep_time = 10
+    $sleep_time = 20
+    $output_file = $registry_output -replace (":", "$")
     while ($true){
         try{
             $pid_exist = Check-PID-WMI $target $process_id
@@ -1172,7 +1343,6 @@ function Get-Registry ($target, $current_evidence_dir) {
                 $loops += 1
             } else {
                 Start-Sleep 5
-                $output_file = $registry_output -replace (":", "$")
                 Log-Message "[*] [$target] Retrieving Output File: \\$target\$output_file"
                 try {
                     if (Test-Path "\\$target\$output_file"){
@@ -1195,6 +1365,7 @@ function Get-Registry ($target, $current_evidence_dir) {
             if ($loops -gt $max_loops){
                 Log-Message "[!] [$target] Breaking to avoid infinite loop - target process still appears to be running (PID: $process_id)"
                 Log-Message "[*] [$target] Check For Output File: \\$target\$output_file"
+                break
             }
         } catch {
             Log-Message "[!] [$target] Fatal Error Processing Registry Retrieval!" $false "Red"

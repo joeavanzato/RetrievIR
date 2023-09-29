@@ -275,6 +275,15 @@
 				"%HOMEDRIVE%\\Users\\*\\AppData\\Local\\Microsoft\\Windows\\Notifications\\*"
 			]
 		},
+		"PowerShellProfiles": {
+			"category": "PowerShell",
+			"filter": ["*profile.ps1"],
+			"recursive": false,
+			"paths": [
+				"%HOMEDRIVE%\\Users\\*\\Documents\\WindowsPowerShell\\*",
+				"%HOMEDRIVE%\\Windows\\System32\\WindowsPowerShell\\v1.0\\*"
+			]
+		},
 		"PowerShell7Config": {
 			"category": "PowerShell",
 			"filter": ["powershell.config.json"],
@@ -725,6 +734,30 @@
 			"tags": ["sans_triage", "heavy"],
 			"type": "MFT",
 			"parser": "MFTECmd"
+		},
+		"TasksDetailed": {
+			"category": "Windows",
+			"command": "$ListOfTasks = (Get-ChildItem -File -Path \"C:\\Windows\\System32\\Tasks\" -Recurse).fullname;$ListOfTasks | foreach { $ModifiedTime = (gci -Path $_).LastWriteTimeUtc.toString('yyyy-MM-ddTHH:mm:ss');$xmlFile = [xml](get-content \"$_\");$Date = $xmlFile.ChildNodes.RegistrationInfo.Date;$Author = $xmlFile.ChildNodes.RegistrationInfo.Author;$Description = $xmlFile.ChildNodes.RegistrationInfo.Description ;$URI = $xmlFile.ChildNodes.RegistrationInfo.URI;$Principals = $xmlFile.ChildNodes.Principals.Principal.UserId;$LogonType = $xmlFile.ChildNodes.Principals.Principal.LogonType;$Enabled = $xmlFile.ChildNodes.Settings.Enabled;$Action = $xmlFile.ChildNodes.Actions.Exec.Command;$Arguments = $xmlFile.ChildNodes.Actions.Exec.Arguments;$ComHandler_ClassID = $xmlFile.ChildNodes.Actions.ComHandler.ClassId; $ComHandler_Data = [string]$xmlFile.ChildNodes.Actions.ComHandler.Data.'#cdata-section';$xmlFile.ChildNodes[1] |ForEach-Object { [PSCustomObject]@{TaskFile_LastModifiedTime = $ModifiedTime;Registration_Date = $Date;Author = $Author ;  Description = $Description ; Task_Name = $URI ;  Principals_UserContext = $Principals;  LogonType = $LogonType  ; Enabled = $Enabled   ; Action_Arguments = $Action + ' ' + $Arguments;ComHandler_ClassID = $ComHandler_ClassID; ComHandler_Data = $ComHandler_Data; } } } 2> $NULL | Export-Csv -Path #FILEPATH# -NoTypeInformation",
+			"output": "ScheduledTasksDetailed.csv",
+			"tags": ["sans_triage", "light", "tasks"],
+			"type": "Tasks",
+			"parser": "CSVOutputCollector"
+		},
+		"SMBOpenFile": {
+			"category": "Windows",
+			"command": "Get-SMBOpenFile | Select FileId, SessionId, Path, ShareRelativePath, ClientComputerName, ClientUsername | Export-Csv -Path #FILEPATH# -NoTypeInformation",
+			"output": "SMBOpenFile.csv",
+			"tags": ["sans_triage", "light"],
+			"type": "SMB",
+			"parser": "CSVOutputCollector"
+		},
+		"SMBSession": {
+			"category": "Windows",
+			"command": "Get-SMBSession | Select SessionId, ClientComputerName, ClientUserName, NumOpens | Export-Csv -Path #FILEPATH# -NoTypeInformation",
+			"output": "SMBSession.csv",
+			"tags": ["sans_triage", "light"],
+			"type": "SMB",
+			"parser": "CSVOutputCollector"
 		}
 	},
 	"registry": {

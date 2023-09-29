@@ -363,7 +363,7 @@ function Parse-Downloads-Table ($target, $user, $dbConnection, $downloads_table_
 
 function Main {
     $targets = Get-ChildItem $base_evidence_dir | Where { $_.PSIsContainer }
-    Write-Host "[+] Parsing Chrome User Data..."
+    Write-Host "[+] Parsing Additional Browser Meta Data..."
     Write-Host "[+] Found $($targets.Count) Targets..."
     ForEach ($target in $targets){
         Write-Host "[+] Processing: $target"

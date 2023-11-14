@@ -18,6 +18,7 @@
 				"Microsoft-Windows-Security-netlogon*",
 				"Microsoft-Windows-SMB*",
 				"Microsoft-Windows-WinRM*",
+				"Windows Powershell.evtx",
 				"OpenSSH*",
 				"Microsoft-Windows-WMI*",
 				"*SYSMON*"

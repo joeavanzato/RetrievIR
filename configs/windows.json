@@ -620,7 +620,7 @@
 		},
 		"$MFT": {
 			"category": "Windows",
-			"command": "file:configs\\Export-MFT.ps1",
+			"command": "file:#CONFIGS#\\Export-MFT.ps1",
 			"output": "MFT",
 			"tags": ["sans_triage", "heavy"],
 			"type": "MFT",

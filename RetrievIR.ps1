@@ -1123,7 +1123,8 @@ function Run-Commands ($target, $current_evidence_dir) {
             if ($item.$category.command.StartsWith("file:")){
                 $splits = $item.$category.command -split ":"
                 try {
-                    $cmd = Get-Content -Raw -Path $splits[1]
+                    $filepath = $splits[1].Replace("#CONFIGS#", $config)
+                    $cmd = Get-Content -Raw -Path $filepath
                     $command_final += $cmd -Replace ("#FILEPATH#", $tmp_name)
                 } catch {
                     continue
